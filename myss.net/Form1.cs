@@ -25,23 +25,65 @@ namespace myss.net
             InitializeComponent();
         }
 
-        private void Import(Stream stream)
+        private void Import(Stream stream, bool isJson = true)
         {
             var reader = new StreamReader(stream);
-            var json = new JsonTextReader(reader);
-            var ser = new JsonSerializer();
-            var obj = ser.Deserialize(json, typeof(List<ss>));
-            List<ss> ssList = obj as List<ss>;
 
-            itemList = ssList.ConvertAll(s =>
+            if (isJson)
             {
-                var item = new listItem();
-                item.item = s;
-                item.speed = 0;
-                item.config = null;
-                //item.config = Helper.GetConfigurationInformation("https://shadowsocks.net/media/" + s.qr);
-                return item;
-            });
+                var json = new JsonTextReader(reader);
+                var ser = new JsonSerializer();
+                var obj = ser.Deserialize(json, typeof(List<ss>));
+                List<ss> ssList = obj as List<ss>;
+
+                itemList = ssList.ConvertAll(s =>
+                {
+                    var item = new listItem();
+                    item.item = s;
+                    item.speed = 0;
+                    item.config = null;
+                    //item.config = Helper.GetConfigurationInformation("https://shadowsocks.net/media/" + s.qr);
+                    return item;
+                });
+            }
+            else
+            {
+                itemList.Clear();
+                var id = 0;
+                while (reader.Peek() > 0)
+                {
+                    var line = reader.ReadLine().Trim();
+
+                    if (String.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    if (line.StartsWith("#"))
+                        continue;
+
+                    try 
+                    {
+                        var cfg = line.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                        var item = new listItem();
+                        item.config = new NameValueCollection();
+                        item.config.Add("Server", cfg[0]);
+                        item.config.Add("Port", cfg[1]);
+                        item.config.Add("Password", cfg[2]);
+                        item.config.Add("EncryptionMethod", cfg[3]);
+                        item.item.id = ++id;
+                        item.item.online = 1;
+                        item.item.name = item.config["Server"];
+                        item.item.country = item.config["Port"];
+
+                        itemList.Add(item);
+                    }
+                    catch 
+                    {
+                        ;
+                    }
+
+                }
+            }
 
             listBox1.Items.Clear();
             itemList.ForEach(i =>
@@ -180,28 +222,22 @@ namespace myss.net
             if (result != DialogResult.OK)
                 return;
 
-            Import(openFileDialog1.OpenFile());
+            var cursor = Cursor;
+            Cursor = Cursors.WaitCursor;
+
+            Import(openFileDialog1.OpenFile(), false);
+
+            Cursor = cursor;
         }
 
         private void importUrlToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = new Form();
-            var txtbox = new TextBox();
-            var btn = new Button();
-            btn.Width = 50;
-            btn.Height = 20;
-            btn.Text = "OK";
-            txtbox.Width = 400;
-            form.Height = 100;
-            form.Width = 500;
-            form.Text = "Input Url";
-            form.MinimizeBox = false;
-            form.MaximizeBox = false;
-            form.FormBorderStyle = FormBorderStyle.FixedDialog;
-            form.Controls.Add(txtbox);
-            form.Controls.Add(btn);
-            form.ShowDialog();
+            var cursor = Cursor;
+            Cursor = Cursors.WaitCursor;
 
+            ImportUrl("https://shadowsocks.net/api");
+
+            Cursor = cursor;
         }
     }
 

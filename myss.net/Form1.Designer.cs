@@ -44,18 +44,20 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(51, 17);
+            this.textBox1.Location = new System.Drawing.Point(38, 14);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(46, 25);
+            this.textBox1.Size = new System.Drawing.Size(36, 21);
             this.textBox1.TabIndex = 0;
             this.textBox1.Text = "1080";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 20);
+            this.label1.Location = new System.Drawing.Point(7, 16);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 15);
+            this.label1.Size = new System.Drawing.Size(29, 12);
             this.label1.TabIndex = 1;
             this.label1.Text = "Port";
             // 
@@ -63,10 +65,11 @@
             // 
             this.listBox1.ContextMenuStrip = this.contextMenuStrip1;
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 15;
-            this.listBox1.Location = new System.Drawing.Point(7, 61);
+            this.listBox1.ItemHeight = 12;
+            this.listBox1.Location = new System.Drawing.Point(5, 49);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(2);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(397, 304);
+            this.listBox1.Size = new System.Drawing.Size(299, 244);
             this.listBox1.TabIndex = 2;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -76,27 +79,28 @@
             this.importFileToolStripMenuItem,
             this.importUrlToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(170, 52);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(257, 48);
             // 
             // importFileToolStripMenuItem
             // 
             this.importFileToolStripMenuItem.Name = "importFileToolStripMenuItem";
-            this.importFileToolStripMenuItem.Size = new System.Drawing.Size(169, 24);
+            this.importFileToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
             this.importFileToolStripMenuItem.Text = "Import File...";
             this.importFileToolStripMenuItem.Click += new System.EventHandler(this.importFileToolStripMenuItem_Click);
             // 
             // importUrlToolStripMenuItem
             // 
             this.importUrlToolStripMenuItem.Name = "importUrlToolStripMenuItem";
-            this.importUrlToolStripMenuItem.Size = new System.Drawing.Size(169, 24);
-            this.importUrlToolStripMenuItem.Text = "Import Url...";
+            this.importUrlToolStripMenuItem.Size = new System.Drawing.Size(256, 22);
+            this.importUrlToolStripMenuItem.Text = "Import from ShadowSocks.Net";
             this.importUrlToolStripMenuItem.Click += new System.EventHandler(this.importUrlToolStripMenuItem_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(334, 17);
+            this.button1.Location = new System.Drawing.Point(250, 14);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(70, 23);
+            this.button1.Size = new System.Drawing.Size(52, 18);
             this.button1.TabIndex = 3;
             this.button1.Text = "GO";
             this.button1.UseVisualStyleBackColor = true;
@@ -104,9 +108,10 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(253, 17);
+            this.button2.Location = new System.Drawing.Point(190, 14);
+            this.button2.Margin = new System.Windows.Forms.Padding(2);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(70, 23);
+            this.button2.Size = new System.Drawing.Size(52, 18);
             this.button2.TabIndex = 4;
             this.button2.Text = "Test";
             this.button2.UseVisualStyleBackColor = true;
@@ -115,22 +120,23 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 380);
+            this.label2.Location = new System.Drawing.Point(7, 304);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(0, 15);
+            this.label2.Size = new System.Drawing.Size(0, 12);
             this.label2.TabIndex = 5;
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.DefaultExt = "json";
-            this.openFileDialog1.Filter = "json|*.json";
+            this.openFileDialog1.DefaultExt = "txt";
+            this.openFileDialog1.Filter = "Text|*.txt";
             this.openFileDialog1.ReadOnlyChecked = true;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(411, 408);
+            this.ClientSize = new System.Drawing.Size(308, 326);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -138,6 +144,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
