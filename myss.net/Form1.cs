@@ -187,9 +187,21 @@ namespace myss.net
         {
             var form = new Form();
             var txtbox = new TextBox();
-            txtbox.Width = 100;
+            var btn = new Button();
+            btn.Width = 50;
+            btn.Height = 20;
+            btn.Text = "OK";
+            txtbox.Width = 400;
+            form.Height = 100;
+            form.Width = 500;
+            form.Text = "Input Url";
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
             form.Controls.Add(txtbox);
+            form.Controls.Add(btn);
             form.ShowDialog();
+
         }
     }
 
