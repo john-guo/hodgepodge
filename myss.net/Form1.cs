@@ -72,8 +72,15 @@ namespace myss.net
                         item.config.Add("EncryptionMethod", cfg[3]);
                         item.item.id = ++id;
                         item.item.online = 1;
+
                         item.item.name = item.config["Server"];
                         item.item.country = item.config["Port"];
+                        if (cfg.Length > 4)
+                        {
+                            item.item.name = cfg[4];
+                            item.item.country = item.config["Server"];
+                        }
+
 
                         itemList.Add(item);
                     }
@@ -189,7 +196,14 @@ namespace myss.net
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Helper.Port = int.Parse(textBox1.Text);
+            try
+            {
+                Helper.Port = int.Parse(textBox1.Text);
+            }
+            catch
+            {
+                textBox1.Text = Helper.Port.ToString();
+            }
 
             var item = listBox1.SelectedItem as listItem;
             if (item != null)
