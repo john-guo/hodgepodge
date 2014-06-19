@@ -28,12 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.importFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importUrlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox1
@@ -55,6 +61,7 @@
             // 
             // listBox1
             // 
+            this.listBox1.ContextMenuStrip = this.contextMenuStrip1;
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 15;
             this.listBox1.Location = new System.Drawing.Point(7, 61);
@@ -62,6 +69,28 @@
             this.listBox1.Size = new System.Drawing.Size(397, 304);
             this.listBox1.TabIndex = 2;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importFileToolStripMenuItem,
+            this.importUrlToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(170, 52);
+            // 
+            // importFileToolStripMenuItem
+            // 
+            this.importFileToolStripMenuItem.Name = "importFileToolStripMenuItem";
+            this.importFileToolStripMenuItem.Size = new System.Drawing.Size(169, 24);
+            this.importFileToolStripMenuItem.Text = "Import File...";
+            this.importFileToolStripMenuItem.Click += new System.EventHandler(this.importFileToolStripMenuItem_Click);
+            // 
+            // importUrlToolStripMenuItem
+            // 
+            this.importUrlToolStripMenuItem.Name = "importUrlToolStripMenuItem";
+            this.importUrlToolStripMenuItem.Size = new System.Drawing.Size(169, 24);
+            this.importUrlToolStripMenuItem.Text = "Import Url...";
+            this.importUrlToolStripMenuItem.Click += new System.EventHandler(this.importUrlToolStripMenuItem_Click);
             // 
             // button1
             // 
@@ -91,6 +120,12 @@
             this.label2.Size = new System.Drawing.Size(0, 15);
             this.label2.TabIndex = 5;
             // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.DefaultExt = "json";
+            this.openFileDialog1.Filter = "json|*.json";
+            this.openFileDialog1.ReadOnlyChecked = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -109,6 +144,7 @@
             this.Text = "MySS.Net";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -122,6 +158,10 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem importFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importUrlToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }
 

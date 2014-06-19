@@ -25,10 +25,8 @@ namespace myss.net
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Import(Stream stream)
         {
-            var req = WebRequest.CreateHttp("https://shadowsocks.net/api");
-            var stream = req.GetResponse().GetResponseStream();
             var reader = new StreamReader(stream);
             var json = new JsonTextReader(reader);
             var ser = new JsonSerializer();
@@ -45,14 +43,30 @@ namespace myss.net
                 return item;
             });
 
-            itemList.ForEach(i => {
+            listBox1.Items.Clear();
+            itemList.ForEach(i =>
+            {
                 if (i.item.online != 1)
                     return;
                 listBox1.Items.Add(i);
             });
         }
 
-        async private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void ImportUrl(string url)
+        {
+            var req = WebRequest.CreateHttp(url);
+            var stream = req.GetResponse().GetResponseStream();
+
+            Import(stream);
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            openFileDialog1.InitialDirectory = Application.StartupPath;
+
+            ImportUrl("https://shadowsocks.net/api");
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             var item = listBox1.SelectedItem as listItem;
             if (item != null && item.config == null)
@@ -158,6 +172,24 @@ namespace myss.net
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             Helper.StopProxy();
+        }
+
+        private void importFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var result = openFileDialog1.ShowDialog();
+            if (result != DialogResult.OK)
+                return;
+
+            Import(openFileDialog1.OpenFile());
+        }
+
+        private void importUrlToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new Form();
+            var txtbox = new TextBox();
+            txtbox.Width = 100;
+            form.Controls.Add(txtbox);
+            form.ShowDialog();
         }
     }
 
