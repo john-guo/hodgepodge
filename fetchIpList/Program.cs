@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Diagnostics;
 using System.Net;
 using System.IO;
+using System.Net.Cache;
 
 namespace fetchIpList
 {
@@ -25,16 +26,16 @@ namespace fetchIpList
 
         static void Main(string[] args)
         {
-            if (args.Length < 1)
-            {
-                Console.WriteLine("usage: fetchIpList url");
-                return;
-            }
+            //if (args.Length < 1)
+            //{
+            //    Console.WriteLine("usage: fetchIpList url");
+            //    return;
+            //}
 
-            var url = args[0];
-            //var url = "https://raw.githubusercontent.com/justjavac/Google-IPs/master/README.md";
+            //var url = args[0];
+            var url = "https://raw.githubusercontent.com/justjavac/Google-IPs/master/README.md";
 
-            run(url, false).Wait();
+            run(url).Wait();
 
 #if DEBUG
             Console.ReadLine();
@@ -44,7 +45,7 @@ namespace fetchIpList
         async static Task run(string url, bool isUrl = true)
         {
             var app = new Program();
-            var ipList = isUrl ? app.getIpListFromUrl(url) : app.getIpListFromFile(url);
+            var ipList = (isUrl ? app.getIpListFromUrl(url) : app.getIpListFromFile(url)).ToList();
 
             var total = ipList.Count();
             var offset = 0;
@@ -95,6 +96,10 @@ namespace fetchIpList
             foreach (var ip in list)
             {
                 var r = await testIp(ip);
+
+                if (r.timeout == long.MaxValue)
+                    continue;
+
                 rlist.Add(r);
             }
 
@@ -137,14 +142,26 @@ namespace fetchIpList
 
         async Task<Result> testIp(string ip)
         {
-            var client = new TcpClient();
+            var client = WebRequest.CreateHttp(String.Format("https://{0}", ip));
+            //client.Timeout = 10000;
+            client.Method = "HEAD";
+            client.AllowAutoRedirect = false;
+            client.KeepAlive = false;
+            client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
+
             var result = new Result();
             result.ip = ip;
             try
             {
                 var watch = Stopwatch.StartNew();
-                await client.ConnectAsync(ip, port);
+                var response = (HttpWebResponse)await client.GetResponseAsync();
                 watch.Stop();
+
+                if (response.Server != "gws")
+                {
+                    throw new NotSupportedException();
+                }
+
                 result.timeout = watch.ElapsedMilliseconds;
             }
             catch
@@ -153,7 +170,8 @@ namespace fetchIpList
             }
 
 #if DEBUG
-            Console.WriteLine("{0} {1}", result.ip, result.timeout);
+            if (result.timeout != long.MaxValue)
+                Console.WriteLine("{0} {1}", result.ip, result.timeout);
 #endif
             return result;
         }
