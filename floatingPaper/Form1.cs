@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -12,8 +13,12 @@ namespace floatingPaper
 {
     public partial class Form1 : Form
     {
+        List<Form> forms;
+        static int index = 0;
+
         public Form1()
         {
+            forms = new List<Form>();
             InitializeComponent();
         }
 
@@ -21,6 +26,7 @@ namespace floatingPaper
         {
             var img = generateImage(ClientRectangle.Width, 60);
             var form = newFloatingForm(ClientRectangle.Width, 60, (Bitmap)img);
+            forms.Add(form);
             form.Show();
         }
 
@@ -77,6 +83,7 @@ namespace floatingPaper
         private Form newFloatingForm(int w, int h, Bitmap img)
         {
             var form = new Form();
+            form.Name = String.Format("{0}", index++);
             form.ControlBox = false;
             form.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             form.Width = w;
@@ -90,14 +97,11 @@ namespace floatingPaper
             form.MouseUp += form_MouseUp;
             form.MouseMove += form_MouseMove;
             form.MouseDoubleClick += form_MouseDoubleClick;
+            form.MouseWheel += form_MouseWheel;
             form.Tag = null;
             form.AllowTransparency = true;
 
             return form;
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
         }
 
         class DragObj
@@ -109,6 +113,17 @@ namespace floatingPaper
             {
                 resize = false;
             }
+        }
+
+        void form_MouseWheel(object sender, MouseEventArgs e)
+        {
+            var form = sender as Form;
+            if (e.Delta > 0)
+                form.Opacity += 0.05;
+            if (e.Delta < 0) 
+                form.Opacity -= 0.05;
+            if (form.Opacity < 0.2)
+                form.Opacity = 0.2;
         }
 
         void form_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -235,7 +250,275 @@ namespace floatingPaper
                 }//for x 
             }//for y 
             return rgn;
-        }   
+        }
 
+        private void LoadForms()
+        {
+            var section = ConfigurationManager.GetSection("floatingForms") as FloatingFormsSection;
+            if (section == null)
+                return;
+
+            foreach (var f in section.Forms)
+            {
+                if (String.IsNullOrWhiteSpace(f.Name))
+                    continue;
+
+                var img = generateImage(f.Width, f.Height);
+                var form = newFloatingForm(f.Width, f.Height, (Bitmap)img);
+                form.BackColor = f.Lock ? Color.LightYellow : Color.White;
+                form.Opacity = f.Opacity;
+                form.Left = f.X;
+                form.Top = f.Y;
+                forms.Add(form);
+                form.Show();
+            }
+        }
+
+        private void SaveForms()
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var section = new FloatingFormsSection();
+            foreach (var f in forms)
+            {
+                var form = new FloatingFormElement()
+                {
+                    Name = f.Name,
+                    X = f.Left,
+                    Y = f.Top,
+                    Width = f.Width,
+                    Height = f.Height,
+                    Opacity = f.Opacity,
+                    Lock = f.BackColor != Color.White
+                };
+
+                section.Forms.Add(form);
+            }
+
+            if (config.Sections["floatingForms"] != null)
+                config.Sections.Remove("floatingForms");
+
+            config.Sections.Add("floatingForms", section);
+            section.SectionInformation.ForceSave = true;
+            config.Save();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            LoadForms();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveForms();
+        }   
+    }
+
+    class FloatingFormsSection : ConfigurationSection
+    {
+        [ConfigurationProperty("forms", IsDefaultCollection = true)]
+        [ConfigurationCollection(typeof(FloatingFormCollection), 
+            AddItemName = "addForm", 
+            ClearItemsName = "clearForms",
+            RemoveItemName = "removeForm")]
+        public FloatingFormCollection Forms
+        {
+            get
+            {
+                return this["forms"] as FloatingFormCollection;
+            }
+        }
+    }
+
+    class FloatingFormCollection : ConfigurationElementCollection, IList<FloatingFormElement>
+    {
+        public FloatingFormCollection()
+        {
+            FloatingFormElement element = (FloatingFormElement)CreateNewElement();
+            Add(element);
+        }
+
+        public override ConfigurationElementCollectionType CollectionType
+        {
+            get
+            {
+                return ConfigurationElementCollectionType.AddRemoveClearMap;
+            }
+        }
+
+        protected override ConfigurationElement CreateNewElement()
+        {
+            return new FloatingFormElement();
+        }
+
+        protected override object GetElementKey(ConfigurationElement element)
+        {
+            return ((FloatingFormElement)element).Name;
+        }
+
+        protected override string ElementName
+        {
+            get
+            {
+                return "form";
+            }
+        }
+
+        public void Add(FloatingFormElement element)
+        {
+            BaseAdd(element, true);
+        }
+
+        public void Clear()
+        {
+            BaseClear();
+        }
+
+        public bool Contains(FloatingFormElement element)
+        {
+            return !(BaseIndexOf(element) < 0);
+        }
+
+        public void CopyTo(FloatingFormElement[] array, int index)
+        {
+            base.CopyTo(array, index);
+        }
+
+        public bool Remove(FloatingFormElement element)
+        {
+            BaseRemove(GetElementKey(element));
+            return true;
+        }
+
+        bool ICollection<FloatingFormElement>.IsReadOnly
+        {
+            get { return IsReadOnly(); }
+        }
+
+        public int IndexOf(FloatingFormElement element)
+        {
+            return BaseIndexOf(element);
+        }
+
+        public void Insert(int index, FloatingFormElement element)
+        {
+            BaseAdd(index, element);
+        }
+
+        public void RemoveAt(int index)
+        {
+            BaseRemoveAt(index);
+        }
+
+        public FloatingFormElement this[int index]
+        {
+            get
+            {
+                return (FloatingFormElement)BaseGet(index);
+            }
+            set
+            {
+                if (BaseGet(index) != null)
+                {
+                    BaseRemoveAt(index);
+                }
+                BaseAdd(index, value);
+            }
+        }
+
+        public new IEnumerator<FloatingFormElement> GetEnumerator()
+        {
+            return this.OfType<FloatingFormElement>().GetEnumerator();
+        }
+    }
+
+    class FloatingFormElement : ConfigurationElement
+    {
+        public FloatingFormElement() { }
+
+
+        [ConfigurationProperty("name", IsKey = true, IsRequired = true)]
+        public string Name
+        {
+            get
+            {
+                return (string)this["name"];
+            }
+            set
+            {
+                this["name"] = value;
+            }
+        }
+        [ConfigurationProperty("isLock", IsRequired = true)]
+        public bool Lock
+        {
+            get
+            {
+                return (bool)this["isLock"];
+            }
+            set
+            {
+                this["isLock"] = value;
+            }
+        }
+        [ConfigurationProperty("x", IsRequired = true)]
+        public int X
+        {
+            get
+            {
+                return (int)this["x"];
+            }
+            set
+            {
+                this["x"] = value;
+            }
+        }
+        [ConfigurationProperty("y", IsRequired = true)]
+        public int Y
+        {
+            get
+            {
+                return (int)this["y"];
+            }
+            set
+            {
+                this["y"] = value;
+            }
+        }
+        [ConfigurationProperty("width", IsRequired = true)]
+        public int Width
+        {
+            get
+            {
+                return (int)this["width"];
+            }
+            set
+            {
+                this["width"] = value;
+            }
+        }
+        [ConfigurationProperty("height", IsRequired = true)]
+        public int Height
+        {
+            get
+            {
+                return (int)this["height"];
+            }
+            set
+            {
+                this["height"] = value;
+            }
+        }
+        [ConfigurationProperty("opacity", IsRequired = true)]
+        public double Opacity
+        {
+            get
+            {
+                return (double)this["opacity"];
+            }
+            set
+            {
+                this["opacity"] = value;
+            }
+        }
     }
 }
