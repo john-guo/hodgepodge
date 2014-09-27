@@ -46,7 +46,7 @@ namespace floatingPaper
             keys[KEYCLEAR] = id;
 
             id = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
-            result = RegisterHotKey(this.Handle, id, (uint)(KeyModifiers.Alt), (uint)Keys.Scroll);
+            result = RegisterHotKey(this.Handle, id, (uint)(KeyModifiers.Alt), (uint)Keys.NumLock);
             if (!result)
                 throw new Exception();
 
