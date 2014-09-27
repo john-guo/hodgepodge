@@ -5,7 +5,9 @@ using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,10 +18,72 @@ namespace floatingPaper
         List<Form> forms;
         static int index = 0;
 
+        [DllImport("user32", SetLastError = true)]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32", SetLastError = true)]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        private static Dictionary<int, int> keys = new Dictionary<int, int>();
+        private const int KEYCLEAR = 1;
+        private const int KEYUNLOCK = 2;
+
+
         public Form1()
         {
             forms = new List<Form>();
             InitializeComponent();
+        }
+
+
+        private void RegisterHotkeys()
+        {
+            var id = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
+            var result = RegisterHotKey(this.Handle, id, (uint)KeyModifiers.Alt, (uint)Keys.Pause);
+            if (!result)
+                throw new Exception();
+
+            keys[KEYCLEAR] = id;
+
+            id = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
+            result = RegisterHotKey(this.Handle, id, (uint)(KeyModifiers.Shift | KeyModifiers.Alt), (uint)Keys.Pause);
+            if (!result)
+                throw new Exception();
+
+            keys[KEYUNLOCK] = id;
+        }
+
+        private void UnregisterHotkeys()
+        {
+            UnregisterHotKey(this.Handle, keys[KEYCLEAR]);
+            UnregisterHotKey(this.Handle, keys[KEYUNLOCK]);
+        }
+
+        private void ProcessHotkey(int keyId) //按下设定的键时调用该函数
+        {
+            if (keys[KEYCLEAR] == keyId)
+            {
+                forms.ForEach(f => f.Visible = !f.Visible);
+            }
+            else if (keys[KEYUNLOCK] == keyId)
+            {
+                forms.ForEach(f => {
+                    var uf = (UntouchableForm)f;
+                    uf.Lock = !uf.Lock;
+                });
+            }
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_HOTKEY = 0x0312;//如果m.Msg的值为0x0312那么表示用户按下了热键
+            switch (m.Msg)
+            {
+                case WM_HOTKEY:
+                    ProcessHotkey((int)m.WParam);//按下热键时调用ProcessHotkey()函数
+                    break;
+            }
+            base.WndProc(ref m); //将系统消息传递自父类的WndProc
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -38,12 +102,12 @@ namespace floatingPaper
 
             var img = new Bitmap(w, h);
             var brush = new SolidBrush(Color.White);
-            var pen = new Pen(brush, 2);
+            var pen = new Pen(brush, 1);
             using (var g = Graphics.FromImage(img))
             {
                 var y = h / 2;
 
-                g.DrawLine(pen, margin, y, w - margin, y);
+                //g.DrawLine(pen, margin, y, w - margin, y);
                 for (var i = 0; i <= 100; ++i)
                 {
                     var x = margin + width * i / 100;
@@ -53,13 +117,13 @@ namespace floatingPaper
                     if (i % 10 == 0)
                     {
                         y1 -= 10;
-                        pen.Width = 3;
+                        //pen.Width = 3;
                         text = true;
                     }
                     else if (i % 5 == 0)
                     {
                         y1 -= 5;
-                        pen.Width = 2;
+                        //pen.Width = 2;
                         text = true;
                     }
 
@@ -80,9 +144,9 @@ namespace floatingPaper
             return img;
         }
 
-        private Form newFloatingForm(int w, int h, Bitmap img)
+        private Form newFloatingForm(int w, int h, Bitmap img, bool islock = false)
         {
-            var form = new Form();
+            var form = new UntouchableForm();
             form.Name = String.Format("{0}", index++);
             form.ControlBox = false;
             form.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -92,16 +156,93 @@ namespace floatingPaper
             var tran = Color.FromArgb(0);
             img.MakeTransparent(tran);
             form.Region = bmprgn(img, tran);
-            form.BackColor = Color.White;
             form.MouseDown += form_MouseDown;
             form.MouseUp += form_MouseUp;
             form.MouseMove += form_MouseMove;
             form.MouseDoubleClick += form_MouseDoubleClick;
             form.MouseWheel += form_MouseWheel;
+            form.KeyDown += form_KeyDown;
+            form.KeyUp += form_KeyUp;
             form.Tag = null;
             form.AllowTransparency = true;
+            form.StartPosition = FormStartPosition.Manual;
+            form.Lock = islock;
+            form.ShowInTaskbar = false;
 
             return form;
+        }
+
+        void form_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+
+            var form = sender as UntouchableForm;
+            if (form.Lock)
+                return;
+
+            if (!e.Shift)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.Up:
+                        form.Top--;
+                        break;
+                    case Keys.Down:
+                        form.Top++;
+                        break;
+                    case Keys.Left:
+                        form.Left--;
+                        break;
+                    case Keys.Right:
+                        form.Left++;
+                        break;
+                    default:
+                        return;
+                }
+            }
+            else
+            {
+                if (form.BackColor != SystemColors.ControlDarkDark)
+                {
+                    form.Region = null;
+                    if (form.Opacity >= 1)
+                        form.Opacity = 0.8;
+                    form.BackColor = SystemColors.ControlDarkDark;
+                    form.BackgroundImage = generateImage(form.Width, form.Height);
+                }
+                switch (e.KeyCode)
+                {
+                    case Keys.Left:
+                        form.Width--;
+                        break;
+                    case Keys.Right:
+                        form.Width++;
+                        break;
+                    default:
+                        return;
+                }
+                form.BackgroundImage = generateImage(form.Width, form.Height);
+            }
+        }
+
+        void form_KeyUp(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+
+            var form = sender as UntouchableForm;
+            if (form.Lock)
+                return;
+
+            if (e.Shift || e.KeyCode == Keys.ShiftKey)
+            {
+                var img = (Bitmap)form.BackgroundImage;
+                if (img == null) return;
+                form.BackColor = Color.White;
+                var tran = Color.FromArgb(0);
+                img.MakeTransparent(tran);
+                form.Region = bmprgn(img, tran);
+                form.BackgroundImage = null;
+            }
         }
 
         class DragObj
@@ -122,23 +263,20 @@ namespace floatingPaper
                 form.Opacity += 0.05;
             if (e.Delta < 0) 
                 form.Opacity -= 0.05;
-            if (form.Opacity < 0.2)
-                form.Opacity = 0.2;
+            if (form.Opacity < 0.1)
+                form.Opacity = 0.1;
         }
 
         void form_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            var form = sender as Form;
-            if (form.BackColor == Color.White)
-                form.BackColor = Color.LightYellow;
-            else
-                form.BackColor = Color.White;
+            var form = sender as UntouchableForm;
+            form.Lock = !form.Lock;
         }
 
         void form_MouseMove(object sender, MouseEventArgs e)
         {
-            var form = sender as Form;
-            if (form.BackColor == Color.LightYellow)
+            var form = sender as UntouchableForm;
+            if (form.Lock)
                 return;
 
             var d = form.Tag as DragObj;
@@ -170,8 +308,8 @@ namespace floatingPaper
 
         void form_MouseUp(object sender, MouseEventArgs e)
         {
-            var form = sender as Form;
-            if (form.BackColor == Color.LightYellow)
+            var form = sender as UntouchableForm;
+            if (form.Lock)
                 return;
 
             var d = form.Tag as DragObj;
@@ -182,7 +320,6 @@ namespace floatingPaper
             if (d.resize)
             {
                 form.BackColor = Color.White;
-                form.Opacity = 1;
                 var tran = Color.FromArgb(0);
                 var img = (Bitmap)form.BackgroundImage;
                 img.MakeTransparent(tran);
@@ -193,8 +330,8 @@ namespace floatingPaper
 
         void form_MouseDown(object sender, MouseEventArgs e)
         {
-            var form = sender as Form;
-            if (form.BackColor == Color.LightYellow)
+            var form = sender as UntouchableForm;
+            if (form.Lock)
                 return;
 
             var d = new DragObj();
@@ -203,8 +340,9 @@ namespace floatingPaper
             if (form.Cursor == Cursors.SizeWE) 
             {
                 form.Region = null;
-                form.Opacity = 0.8;
-                form.BackColor = SystemColors.Control;
+                if (form.Opacity >= 1)
+                    form.Opacity = 0.8;
+                form.BackColor = SystemColors.ControlDarkDark;
                 form.BackgroundImage = generateImage(form.Width, form.Height);
                 d.resize = true;
             }
@@ -265,12 +403,12 @@ namespace floatingPaper
 
                 var img = generateImage(f.Width, f.Height);
                 var form = newFloatingForm(f.Width, f.Height, (Bitmap)img);
-                form.BackColor = f.Lock ? Color.LightYellow : Color.White;
                 form.Opacity = f.Opacity;
                 form.Left = f.X;
                 form.Top = f.Y;
                 forms.Add(form);
                 form.Show();
+                (form as UntouchableForm).Lock = true;
             }
         }
 
@@ -278,7 +416,7 @@ namespace floatingPaper
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var section = new FloatingFormsSection();
-            foreach (var f in forms)
+            foreach (var f in forms.OfType<UntouchableForm>())
             {
                 var form = new FloatingFormElement()
                 {
@@ -288,7 +426,7 @@ namespace floatingPaper
                     Width = f.Width,
                     Height = f.Height,
                     Opacity = f.Opacity,
-                    Lock = f.BackColor != Color.White
+                    Lock = f.Lock,
                 };
 
                 section.Forms.Add(form);
@@ -304,14 +442,122 @@ namespace floatingPaper
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            RegisterHotkeys();
             LoadForms();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             SaveForms();
+            UnregisterHotkeys();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            SaveForms();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (forms.Count <= 1)
+                return;
+            forms.Last().Close();
+            forms.RemoveAt(forms.Count - 1);
         }   
     }
+
+
+    [Flags]
+    public enum KeyModifiers
+    {
+        None = 0,
+        Alt = 1,
+        Control = 2,
+        Shift = 4,
+        Windows = 8,
+        NoRepeat = 0x4000
+    }
+
+    public class UntouchableForm : Form 
+    {
+        private const int WM_MOUSEACTIVATE = 0x21;
+        private const int MA_NOACTIVATEANDEAT = 4;
+        private const int WM_NCHITTEST = 0x0084;
+
+        [DllImport("user32.dll")]
+        private static extern int SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, IntPtr opt);
+        [DllImport("user32.dll")]
+        private static extern IntPtr AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetCurrentThreadId();
+
+        private static void forceSetForegroundWindow(IntPtr hWnd)
+        {
+            var mainThreadId = GetCurrentThreadId();
+            IntPtr foregroundThreadID = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
+            if (foregroundThreadID != mainThreadId)
+            {
+                AttachThreadInput(foregroundThreadID, mainThreadId, true);
+                SetForegroundWindow(hWnd);
+                AttachThreadInput(foregroundThreadID, mainThreadId, false);
+            }
+            else
+                SetForegroundWindow(hWnd);
+        }
+
+        private bool _lock;
+        public bool Lock 
+        { 
+            get { return _lock; }
+            set
+            {
+                _lock = value;
+                if (_lock)
+                {
+                    BackColor = Color.OrangeRed;
+                }
+                else
+                {
+                    BackColor = Color.White;
+                }
+            }
+        }
+
+        public UntouchableForm()
+            : base()
+        {
+            Lock = false;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (Lock)
+            {
+                if (m.Msg == WM_MOUSEACTIVATE)
+                {
+                    m.Result = new IntPtr(MA_NOACTIVATEANDEAT);
+                    return;
+                }
+            }
+            base.WndProc(ref m);
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;  // Turn on WS_EX_COMPOSITED
+                return cp;
+            }
+        }
+    }
+
 
     class FloatingFormsSection : ConfigurationSection
     {
