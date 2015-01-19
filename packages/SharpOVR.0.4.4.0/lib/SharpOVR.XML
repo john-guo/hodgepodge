@@ -1,0 +1,1060 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SharpOVR</name>
+    </assembly>
+    <members>
+        <member name="T:SharpOVR.DistortionCapabilities">
+            <summary>
+            Distortion capability bits reported by device.
+            Used with HMD.ConfigureRendering() and HMD.CreateDistortionMesh().
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.Chromatic">
+            <summary>
+            Supports chromatic aberration correction
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.TimeWarp">
+            <summary>
+            Supports timewarp
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.Vignette">
+            <summary>
+            Supports vignetting around the edges of the view
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.NoRestore">
+            <summary>
+            Do not save and restore the graphics state when rendering distortion
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.FlipInput">
+            <summary>
+            Flip the vertical texture coordinate of input images
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.SRGB">
+            <summary>
+            Assume input images are in sRGB gamma-corrected color space
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.Overdrive">
+            <summary>
+            Overdrive brightness transitions to reduce artifacts on DK2+ displays
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.HqDistortion">
+            <summary>
+            High-quality sampling of distortion buffer for anti-aliasing
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.LinuxDevFullscreen">
+            <summary>
+            Indicates window is fullscreen on a device when set. The SDK will automatically apply distortion mesh rotation if needed.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.ComputeShader">
+            <summary>
+            Using compute shader (DX11+ only)
+            </summary>
+        </member>
+        <member name="F:SharpOVR.DistortionCapabilities.ProfileNoTimewarpSpinWaits">
+            <summary>
+            Use when profiling with timewarp to remove false positives
+            </summary>
+        </member>
+        <member name="T:SharpOVR.HMDCapabilities">
+            <summary>
+            HMD capability bits reported by device.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.Present">
+            <summary>
+            The HMD is plugged in and detected by the system
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.Available">
+            <summary>
+            The HMD and its sensor is available for ownership use 
+            (i.e. it is not already owned by another application)
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.Captured">
+            <summary>
+            Set to 'true' if we captured ownership of this HMD
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.ExtendDesktop">
+            <summary>
+            Read only, means display driver is in compatibility mode
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.NoMirrorToWindow">
+            <summary>
+            Disables mirroring of HMD output to the window. This may improve 
+            rendering performance slightly (only if 'ExtendDesktop' is off)
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.DisplayOff">
+            <summary>
+            Turns off HMD screen and output (only if 'ExtendDesktop' is off)
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.LowPersistence">
+            <summary>
+            HMD supports low persistence mode
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.DynamicPrediction">
+            <summary>
+            Adjust prediction dynamically based on internally measured latency
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.DirectPentile">
+            <summary>
+            Write directly in pentile color mapping format
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.NoVSync">
+            <summary>
+            Support rendering without VSync for debugging
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.WritableMask">
+            <summary>
+            These bits can be modified by HMD.SetEnabledCaps
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDCapabilities.ServiceMask">
+            <summary>
+            These flags are currently passed into the service. May change without notice.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.HMDType">
+            <summary>
+            Enumerates all HMD types that we support.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HMDType.Other">
+            <summary>
+            Some HMD other then the one in the enumeration.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.RenderAPIType.Android_GLES">
+            <remarks>
+            May include extra native window pointers, etc.
+            </remarks>
+        </member>
+        <member name="T:SharpOVR.TrackingCapabilities">
+            <summary>
+            Tracking capability bits reported by device.
+            Used with HMD.ConfigureTracking.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingCapabilities.Orientation">
+            <summary>
+            Support orientation tracking (IMU)
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingCapabilities.MagYawCorrection">
+            <summary>
+            Supports yaw drift correction via a magnetometer or other means
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingCapabilities.Position">
+            <summary>
+            Supports positional tracking
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingCapabilities.Idle">
+            <summary>
+             Overrides the other flags. Indicates that the application
+             doesn't care about tracking settings. This is the internal
+             default before HMD.ConfigureTracking is called.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.StatusBits.OrientationTracked">
+            <summary>
+            Orientation is currently tracked (connected and in use).
+            </summary>
+        </member>
+        <member name="F:SharpOVR.StatusBits.PositionTracked">
+            <summary>
+            Position is currently tracked (FALSE if out of range).
+            </summary>
+        </member>
+        <member name="F:SharpOVR.StatusBits.CameraPoseTracked">
+            <summary>
+            Camera pose is currently tracked
+            </summary>
+        </member>
+        <member name="F:SharpOVR.StatusBits.PositionConnected">
+            <summary>
+            Position tracking HW is connected.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpOVR.StatusBits.HmdConnected" -->
+        <member name="T:SharpOVR.MatrixExtensions">
+            <summary>
+            Extension methods for the SharpDX.Matrix struct.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.MatrixExtensions.Transform(SharpDX.Matrix,SharpDX.Vector3)">
+            <summary>
+            Transforms the specified matrix.
+            </summary>
+            <param name="m">The matrix.</param>
+            <param name="v">The vector.</param>
+            <returns></returns>
+        </member>
+        <member name="T:SharpOVR.QuaternionExtensions">
+            <summary>
+            Extension methods for the SharpDX.Quaternion struct.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.QuaternionExtensions.GetEulerAngles(SharpDX.Quaternion,System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Gets the euler angles of a quaternion.
+            </summary>
+            <param name="q">The quqaernion.</param>
+            <param name="yaw">The yaw.</param>
+            <param name="pitch">The pitch.</param>
+            <param name="roll">The roll.</param>
+        </member>
+        <member name="M:SharpOVR.QuaternionExtensions.GetMatrix(SharpDX.Quaternion)">
+            <summary>
+            Gets a matrix from a quaternion.
+            </summary>
+            <param name="q">The qquaternion.</param>
+            <returns></returns>
+        </member>
+        <member name="T:SharpOVR.Vector3Extensions">
+            <summary>
+            Extension methods for the SharpDX.Vector3 struct.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.Vector3Extensions.GetTranslationMatrix(SharpDX.Vector3)">
+            <summary>
+            Gets the translation matrix.
+            </summary>
+            <param name="v">The vector.</param>
+            <returns></returns>
+        </member>
+        <member name="T:SharpOVR.HMD">
+            <summary>
+            Represents a physical Head Mounted Display.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.HMD.GetFovTextureSize(SharpOVR.EyeType,SharpOVR.FovPort,System.Single)">
+            <summary>
+            Calculates texture size recommended for rendering one eye within HMD, given FOV cone.
+            Higher FOV will generally require larger textures to maintain quality.
+            </summary>
+            <param name="eye"></param>
+            <param name="fov"></param>
+            <param name="pixelsPerDisplayPixel">Specifies that number of render target pixels per display
+            pixel at center of distortion; 1.0 is the default value. Lower values
+            can improve performance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.GetDefaultRenderTargetSize(System.Single)">
+            <summary>
+            Calculates texture size recommended for rendering both eyes within HMD, using default eye FOV.
+            </summary>
+            <param name="pixelsPerDisplayPixel">Specifies that number of render target pixels per display
+            pixel at center of distortion; 1.0 is the default value. Lower values
+            can improve performance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.GetMaxRenderTargetSize(System.Single)">
+            <summary>
+            Calculates texture size recommended for rendering both eyes within HMD, using maximum eye FOV.
+            </summary>
+            <param name="pixelsPerDisplayPixel">Specifies that number of render target pixels per display
+            pixel at center of distortion; 1.0 is the default value. Lower values
+            can improve performance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.ConfigureRendering(SharpOVR.D3D11ConfigData,SharpOVR.DistortionCapabilities,SharpOVR.FovPort[],SharpOVR.EyeRenderDesc[])">
+            <summary>
+            Configures rendering; fills in computed render parameters.
+            This function can be called multiple times to change rendering settings.
+            The users pass in two eye view descriptors that are used to
+            generate complete rendering information for each eye in eyeRenderDescOut[2].
+            </summary>
+            <param name="apiConfig">Provides D3D/OpenGL specific parameters (D3D11ConfigData for example).</param>
+            <param name="distortionCaps">Describes distortion settings that will be applied.</param>
+            <param name="eyeFovIn">The eye fov in.</param>
+            <param name="eyeRenderDescOut">The eye render desc out.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.ShutdownRendering">
+            <summary>
+            Shutdowns SDK rendering.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.GetRenderDesc(SharpOVR.EyeType,SharpOVR.FovPort)">
+            <summary>
+            Computes distortion viewport, view adjust and other rendering for the specified
+            eye. This can be used instead of ovrHmd_ConfigureRendering to help setup rendering on
+            the game side.
+            </summary>
+            <param name="eye"></param>
+            <param name="fov"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.ConfigureTracking(SharpOVR.TrackingCapabilities,SharpOVR.TrackingCapabilities)">
+            <summary>
+            All tracking interface functions are thread-safe, allowing tracking state to be sampled
+            from different threads.
+            ConfigureTracking starts sensor sampling, enabling specified capabilities, 
+            described by ovrTrackingCaps.
+            Pass None for both supportedTrackingCaps and requiredTrackingCaps to disable tracking.
+            </summary>
+            <param name="supportedCaps">Specifies support that is requested. The function will succeed 
+            even if these caps are not available (i.e. sensor or camera is unplugged). Support
+            will automatically be enabled if such device is plugged in later. Software should
+            check ovrTrackingState.StatusFlags for real-time status.</param>
+            <param name="requiredCaps">Specify sensor capabilities required at the time of the call.
+            If they are not available, the function will fail. Pass None if only specifying
+            supportedTrackingCaps.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.RecenterPose">
+            <summary>
+            Re-centers the sensor orientation.
+            Normally this will recenter the (x,y,z) translational components and the yaw 
+            component of orientation.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.HMD.BeginFrame(System.UInt32)">
+            <summary>
+            Begins a frame, returning timing and orientation information useful for simulation.
+            This should be called in the beginning of game rendering loop (on render thread).
+            This function relies on BeginFrameTiming for some of its functionality.
+            Pass 0 for frame index if not using GetFrameTiming.
+            </summary>
+            <param name="frameIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.BeginFrameTiming(System.UInt32)">
+            <summary>
+            Called at the beginning of the frame on the Render Thread.
+            Pass frameIndex == 0 if ovrHmd_GetFrameTiming isn't being used. Otherwise,
+            pass the same frame index as was used for GetFrameTiming on the main thread.
+            </summary>
+            <param name="frameIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.GetFrameTiming(System.UInt32)">
+            <summary>
+            Thread-safe timing function for the main thread. Caller should increment frameIndex
+            with every frame and pass the index where applicable to functions called on the
+            rendering thread.
+            </summary>
+            <param name="frameIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.EndFrame(SharpOVR.PoseF[],SharpOVR.D3D11TextureData[])">
+            <summary>
+            Ends a frame, submitting the rendered textures to the frame buffer.
+            RenderViewport within each eyeTexture can change per frame if necessary.
+            This may perform distortion and scaling internally, assuming is it not
+            delegated to another thread.
+            Must be called on the same thread as BeginFrame.
+            *** This Function will call Present/SwapBuffers and potentially wait for GPU Sync ***.
+            </summary>
+            <param name="renderPose">Will typically be the value returned from ovrHmd_GetEyePose, 
+              but can be different if a different head pose was used for rendering.</param>
+            <param name="eyeTexture">The eye textures.</param>
+        </member>
+        <member name="M:SharpOVR.HMD.EndFrameTiming">
+            <summary>
+            Marks the end of game-rendered frame, tracking the necessary timing information. This
+            function must be called immediately after Present/SwapBuffers + GPU sync. GPU sync is important
+            before this call to reduce latency and ensure proper timing.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.HMD.GetTrackingState(System.Double)">
+            <summary>
+            Returns tracking state reading based on the specified absolute system time.
+            Pass an absTime value of 0.0 to request the most recent sensor reading. In this case
+            both PredictedPose and SamplePose will have the same value.
+            HMD.GetEyePose() relies on this internally.
+            This may also be used for more refined timing of FrontBuffer rendering logic, etc.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:SharpOVR.HMD.GetHmdPosePerEye(SharpOVR.EyeType)" -->
+        <member name="M:SharpOVR.HMD.GetEyePoses(System.UInt32,SharpDX.Vector3[],SharpOVR.PoseF[],SharpOVR.TrackingState@)">
+            <summary>
+            Returns predicted head pose in outHmdTrackingState and offset eye poses in outEyePoses
+            as an atomic operation. Caller need not worry about applying HmdToEyeViewOffset to the
+            returned outEyePoses variables.
+            - Thread-safe function where caller should increment frameIndex with every frame
+              and pass the index where applicable to functions called on the  rendering thread.
+            - hmdToEyeViewOffset[2] can be ovrEyeRenderDesc.HmdToEyeViewOffset returned from 
+              ovrHmd_ConfigureRendering or ovrHmd_GetRenderDesc. For monoscopic rendering,
+              use a vector that is the average of the two vectors for both eyes.
+            - If frameIndex is not being used, pass in 0.
+            - Assuming outEyePoses are used for rendering, it should be passed into ovrHmd_EndFrame.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.HMD.GetEyePoses(System.UInt32,SharpDX.Vector3[],SharpOVR.PoseF[])">
+            <summary>
+            Returns predicted offset eye poses in outEyePoses
+            as an atomic operation. Caller need not worry about applying HmdToEyeViewOffset to the
+            returned outEyePoses variables.
+            - Thread-safe function where caller should increment frameIndex with every frame
+              and pass the index where applicable to functions called on the  rendering thread.
+            - hmdToEyeViewOffset[2] can be ovrEyeRenderDesc.HmdToEyeViewOffset returned from 
+              ovrHmd_ConfigureRendering or ovrHmd_GetRenderDesc. For monoscopic rendering,
+              use a vector that is the average of the two vectors for both eyes.
+            - If frameIndex is not being used, pass in 0.
+            - Assuming outEyePoses are used for rendering, it should be passed into ovrHmd_EndFrame.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.HMD.DismissHSWDisplay">
+            <summary>
+            Dismisses the HSW display if the warning is dismissible and the earliest dismissal time 
+            has occurred.
+            The application should recognize that the HSW display is being displayed (via ovrhmd_GetHSWDisplayState)
+            and if so then call this function when the appropriate user input to dismiss the warning
+            occurs.
+            </summary>
+            <returns>Returns true if the display is valid and could be dismissed.</returns>
+        </member>
+        <member name="M:SharpOVR.HMD.AttachToWindow(System.IntPtr)">
+            <summary>
+            Platform specific function to specify the application window whose output will be
+            displayed on the HMD. Only used if the EnabledCaps.ExtendDesktop flag is false.
+            Windows: SwapChain associated with this window will be displayed on the HMD.
+            </summary>
+            <param name="hwnd">The handle to the window.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.EnableHSWDisplaySDKRender(System.Boolean)">
+            <summary>
+            Normally if an application uses SDK-based distortion rendering 
+            (ovrHmd_BeginFrame / ovrHmd_EndFrame) then the SDK also takes care of 
+            drawing the health and safety warning. If an application is using 
+            SDK-based rendering but wants to draw the warning display itself, 
+            it call this function with enabled set to false.
+            </summary>
+            <param name="enabled">if set to <c>true</c> [enabled].</param>
+        </member>
+        <member name="M:SharpOVR.HMD.GetMeasuredLatency">
+            <summary>
+            Returns non-null string once with latency test result, when it is available.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.HMD.ResetFrameTiming(System.UInt32)">
+            <summary>
+            Initializes and resets frame time tracking. This is typically not necessary, but
+            is helpful if game changes vsync state or video mode. vsync is assumed to be on if this
+            isn't called.
+            </summary>
+            <param name="frameIndex">Resets internal frame index to the specified number.</param>
+        </member>
+        <member name="M:SharpOVR.HMD.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.HMD.Dispose(System.Boolean)">
+            <summary>
+            Releases unmanaged and - optionally - managed resources.
+            </summary>
+            <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        </member>
+        <member name="P:SharpOVR.HMD.Type">
+            <summary>
+            This HMD's type.
+            </summary>
+            <value>
+            The type.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.ProductName">
+            <summary>
+            Gets the name describing the product: "Oculus Rift DK1", etc.
+            </summary>
+            <value>
+            The name of the product.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.Manufacturer">
+            <summary>
+            Gets the manufacturer of the product.
+            </summary>
+            <value>
+            The manufacturer.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.HMDCaps">
+            <summary>
+            Gets the capability bits described by HMDCapabilities.
+            </summary>
+            <value>
+            The HMD capabilities.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.TrackingCaps">
+            <summary>
+            Gets the capability bits described by TrackingCapabilities.
+            </summary>
+            <value>
+            The tracking capabilities.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.DistortionCaps">
+            <summary>
+            Gets the capability bits described by DistortionCapabilities.
+            </summary>
+            <value>
+            The distortion capabilities.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.Resolution">
+            <summary>
+            Gets the resolution of the full HMD screen (both eyes) in pixels.
+            </summary>
+            <value>
+            The resolution.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.WindowPos">
+            <summary>
+            Gets the location of the application window on the desktop (or 0,0).
+            </summary>
+            <value>
+            The window location.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.DefaultEyeFov">
+            <summary>
+            Gets the default recommended optical FOV for the HMD.
+            </summary>
+            <value>
+            The recommended optical fov.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.MaxEyeFov">
+            <summary>
+            Gets the maximum recommended optical FOV for the HMD.
+            </summary>
+            <value>
+            The maximum optical fov.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.EyeRenderOrder">
+            <summary>
+            Preferred eye rendering order for best performance.
+            Can help reduce latency on sideways-scanned screens.
+            </summary>
+            <value>
+            The eye rendering order.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.DeviceName">
+            <summary>
+            Display that the HMD should present on.
+            TBD: It may be good to remove this information relying on WindowPos instead.
+            Ultimately, we may need to come up with a more convenient alternative,
+            such as API-specific functions that return adapter, or something that will
+            work with our monitor driver.
+            Windows: (e.g. "\\\\.\\DISPLAY3", can be used in EnumDisplaySettings/CreateDC).
+            </summary>
+            <value>
+            The name of the display device.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.DisplayId">
+            <summary>
+            Gets the display identifier (MacOS).
+            </summary>
+            <value>
+            The display identifier.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.ProductId">
+            <summary>
+            Gets the product identifier.
+            </summary>
+            <value>
+            The product identifier.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.VendorId">
+            <summary>
+            Gets the vendor identifier.
+            </summary>
+            <value>
+            The vendor identifier.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.SerialNumber">
+            <summary>
+            Gets the serial number.
+            </summary>
+            <value>
+            The serial number.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.Profile">
+            <summary>
+            Gets the profile.
+            </summary>
+            <value>
+            The profile.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.EnabledCaps">
+            <summary>
+            Gets or sets the capability bits that are enabled as described by HMDCapabilities.
+            Note that this value is different font HMD.HMDCaps, which describes what
+            capabilities are available for that HMD.
+            </summary>
+            <value>
+            The enabled caps.
+            </value>
+        </member>
+        <member name="P:SharpOVR.HMD.HSWDisplayState">
+            <summary>
+            Returns the current state of the HSW display. If the application is doing the rendering of
+            the HSW display then this function serves to indicate that the warning should be 
+            currently displayed. If the application is using SDK-based eye rendering then the SDK by 
+            default automatically handles the drawing of the HSW display. An application that uses 
+            application-based eye rendering should use this function to know when to start drawing the
+            HSW display itself and can optionally use it in conjunction with ovrhmd_DismissHSWDisplay
+            as described below.
+            </summary>
+            <value>
+            The state of the HSW display.
+            </value>
+        </member>
+        <member name="T:SharpOVR.OVR">
+            <summary>
+            Entry point for the SharpOVR library.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.OVR.Initialize">
+            <summary>
+            Library initialization, must be called around all other OVR code.
+            No other functions calls besides InitializeRenderingShim are allowed
+            before Initialize succeeds or after Shutdown.
+            Initializes all Oculus functionality.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.OVR.InitializeRenderingShim">
+             <summary>
+             Initializes the rendering shim appart from everything
+             else in LibOVR. This may be helpful if the application prefers to avoid
+             creating any OVR resources (allocations, service connections, etc) at this point.
+             InitializeRenderingShim does not bring up anything within LibOVR except the
+             necessary hooks to enable the Direct-to-Rift functionality.
+            
+             Either InitializeRenderingShim() or Initialize() must be called before any
+             Direct3D or OpenGL initilization is done by applictaion (creation of devices, etc).
+             Initialize() must still be called after to use the rest of LibOVR APIs.
+             </summary>
+        </member>
+        <member name="M:SharpOVR.OVR.Shutdown">
+            <summary>
+            Library shutdown, must be called after all other OVR code.
+            No other functions calls are allowed after Shutdown.
+            </summary>
+        </member>
+        <member name="M:SharpOVR.OVR.GetTimeInSeconds">
+            <summary>
+            Returns global, absolute high-resolution time in seconds.
+            This is the same value as used in sensor messages.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.OVR.HmdDetect">
+            <summary>
+            Detects or re-detects HMDs and reports the total number detected.
+            Users can get information about each HMD by calling HmdCreate with an index.
+            </summary>
+            <returns>The number of HMDs detected.</returns>
+        </member>
+        <member name="M:SharpOVR.OVR.HmdCreate(System.Int32)">
+            <summary>
+            Creates an HMD and fills in data about it.
+            Index can [0 .. HmdDetect()-1]; index mappings can cange after each HmdDetect call.
+            If not null, returned HMD must be disposed.
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.OVR.HmdCreateDebug(SharpOVR.HMDType)">
+            <summary>
+            Creates a "fake" HMD used for debugging only. This is not tied to specific hardware,
+            but may be used to debug some of the related rendering.
+            </summary>
+            <param name="type">The type of HMD to create.</param>
+            <returns>An HMD.</returns>
+        </member>
+        <member name="M:SharpOVR.OVR.MatrixProjection(SharpOVR.FovPort,System.Single,System.Single,System.Boolean)">
+            <summary>
+            Used to generate projection from EyeDesc.Fov
+            </summary>
+            <param name="fov">The fov.</param>
+            <param name="znear">The znear.</param>
+            <param name="zfar">The zfar.</param>
+            <param name="rightHanded">if set to <c>true</c> [right handed].</param>
+            <returns></returns>
+        </member>
+        <member name="M:SharpOVR.OVR.MatrixOrthoSubProjection(SharpDX.Matrix,SharpDX.Vector2,System.Single,System.Single)">
+            <summary>
+            Matrixes the ortho sub projection.
+            </summary>
+            <param name="projection">The projection.</param>
+            <param name="orthoScale">The ortho scale.</param>
+            <param name="orthoDistance">The ortho distance.</param>
+            <param name="eyeViewAdjustX">The eye view adjust x.</param>
+            <returns></returns>
+        </member>
+        <member name="P:SharpOVR.OVR.VersionString">
+            <summary>
+            Gets the version string representing libOVR version.
+            </summary>
+            <value>
+            The version string.
+            </value>
+        </member>
+        <member name="T:SharpOVR.D3D11ConfigData">
+            <summary>
+            Used to configure slave D3D rendering (i.e. for devices created externally).
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11ConfigData.Header">
+            <summary>
+            General device settings.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11ConfigData.pDevice">
+            <summary>
+            The D3D device to use for rendering.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11ConfigData.pDeviceContext">
+            <summary>
+            The D3D device context to use for rendering.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11ConfigData.pBackBufferRT">
+            <summary>
+            A render target view for the backbuffer.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11ConfigData.pBackBufferUAV">
+            <summary>
+            A UAV for the backbuffer (if using compute shaders)
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11ConfigData.pSwapChain">
+            <summary>
+            The swapchain that will present rendered frames.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.D3D11TextureData">
+            <summary>
+            Used to pass D3D11 eye texture data to Hmd.EndFrame.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11TextureData.Header">
+            <summary>
+            General device settings.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11TextureData.pTexture">
+            <summary>
+            The D3D11 texture containing the undistorted eye image.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.D3D11TextureData.pSRView">
+            <summary>
+            The D3D11 shader resource view for this texture.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.EyeDesc.TextureSize">
+            <summary>
+            Absolute size of render texture.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.EyeDesc.RenderViewport">
+            <summary>
+            Viewport within texture where eye rendering takes place.
+            </summary>
+            <remarks>If specified as (0,0,0,0), it will be initialized to TextureSize.</remarks>
+        </member>
+        <member name="T:SharpOVR.EyeRenderDesc">
+            <summary>
+            Rendering information for each eye, computed by either ovrHmd_ConfigureRendering().
+            or ovrHmd_GetRenderDesc() based on the specified Fov.
+            Note that the rendering viewport is not included here as it can be 
+            specified separately and modified per frame though:
+               (a) calling ovrHmd_GetRenderScaleAndOffset with game-rendered api,
+            or (b) passing different values in ovrTexture in case of SDK-rendered distortion.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.EyeRenderDesc.Eye">
+            <summary>
+            The eye index this instance corresponds to.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.EyeRenderDesc.Fov">
+            <summary>
+            The field of view.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.EyeRenderDesc.DistortedViewport">
+            <summary>
+            Distortion viewport
+            </summary>
+        </member>
+        <member name="F:SharpOVR.EyeRenderDesc.PixelsPerTanAngleAtCenter">
+            <summary>
+            How many display pixels will fit in tan(angle) = 1
+            </summary>
+        </member>
+        <member name="F:SharpOVR.EyeRenderDesc.HmdToEyeViewOffset">
+            <summary>
+            Translation to be applied to view matrix for each eye offset
+            </summary>
+        </member>
+        <member name="T:SharpOVR.FovPort">
+            <summary>
+            Field Of View (FOV) in tangent of the angle units.
+            As an example, for a standard 90 degree vertical FOV, we would 
+            have: { UpTan = tan(90 degrees / 2), DownTan = tan(90 degrees / 2) }.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FovPort.UpTan">
+            <summary>
+            The tangent of the angle between the viewing vector and the top edge of the field of view.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FovPort.DownTan">
+            <summary>
+            The tangent of the angle between the viewing vector and the bottom edge of the field of view.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FovPort.LeftTan">
+            <summary>
+            The tangent of the angle between the viewing vector and the left edge of the field of view.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FovPort.RightTan">
+            <summary>
+            The tangent of the angle between the viewing vector and the right edge of the field of view.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.FrameTiming">
+            <summary>
+            Frame timing data reported by HMD.BeginFrameTiming() or HMD.BeginFrame().
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FrameTiming.DeltaSeconds">
+            <summary>
+            The amount of time that has passed since the previous frame returned
+            BeginFrameSeconds value, usable for movement scaling.
+            This will be clamped to no more than 0.1 seconds to prevent
+            excessive movement after pauses for loading or initialization.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FrameTiming.ThisFrameSeconds">
+            <summary>
+            Absolute time value of when rendering of this frame began or is expected to
+            begin; generally equal to NextFrameSeconds of the previous frame. Can be used
+            for animation timing.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FrameTiming.TimewarpPointSeconds">
+            <summary>
+            Absolute point when IMU expects to be sampled for this frame.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FrameTiming.NextFrameSeconds">
+            <summary>
+            Absolute time when frame Present + GPU Flush will finish, and the next frame starts.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FrameTiming.ScanoutMidpointSeconds">
+            <summary>
+            Time when when half of the screen will be scanned out. Can be passed as a prediction
+            value to GetSensorState() to get general orientation.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.FrameTiming.EyeScanoutSeconds">
+            <summary>
+            Timing points when each eye will be scanned out to display. Used for rendering each eye. 
+            </summary>
+        </member>
+        <member name="T:SharpOVR.HSWDisplayState">
+            <summary>
+            Used by HMD.HSWDisplayState to report the current display state.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:SharpOVR.HSWDisplayState.Displayed" -->
+        <member name="F:SharpOVR.HSWDisplayState.StartTime">
+            <summary>
+            Absolute time when the warning was first displayed. See OVR.GetTimeInSeconds().
+            </summary>
+        </member>
+        <member name="F:SharpOVR.HSWDisplayState.DismissibleTime">
+            <summary>
+            Earliest absolute time when the warning can be dismissed. May be a time in the past.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.PoseF">
+            <summary>
+            Position and orientation together.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.PoseStateF">
+            <summary>
+            A full pose (rigid body) configuration with first and second derivatives.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.PoseStateF.ThePose">
+            <summary>
+            The body's position and orientation.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.PoseStateF.AngularVelocity">
+            <summary>
+            The body's angular velocity in radians per second.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.PoseStateF.LinearVelocity">
+            <summary>
+            The body's velocity in meters per second.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.PoseStateF.AngularAcceleration">
+            <summary>
+            The body's angular acceleration in radians per second per second.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.PoseStateF.LinearAcceleration">
+            <summary>
+            The body's acceleration in meters per second per second.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.PoseStateF.TimeInSeconds">
+            <summary>
+            Absolute time of this state sample.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.RenderAPIConfig">
+            <summary>
+            Contains platform-specific information for rendering.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.RenderAPIConfigHeader">
+            <summary>
+            Platform-independent part of rendering API-configuration data.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.RenderAPIConfigHeader.BackBufferSize">
+            <remarks>
+            Previously named RTSize.
+            </remarks>
+        </member>
+        <member name="F:SharpOVR.SensorData.Accelerometer">
+            <summary>
+            Acceleration reading in m/s^2
+            </summary>
+        </member>
+        <member name="F:SharpOVR.SensorData.Gyro">
+            <summary>
+            Rotation rate in rad/s
+            </summary>
+        </member>
+        <member name="F:SharpOVR.SensorData.Magnetometer">
+            <summary>
+            Magnetic field in Gauss
+            </summary>
+        </member>
+        <member name="F:SharpOVR.SensorData.Temperature">
+            <summary>
+            Temperature of the sensor in degrees Celsius
+            </summary>
+        </member>
+        <member name="F:SharpOVR.SensorData.TimeInSeconds">
+            <summary>
+            Time when the reported IMU reading took place, in seconds
+            </summary>
+        </member>
+        <member name="T:SharpOVR.TrackingState">
+            <summary>
+            Tracking state at a given absolute time (describes predicted HMD pose etc).
+            Returned by HMD.GetTrackingState().
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.HeadPose">
+            <summary>
+            Predicted head pose (and derivatives) at the requested absolute time.
+            The look-ahead interval is equal to (HeadPose.TimeInSeconds - RawSensorData.TimeInSeconds).
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.CameraPose">
+            <summary>
+            Current pose of the external camera (if present).
+            This pose includes camera tilt (roll and pitch). For a leveled coordinate
+            system use LeveledCameraPose.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.LeveledCameraPose">
+            <summary>
+            Camera frame aligned with gravity.
+            This value includes position and yaw of the camera, but not roll and pitch.
+            It can be used as a reference point to render real-world objects in the correct location.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.RawSensorData">
+            <summary>
+            The most recent sensor data received from the HMD
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.StatusFlags">
+            <summary>
+            Sensor status described by ovrStatusBits.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.LastVisionProcessingTime">
+            <summary>
+            Time spent processing the last vision frame
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.LastVisionFrameLatency">
+            <summary>
+            Measures the time from exposure until the pose is available for the frame, including processing time.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TrackingState.LastCameraFrameCounter">
+            <summary>
+            Tag the vision processing results to a certain frame counter number.
+            </summary>
+        </member>
+        <member name="T:SharpOVR.TextureHeader">
+            <summary>
+            Platform-independent part of the eye texture descriptor.
+            It is a part of ovrTexture, passed to Hmd.EndFrame().
+            If RenderViewport is all zeros then the full texture will be used.
+            </summary>
+        </member>
+        <member name="F:SharpOVR.TextureHeader.RenderViewport">
+            <summary>
+            Pixel viewport in texture that holds eye image.
+            </summary>
+        </member>
+    </members>
+</doc>

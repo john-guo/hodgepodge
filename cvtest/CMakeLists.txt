@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 2.8)                                      
+project( DisplayImage )                                                                         
+set(OpenCV_DIR E:/projects/opencv)  
+set(OpenCV_STATIC ON)                                                               
+find_package( OpenCV REQUIRED )                                                  
+add_executable( DisplayImage camera.cpp )                               
+target_link_libraries( DisplayImage ${OpenCV_LIBS} )                  
