@@ -13,7 +13,7 @@ namespace RiftGame
     using SharpDX.DXGI;
     using System.Runtime.InteropServices;
     using System.IO;
-using SharpDX.Windows;
+    using SharpDX.Windows;
     using SharpDX.Toolkit.Input;
 
     /// <summary>
