@@ -12,6 +12,7 @@ namespace CEbalance.Symbol
         public Molecule(Ion[] ions)
         {
             formula = new List<Ion>(ions);
+            Factor = 1;
         } 
 
         public IList<Ion> Formula
@@ -24,8 +25,15 @@ namespace CEbalance.Symbol
 
         public override string ToString()
         {
-            return formula.Aggregate(String.Empty, 
+            var ret = formula.Aggregate(String.Empty,
                 (seed, ion) => seed + ion.ToString());
+
+            return Factor > 1 ? String.Format("{0}{1}", Factor, ret) : ret;
+        }
+
+        public int Factor
+        {
+            get; set;
         }
     }
 }

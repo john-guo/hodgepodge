@@ -122,5 +122,20 @@ namespace CEbalance
 
             return matrix;
         }
+
+        public static void Trim(this Equation equ)
+        {
+            var matrix = equ.ToMatrix();
+            var result = Slove(matrix);
+            int index = 0;
+            foreach (var m in equ.Left)
+            {
+                m.Factor = result[index++];
+            }
+            foreach (var m in equ.Right)
+            {
+                m.Factor = result[index++];
+            }
+        }
     }
 }
