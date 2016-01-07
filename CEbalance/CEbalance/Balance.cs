@@ -9,7 +9,7 @@ namespace CEbalance
 {
     public static class Balance
     {
-        public static Dictionary<int, Fraction> Slove(Matrix<Fraction> m)
+        public static Dictionary<int, Fraction> Solve(Matrix<Fraction> m)
         {
             var result = new Dictionary<int, Fraction>();
 
@@ -126,7 +126,7 @@ namespace CEbalance
         public static void Trim(this Equation equ)
         {
             var matrix = equ.ToMatrix();
-            var result = Slove(matrix);
+            var result = Solve(matrix);
             int index = 0;
             foreach (var m in equ.Left)
             {

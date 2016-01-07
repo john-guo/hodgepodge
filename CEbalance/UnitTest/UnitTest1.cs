@@ -4,6 +4,8 @@ using CEbalance.Symbol;
 using CEbalance.Math;
 using CEbalance;
 
+
+
 namespace UnitTest
 {
     [TestClass]
@@ -138,7 +140,7 @@ namespace UnitTest
             Assert.AreEqual(2, matrix.Row);
             Assert.AreEqual(3, matrix.Col);
 
-            var result = Balance.Slove(matrix);
+            var result = Balance.Solve(matrix);
 
             Assert.AreEqual(3, result.Count);
             Assert.AreEqual(1, (int)result[0]);
@@ -149,7 +151,7 @@ namespace UnitTest
             estr = "C2H2 + O2 -> CO2 + H2O";
             equ = new Equation(estr);
             matrix = equ.ToMatrix();
-            result = Balance.Slove(matrix);
+            result = Balance.Solve(matrix);
             Assert.AreEqual(2, (int)result[0]);
             Assert.AreEqual(5, (int)result[1]);
             Assert.AreEqual(4, (int)result[2]);
