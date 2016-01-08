@@ -8,7 +8,6 @@ namespace CEbalance.Symbol
     public class MultiIon
     {
         private IList<Ion> _ions;
-        private int _key;
 
         public MultiIon(Ion[] ions, int key)
         {

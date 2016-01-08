@@ -137,7 +137,7 @@ namespace CEbalance.Symbol
             {
                 if (!char.IsLetterOrDigit(str[i]))
                 {
-                    if (!String.IsNullOrEmpty(ceStr))
+                    if (status == 1)
                     {
                         foreach (var ion in getIons(ceStr))
                         {
@@ -148,14 +148,15 @@ namespace CEbalance.Symbol
 
                     if (str[i] == '(')
                     {
+                        if (molecule == null)
+                            molecule = new Molecule();
+
                         status = 2;
-
                         ceStr = string.Empty;
-                        while (str[++i] != ')')
-                        {
-                            ceStr += str[i];
-                        }
-
+                        continue;
+                    }
+                    else if (str[i] == ')')
+                    {
                         key = string.Empty;
                         while (char.IsDigit(str[++i]))
                         {
@@ -164,15 +165,16 @@ namespace CEbalance.Symbol
                         --i;
 
                         int ikey = 1;
-                        int.TryParse(key, out ikey);
-
+                        if (!string.IsNullOrEmpty(key))
+                            ikey = int.Parse(key);
                         molecule.AddIons(getIons(ceStr), ikey);
 
+                        status = 3;
                         ceStr = string.Empty;
                         continue;
                     }
-
-                    if (molecule != null)
+                        
+                    if (status != 0)
                     {
                         if (isLeft)
                             left.Add(molecule);
@@ -191,9 +193,15 @@ namespace CEbalance.Symbol
                 else
                 {
                     if (status == 0)
+                    {
+                        status = 1;
                         molecule = new Molecule();
+                    }
+                    if (status == 3)
+                    {
+                        status = 1;
+                    }
 
-                    status = 1;
                     ceStr += str[i];
                 }
             }
