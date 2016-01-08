@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace CEbalance.Math
 {
@@ -98,7 +99,7 @@ namespace CEbalance.Math
                 if (v == 0)
                     continue;
                 eliminationRow(i, i);
-                divRow(i, matrix[i, i]);
+                //divRow(i, matrix[i, i]);
             }
 
             for (int i = 0; i < r; ++i)
@@ -188,6 +189,21 @@ namespace CEbalance.Math
             }
 
             return true;
+        }
+
+        [Conditional("DEBUG")]
+        internal void Print()
+        {
+            for (int i = 0; i < Row; ++i)
+            {
+                for (int j = 0; j < Col; ++j)
+                {
+                    dynamic v = matrix[i, j];
+                    Debug.Write(string.Format("{0} ", (v as object).ToString()));
+                }
+
+                Debug.WriteLine("");
+            }
         }
     }
 }

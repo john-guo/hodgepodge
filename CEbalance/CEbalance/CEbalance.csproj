@@ -44,6 +44,7 @@
     <Compile Include="Symbol\Equation.cs" />
     <Compile Include="Symbol\Ion.cs" />
     <Compile Include="Symbol\Molecule.cs" />
+    <Compile Include="Symbol\MultiIon.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

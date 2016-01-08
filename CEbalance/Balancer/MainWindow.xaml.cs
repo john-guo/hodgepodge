@@ -35,7 +35,7 @@ namespace Balancer
                 equ.Trim();
                 label.Content = equ.ToString();
             }
-            catch
+            catch (Exception ex)
             {
                 label.Content = "Equation Invalid.";
             }

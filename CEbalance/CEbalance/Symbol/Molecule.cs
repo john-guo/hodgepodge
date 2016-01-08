@@ -7,15 +7,20 @@ namespace CEbalance.Symbol
 {
     public class Molecule
     {
-        private IList<Ion> formula;
+        private IList<MultiIon> formula;
         
-        public Molecule(Ion[] ions)
+        public Molecule()
         {
-            formula = new List<Ion>(ions);
+            formula = new List<MultiIon>();
             Factor = 1;
         } 
 
-        public IList<Ion> Formula
+        public void AddIons(Ion[] ions, int key = 1)
+        {
+            formula.Add(new MultiIon(ions, key));
+        }
+
+        public IList<MultiIon> Formula
         {
             get
             {

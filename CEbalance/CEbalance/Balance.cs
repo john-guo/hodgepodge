@@ -16,10 +16,11 @@ namespace CEbalance
             m.GaussElimination();
 
             int r = System.Math.Min(m.Row, m.Col);
+            int lcm, gcd;
 
             for (int j = r; j < m.Col; ++j)
             {
-                int lcm = 0;
+                lcm = 0;
                 for (int i = 0; i < r; ++i)
                 {
                     var v = m[i, j];
@@ -52,16 +53,94 @@ namespace CEbalance
 
                     if (v == 1 && current == -1)
                     {
+                        if (result.ContainsKey(j))
+                            continue;
+
                         current = j;
                         result[current] = 0;
+                        break;
+                    }
+                }
+                if (current < 0)
+                    continue;
+
+                for (int j = 0; j < m.Col; ++j)
+                {
+                    if (j == current)
                         continue;
+
+                    dynamic v = m[i, j];
+                    if (v == 0)
+                        continue;
+
+                    if (!result.ContainsKey(j))
+                    {
+                        lcm = 0;
+                        for (int k = 0; k < m.Row; ++k)
+                        {
+                            var u = m[k, j];
+                            if (u == 0)
+                                continue;
+
+                            if (lcm == 0)
+                            {
+                                lcm = u.Denominator;
+                                continue;
+                            }
+
+                            lcm = Utils.LCM(lcm, u.Denominator);
+                        }
+
+                        result[j] = lcm;
                     }
 
                     result[current] += v * result[j];
                 }
 
-                if (current >= 0)
-                    result[current] = -result[current];
+                result[current] = -result[current];
+            }
+
+            for (int j = 0; j < m.Col; j++)
+            {
+                if (result.ContainsKey(j))
+                    continue;
+                result[j] = 0;
+            }
+
+            lcm = 0;
+            foreach (var pair in result)
+            {
+                if (lcm == 0)
+                {
+                    lcm = pair.Value.Denominator;
+                    continue;
+                }
+                lcm = Utils.LCM(lcm, pair.Value.Denominator);
+            }
+            if (lcm > 1)
+            {
+                foreach (var key in result.Keys.ToArray())
+                {
+                    result[key] *= lcm;
+                }
+            }
+
+            gcd = 0;
+            foreach (var pair in result)
+            {
+                if (gcd == 0)
+                {
+                    gcd = pair.Value;
+                    continue;
+                }
+                gcd = Utils.GCD(gcd, pair.Value);
+            }
+            if (gcd > 1)
+            {
+                foreach (var key in result.Keys.ToArray())
+                {
+                    result[key] /= gcd;
+                }
             }
 
             return result;
@@ -76,11 +155,14 @@ namespace CEbalance
             {
                 foreach (var a in m.Formula)
                 {
-                    if (paramTable.ContainsKey(a.Name))
-                        continue;
+                    foreach (var b in a.Ions)
+                    {
+                        if (paramTable.ContainsKey(b.Name))
+                            continue;
 
-                    paramTable[a.Name] = index++;
-                    equParams[paramTable[a.Name]] = new Dictionary<int, int>();
+                        paramTable[b.Name] = index++;
+                        equParams[paramTable[b.Name]] = new Dictionary<int, int>();
+                    }
                 }
             }
 
@@ -89,7 +171,10 @@ namespace CEbalance
             {
                 foreach (var a in equ.Left[i].Formula)
                 {
-                    equParams[paramTable[a.Name]][i] = a.Key;
+                    foreach (var b in a.Ions)
+                    {
+                        equParams[paramTable[b.Name]][i] = a.Key * b.Key;
+                    }
                 }
                 ++i;
             }
@@ -98,7 +183,10 @@ namespace CEbalance
             {
                 foreach (var a in equ.Right[i - equ.Left.Count].Formula)
                 {
-                    equParams[paramTable[a.Name]][i] = -a.Key;
+                    foreach (var b in a.Ions)
+                    {
+                        equParams[paramTable[b.Name]][i] = -(a.Key * b.Key);
+                    }
                 }
                 ++i;
             }
@@ -131,10 +219,14 @@ namespace CEbalance
             foreach (var m in equ.Left)
             {
                 m.Factor = result[index++];
+                if (m.Factor == 0)
+                    throw new Exception();
             }
             foreach (var m in equ.Right)
             {
                 m.Factor = result[index++];
+                if (m.Factor == 0)
+                    throw new Exception();
             }
         }
     }

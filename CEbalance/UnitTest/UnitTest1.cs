@@ -28,6 +28,10 @@ namespace UnitTest
             estr = "SO4 + NaON2CO3H34O + Cl + H -> ClNaHO + Cl3";
             equ = new Equation(estr);
             Assert.AreEqual(estr, equ.ToString());
+
+            estr = "H2 + Ca(CN)2 + NaAlF4 + FeSO4 + MgSiO3 + KI + H3PO4 + PbBrO4 + BrCl + CF2Cl2 + SO2 -> PbBr2 + CrCl3 + MgCO3 + KAl(OH)4 + Fe(SCN)3 + PI3 + Na2SiO3 + CaF + H2O";
+            equ = new Equation(estr);
+            Assert.AreEqual(estr, equ.ToString());
         }
 
         [TestMethod]
@@ -156,6 +160,13 @@ namespace UnitTest
             Assert.AreEqual(5, (int)result[1]);
             Assert.AreEqual(4, (int)result[2]);
             Assert.AreEqual(2, (int)result[3]);
+        }
+
+        [TestMethod]
+        public void ComplexTest()
+        {
+            var equ = new Equation("H2 + Ca(CN)2 + NaAlF4 + FeSO4 + MgSiO3 + KI + H3PO4 + PbBrO4 + BrCl + CF2Cl2 + SO2->PbBr2 + BrCl3 + MgCO3 + KAl(OH)4 + Fe(SCN)3 + PI3 + Na2SiO3 + CaF + H2O");
+            equ.Trim(); 
         }
     }
 }

@@ -53,31 +53,17 @@ namespace CEbalance.Symbol
             return sb.ToString();
         }
 
-        private void fromString(string str)
+        private Ion[] getIons(string str)
         {
+            int status = 0;
             string atom = String.Empty;
             string key = String.Empty;
-            int status = 0;
-            bool isLeft = true;
-            Ion ion;
-            Molecule molecule;
             List<Ion> ions = new List<Ion>();
+            int ikey;
 
             for (int i = 0; i < str.Length; ++i)
             {
-                if (!char.IsLetterOrDigit(str[i]))
-                {
-                    if (str[i] == '>')
-                    {
-                        isLeft = false;
-                    }
-
-                    if (status == 0)
-                        continue;
-
-                    status = 5;
-                }
-                else if (char.IsLetter(str[i]))
+                if (char.IsLetter(str[i]))
                 {
                     if (char.IsUpper(str[i]))
                     {
@@ -95,6 +81,10 @@ namespace CEbalance.Symbol
                 {
                     status = 3;
                 }
+                else
+                {
+                    throw new Exception();
+                }
 
                 switch (status)
                 {
@@ -111,58 +101,115 @@ namespace CEbalance.Symbol
                     case 4:
                         if (string.IsNullOrEmpty(key))
                         {
-                            ion = new Ion(atom);
+                            ikey = 1;
                         }
                         else
                         {
-                            ion = new Ion(atom, int.Parse(key));
+                            ikey = int.Parse(key);
                         }
-                        ions.Add(ion);
+                        ions.Add(new Ion(atom, ikey));
                         goto case 1;
-                    case 5:
-                        if (string.IsNullOrEmpty(key))
-                        {
-                            ion = new Ion(atom);
-                        }
-                        else
-                        {
-                            ion = new Ion(atom, int.Parse(key));
-                        }
-                        ions.Add(ion);
+                }
+            }
 
-                        molecule = new Molecule(ions.ToArray());
+            if (string.IsNullOrEmpty(key))
+            {
+                ikey = 1;
+            }
+            else
+            {
+                ikey = int.Parse(key);
+            }
+            ions.Add(new Ion(atom, ikey));
+
+            return ions.ToArray();
+        }
+
+        private void fromString(string str)
+        {
+            bool isLeft = true;
+            string key = String.Empty;
+            string ceStr = String.Empty;
+            Molecule molecule = null;
+            int status = 0;
+
+            for (int i = 0; i < str.Length; ++i)
+            {
+                if (!char.IsLetterOrDigit(str[i]))
+                {
+                    if (!String.IsNullOrEmpty(ceStr))
+                    {
+                        foreach (var ion in getIons(ceStr))
+                        {
+                            molecule.AddIons(new Ion[] { ion });
+                        }
+                        ceStr = string.Empty;
+                    }
+
+                    if (str[i] == '(')
+                    {
+                        status = 2;
+
+                        ceStr = string.Empty;
+                        while (str[++i] != ')')
+                        {
+                            ceStr += str[i];
+                        }
+
+                        key = string.Empty;
+                        while (char.IsDigit(str[++i]))
+                        {
+                            key += str[i];
+                        }
+                        --i;
+
+                        int ikey = 1;
+                        int.TryParse(key, out ikey);
+
+                        molecule.AddIons(getIons(ceStr), ikey);
+
+                        ceStr = string.Empty;
+                        continue;
+                    }
+
+                    if (molecule != null)
+                    {
                         if (isLeft)
                             left.Add(molecule);
                         else
                             right.Add(molecule);
+                    }
 
-                        ions.Clear();
-                        status = 0;
-                        break;
+                    if (str[i] == '>' || str[i] == '=')
+                    {
+                        isLeft = false;
+                    }
+
+                    status = 0;
+                }
+                else
+                {
+                    if (status == 0)
+                        molecule = new Molecule();
+
+                    status = 1;
+                    ceStr += str[i];
                 }
             }
 
-            if (status == 0)
-                return;
-
-            if (string.IsNullOrEmpty(key))
+            if (!String.IsNullOrEmpty(ceStr))
             {
-                ion = new Ion(atom);
-            }
-            else
-            {
-                ion = new Ion(atom, int.Parse(key));
-            }
-            ions.Add(ion);
+                foreach (var ion in getIons(ceStr))
+                {
+                    molecule.AddIons(new Ion[] { ion });
+                }
+                ceStr = string.Empty;
 
-            molecule = new Molecule(ions.ToArray());
-            if (isLeft)
-                left.Add(molecule);
-            else
-                right.Add(molecule);
-
-            ions.Clear();
-            status = 0;
+                if (isLeft)
+                    left.Add(molecule);
+                else
+                    right.Add(molecule);
+            }
         }
     }
 }

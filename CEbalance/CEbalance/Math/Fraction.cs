@@ -27,6 +27,8 @@ namespace CEbalance.Math
                 f1.Numerator * f2.Numerator,
                 f1.Denominator * f2.Denominator);
 
+            f.reduce();
+
             return f;
         }
 
@@ -36,21 +38,19 @@ namespace CEbalance.Math
                 (f2.Numerator < 0 ? -1 : 1) * f1.Numerator * f2.Denominator,
                 (f2.Numerator < 0 ? -1 : 1) * f1.Denominator * f2.Numerator);
 
+            f.reduce();
+
             return f;
         }
 
         public static Fraction operator +(Fraction f1, Fraction f2)
         {
-            //int lcm = Utils.LCM(f1.Denominator, f2.Denominator);
-            //Fraction f = new Fraction(
-            //    f1.Numerator * (lcm / f1.Denominator)
-            //    + f2.Numerator * (lcm / f2.Denominator),
-            //    lcm);
-
             Fraction f = new Fraction(
                 f1.Numerator * f2.Denominator + f2.Numerator * f1.Denominator,
                 f1.Denominator * f2.Denominator
                 );
+
+            f.reduce();
 
             return f;
         }
@@ -103,8 +103,18 @@ namespace CEbalance.Math
             return !(f1 == f2);
         }
 
+        public bool IsInteger
+        {
+            get
+            {
+                return Numerator % Denominator == 0;
+            }
+        }
+
         private void reduce()
         {
+            if (Denominator == 1)
+                return;
             var gcd = System.Math.Abs(Utils.GCD(Numerator, Denominator));
             Numerator /= gcd;
             Denominator /= gcd;

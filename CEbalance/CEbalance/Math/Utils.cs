@@ -9,8 +9,10 @@ namespace CEbalance.Math
     {
         public static int GCD(int a, int b)
         {
-            int n1 = System.Math.Max(a, b);
-            int n2 = System.Math.Min(a, b);
+            int x = System.Math.Abs(a);
+            int y = System.Math.Abs(b);
+            int n1 = System.Math.Max(x, y);
+            int n2 = System.Math.Min(x, y);
             while (n2 != 0)
             {
                 n1 = n1 > n2 ? n1 : n2;
