@@ -178,6 +178,7 @@ namespace CEbalance.Symbol
                             left.Add(molecule);
                         else
                             right.Add(molecule);
+                        molecule = null;
                     }
 
                     if (str[i] == '>' || str[i] == '=')

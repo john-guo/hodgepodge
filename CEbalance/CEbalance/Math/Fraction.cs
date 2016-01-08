@@ -115,7 +115,7 @@ namespace CEbalance.Math
         {
             if (Denominator == 1)
                 return;
-            var gcd = System.Math.Abs(Utils.GCD(Numerator, Denominator));
+            var gcd = Utils.GCD(Numerator, Denominator);
             Numerator /= gcd;
             Denominator /= gcd;
         }
