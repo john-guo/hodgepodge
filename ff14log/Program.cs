@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ff14log
 {
@@ -246,6 +247,9 @@ namespace ff14log
 
     public class LogBattleItem
     {
+        public const string flag = @"";
+
+        public int time;
         public string main;
         public string target;
         public string skill;
@@ -254,11 +258,33 @@ namespace ff14log
 
         public LogBattleItem()
         {
+            time = 0;
             main = String.Empty;
             target = String.Empty;
             skill = String.Empty;
             hp = String.Empty;
             type = LogBattleType.None;
+        }
+
+        public string GetName(string name)
+        {
+            var target = name.Trim();
+            if (target.StartsWith(flag))
+                target = target.Substring(flag.Length - 1).Trim();
+
+            return target;
+        }
+
+        public bool IsEmpty(string name)
+        {
+            if (String.IsNullOrWhiteSpace(name))
+                return true;
+
+            var target = name.Trim();
+            if (target.StartsWith(flag))
+                return true;
+
+            return false;
         }
 
         public bool IsNone
@@ -290,20 +316,21 @@ namespace ff14log
     {
         const string damagePointPattern = @"\d+\([\+\-]\d+%\)|\d+";
         const string attackPattern = @"(?:(?<target>.+)发动攻击|)\s*(?:|)\s*";
-        const string damagePattern = attackPattern + @"(?:暴击！|)\s*(?<victim>.+?)(?:格挡住了！|招架住了！|)\s*受到(?:了|)(?<damage>" + damagePointPattern + ")点伤害。";
+        const string damagePattern = attackPattern + @"(?:暴击！|)\s*(?<victim>.+?)(?:格挡住了！|招架住了！|)\s*受到(?:了|)(?<damage>" + damagePointPattern + ")点伤(?:害|)(?:。|)";
         const string missPattern = attackPattern + @"失误了！";
 
         static readonly Regex exCast = new Regex(@"(?<target>.+)(?:咏唱|发动)了“(?<skill>.+)”");
         static readonly Regex exCasting = new Regex(@"(?<target>.+)正在(?:咏唱|发动)“(?<skill>.+)”。");
         static readonly Regex exCastStop = new Regex(@"(?<target>.+)中断了(?:咏唱|发动)“(?<skill>.+)”。");
         static readonly Regex exCastInterrupt = new Regex(@"(?<target>.+)的“(?<skill>.+)”(?:被打断|中断)了。");
+        static readonly Regex exMount = new Regex(@"(?<target>.+)乘上了(?<skill>.+)(?:。|)");
         static readonly Regex exBuff = new Regex(@"(?:对|)(?<target>.+)附加了“(?<skill>.+)”(?:的|)效果。");
         static readonly Regex exEbuff = new Regex(@"(?<target>.+)陷入了“(?<skill>.+)”效果。");
         static readonly Regex exHealing = new Regex(@"(?:暴击！\s*|)(?<target>.+)(?:恢复|吸收)了(?<hp>\d+)点(?:体力|魔力|技力)。");
         static readonly Regex exUnbuff = new Regex(@"(?<target>.+)的“(?<skill>.+)”状态效果消失了。");
         static readonly Regex exRescue = new Regex(@"(?<target>.+)从无法战斗状态复苏了。");
         static readonly Regex exDamage = new Regex(damagePattern);
-        static readonly Regex exAura = new Regex(@"“(?<skill>.+)”效果发动。");
+        static readonly Regex exAura = new Regex(@"“(?<skill>.+)”效果发动(?:。|)");
         static readonly Regex exMiss = new Regex(missPattern);
         static readonly Regex exAllMiss = new Regex("失误！|失误了！");
         static readonly Regex exThreat = new Regex(@"(?<target>.+)仇恨提高。");
@@ -313,8 +340,13 @@ namespace ff14log
         static readonly Regex exResist = new Regex(@"(?<target>.+)完全抵抗住了“(?<skill>.+)”。");
         static readonly Regex exBreak = new Regex(@"(?<target>.+)破坏了(?<monster>.+)。");
         static readonly Regex exItem = new Regex(@"(?<target>.+)使用了“(?<skill>.+)”");
+        static readonly Regex exImmune = new Regex(@"无效！(?<target>.+)没有受到伤害。");
+        static readonly Regex exImmune2 = new Regex(@"(?<target>.+)发动攻击\s*\s*对(?<monster>.+)无效。");
+        static readonly Regex exImmune3 = new Regex(@"(?<target>.+)令“(?<skill>.+)”无效化了。");
 
         static Dictionary<int, List<AnalyzeItem>> regexDict = new Dictionary<int, List<AnalyzeItem>>();
+
+        static string lastTarget = String.Empty;
 
         abstract class AnalyzeItem
         {
@@ -373,15 +405,25 @@ namespace ff14log
                 item.hp = m.Groups["damage"].Value;
                 item.skill = String.Empty;
 
+                if (item.IsEmpty(item.main) && !String.IsNullOrWhiteSpace(lastTarget))
+                {
+                    item.main = lastTarget;
+                    lastTarget = String.Empty;
+                }
+
                 return item;
             }
         }
 
         class CastAnalyzeItem: AnalyzeItem
         {
-            public CastAnalyzeItem(Regex ex)
+            private bool targetLink;
+
+            public CastAnalyzeItem(Regex ex, bool tlink = false)
                 : base(ex)
-            { }
+            {
+                targetLink = tlink;
+            }
 
             protected override LogBattleItem Process(Match m)
             {
@@ -391,6 +433,11 @@ namespace ff14log
                 item.target = String.Empty;
                 item.hp = String.Empty;
                 item.skill = m.Groups["skill"].Value;
+
+                if (targetLink)
+                {
+                    lastTarget = item.main;
+                }
 
                 return item;
             }
@@ -502,9 +549,10 @@ namespace ff14log
 
         readonly static AnalyzeItem aiDamage = new DamageAnalyzeItem();
         readonly static AnalyzeItem aiCasting = new CastAnalyzeItem(exCasting);
-        readonly static AnalyzeItem aiCast = new CastAnalyzeItem(exCast);
+        readonly static AnalyzeItem aiCast = new CastAnalyzeItem(exCast, true);
         readonly static AnalyzeItem aiCastStop = new CastAnalyzeItem(exCastStop);
         readonly static AnalyzeItem aiCastInterrupt = new CastAnalyzeItem(exCastInterrupt);
+        readonly static AnalyzeItem aiMount = new CastAnalyzeItem(exMount);
         readonly static AnalyzeItem aiBuff = new CastAnalyzeItem(exBuff);
         readonly static AnalyzeItem aiUnbuff = new CastAnalyzeItem(exUnbuff);
         readonly static AnalyzeItem aiEBuff = new CastAnalyzeItem(exEbuff);
@@ -513,6 +561,9 @@ namespace ff14log
         readonly static AnalyzeItem aiThreat = new TargetAnalyzeItem(exThreat);
         readonly static AnalyzeItem aiMiss = new TargetAnalyzeItem(exMiss);
         readonly static AnalyzeItem aiNothing = new TargetAnalyzeItem(exNothing);
+        readonly static AnalyzeItem aiImmune = new TargetAnalyzeItem(exImmune);
+        readonly static AnalyzeItem aiImmune2 = new TargetAnalyzeItem(exImmune2);
+        readonly static AnalyzeItem aiImmune3 = new TargetAnalyzeItem(exImmune3);
         readonly static AnalyzeItem aiRescue = new TargetAnalyzeItem(exRescue, LogBattleType.Rescue);
         readonly static AnalyzeItem aiDead = new DeadAnalyzeItem();
         readonly static AnalyzeItem aiDeadOne = new TargetAnalyzeItem(exBeatOne, LogBattleType.Dead);
@@ -524,28 +575,28 @@ namespace ff14log
         static LogAnalyzer() 
         {
             regexDict.Add(41, new List<AnalyzeItem>() { aiDamage, aiThreat });
-            regexDict.Add(42, new List<AnalyzeItem>() { aiMiss, aiNothing, aiResist, aiAllMiss });
-            regexDict.Add(43, new List<AnalyzeItem>() { aiCasting, aiCast, aiCastStop, aiCastInterrupt });
+            regexDict.Add(42, new List<AnalyzeItem>() { aiMiss, aiNothing, aiResist, aiAllMiss, aiImmune, aiImmune2, aiImmune3 });
+            regexDict.Add(43, new List<AnalyzeItem>() { aiCasting, aiCast, aiCastStop, aiCastInterrupt, aiMount });
             regexDict.Add(44, new List<AnalyzeItem>() { aiItem });
             regexDict.Add(45, new List<AnalyzeItem>() { aiHealing });
-            regexDict.Add(46, new List<AnalyzeItem>() { aiBuff });
+            regexDict.Add(46, new List<AnalyzeItem>() { aiBuff, aiAura });
             regexDict.Add(47, new List<AnalyzeItem>() { aiBuff, aiEBuff });
             regexDict.Add(48, new List<AnalyzeItem>() { aiUnbuff });
             regexDict.Add(49, new List<AnalyzeItem>() { aiUnbuff });
             regexDict.Add(58, new List<AnalyzeItem>() { aiRescue, aiDead, aiDeadOne, aiBreak });
             regexDict.Add(169, new List<AnalyzeItem>() { aiDamage, aiThreat });
-            regexDict.Add(170, new List<AnalyzeItem>() { aiNothing, aiResist, aiAllMiss });
+            regexDict.Add(170, new List<AnalyzeItem>() { aiNothing, aiResist, aiAllMiss, aiImmune, aiImmune2, aiImmune3 });
             regexDict.Add(171, new List<AnalyzeItem>() { aiCasting });
             regexDict.Add(173, new List<AnalyzeItem>() { aiHealing });
             regexDict.Add(174, new List<AnalyzeItem>() { aiBuff, aiAura });
             regexDict.Add(175, new List<AnalyzeItem>() { aiBuff, aiEBuff });
             regexDict.Add(176, new List<AnalyzeItem>() { aiUnbuff });
             regexDict.Add(177, new List<AnalyzeItem>() { aiUnbuff });
-            regexDict.Add(186, new List<AnalyzeItem>() { aiDead });
+            regexDict.Add(186, new List<AnalyzeItem>() { aiDead, aiDeadOne });
         }
 
         static readonly int[] ignoreMainType = { 0, 2, 32, 34 };
-        static readonly int[] ignoreSubType = { 57, 62 };
+        static readonly int[] ignoreSubType = { 57, 60, 62, 64, 65, 66, 70, 185, 201 };
 
         public LogBattleItem Analyse(LogItem item)
         {
@@ -557,7 +608,7 @@ namespace ff14log
 
             if (!regexDict.ContainsKey(item.type2))
             {
-                throw new Exception();
+                throw new Exception(String.Format("{0},{1},{2}", item.type1, item.type2, item.AllContent));
             }
 
             var content = item.AllContent.Trim();
@@ -571,12 +622,13 @@ namespace ff14log
 
                 matched = true;
                 lbi = bi.GetItem();
+                lbi.time = item.timestamp;
                 break;    
             }
 
             if (!matched)
             {
-                throw new Exception();
+                throw new Exception(String.Format("{0},{1},{2}", item.type1, item.type2, item.AllContent));
             }
 
             return lbi;
@@ -585,6 +637,16 @@ namespace ff14log
 
     class Program
     {
+
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
+        }
+
+        /*
         static void Main(string[] args)
         {
             //Export(args.Length > 0 ? args[0] : "log.txt", args.Length == 0);
@@ -641,5 +703,6 @@ namespace ff14log
             File.Create(logfile).Close();
             File.AppendAllLines(logfile, result.Select(i => String.Format("[{0}] {1} {2} {3}", i.LocalTime, i.type1, i.type2, i.AllContent)));
         }
+        */
     }
 }
