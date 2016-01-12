@@ -3,12 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("UnitTest")]
 
 namespace CEbalance.Math
 {
     public class Matrix<T>
     {
         private T[,] matrix;
+
+        public Matrix(T[,] array)
+        {
+            matrix = array;
+        }
 
         public Matrix(int row, int col)
         {
@@ -33,6 +41,16 @@ namespace CEbalance.Math
         {
             get { return matrix[i, j]; }
             set { matrix[i, j] = value; }
+        }
+
+        internal int RowBegin
+        {
+            get { return matrix.GetLowerBound(0); }
+        }
+
+        internal int RowEnd
+        {
+            get { return matrix.GetUpperBound(0); }
         }
 
         public int Row
@@ -87,7 +105,8 @@ namespace CEbalance.Math
 
         public void GaussElimination()
         {
-            sortRow(false);
+            Sort(false);
+            //sortRow(false);
 
             int r = System.Math.Min(Row, Col);
 
@@ -116,7 +135,8 @@ namespace CEbalance.Math
                 }
             }
 
-            sortRow(false);
+            Sort(false);
+            //sortRow(false);
         }
 
         private void eliminationRow(int row, int col)
@@ -134,8 +154,11 @@ namespace CEbalance.Math
             }
         }
 
-        private void swapRow(int row1, int row2)
+        internal void swapRow(int row1, int row2)
         {
+            if (row1 == row2)
+                return;
+
             T[] tempRow = new T[Col];
             for (int j = 0; j < Col; ++j)
             {
@@ -151,12 +174,20 @@ namespace CEbalance.Math
             }
         }
 
-        private int compareRow(int row1, int row2)
+        internal int compareRow(int row1, int row2)
         {
             for (int j = 0; j < Col; ++j)
             {
                 dynamic v1 = matrix[row1, j];
                 dynamic v2 = matrix[row2, j];
+
+                if (v1 == v2)
+                    return 0;
+
+                if (v1 == 0)
+                    return -1;
+                if (v2 == 0)
+                    return 1;
 
                 if (v1 < v2)
                     return -1;
@@ -165,6 +196,34 @@ namespace CEbalance.Math
             }
 
             return 0;
+        }
+
+        internal void Sort(bool isAsc = true)
+        {
+            if (Row < 10)
+            {
+                sortRow(isAsc);
+                return;
+            }
+
+            var exchangeArray = Enumerable.Range(0, Row).ToArray();
+            var indexedArray = (int[])exchangeArray.Clone();
+
+            Array.Sort(indexedArray, (x, y) =>
+                {
+                    return isAsc ? compareRow(x, y) : compareRow(y, x);
+                });
+
+            for (int i = 0; i < exchangeArray.Length; ++i)
+            {
+                var newRow = indexedArray[i];
+                var targetRow = Array.FindIndex(exchangeArray, p => p == newRow);
+
+                exchangeArray[targetRow] = exchangeArray[i];
+                exchangeArray[i] = newRow;
+
+                swapRow(targetRow, i);
+            }
         }
 
         private void sortRow(bool isAsc = true)

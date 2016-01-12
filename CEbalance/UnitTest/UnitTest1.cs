@@ -3,11 +3,37 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CEbalance.Symbol;
 using CEbalance.Math;
 using CEbalance;
-
-
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace UnitTest
 {
+
+    [TestClass]
+    public class CompareTest
+    {
+        [TestMethod]
+        public void Test()
+        {
+            int[,] m = new int[6, 4]
+            {
+                { 13, 33, 22, 4 },
+                { 3 , 0, 0 , 2  },
+                { 0, 9, 6, 7 },
+                { 0, 0, 0, 3 },
+                { 22, 33, 0, 0 },
+                { 1, 0, 0, 0 }
+            };
+
+            Matrix<int> mm = new Matrix<int>(m);
+
+            mm.Sort(false);
+
+            mm.Print();
+        }
+    }
+
     [TestClass]
     public class UnitTest1
     {

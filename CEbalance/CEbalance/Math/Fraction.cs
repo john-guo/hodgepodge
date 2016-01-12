@@ -12,6 +12,9 @@ namespace CEbalance.Math
 
         public Fraction(int numerator, int denominator)
         {
+            if (denominator == 0)
+                throw new Exception();
+
             Numerator = numerator;
             Denominator = denominator;
         }
@@ -87,6 +90,9 @@ namespace CEbalance.Math
 
         public bool Equals(Fraction f)
         {
+            if (Numerator == 0 && f.Numerator == 0)
+                return true;
+
             this.reduce();
             f.reduce();
 
@@ -113,7 +119,7 @@ namespace CEbalance.Math
 
         private void reduce()
         {
-            if (Denominator == 1)
+            if (Denominator == 1 || Numerator == 0)
                 return;
             var gcd = Utils.GCD(Numerator, Denominator);
             Numerator /= gcd;
