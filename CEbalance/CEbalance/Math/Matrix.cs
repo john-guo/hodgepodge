@@ -106,11 +106,8 @@ namespace CEbalance.Math
         public void GaussElimination()
         {
             Sort(false);
-            //sortRow(false);
 
             int r = System.Math.Min(Row, Col);
-
-            //int r = Row;
 
             for (int i = 0; i < r; ++i)
             {
@@ -118,7 +115,6 @@ namespace CEbalance.Math
                 if (v == 0)
                     continue;
                 eliminationRow(i, i);
-                //divRow(i, matrix[i, i]);
             }
 
             for (int i = 0; i < r; ++i)
@@ -136,7 +132,6 @@ namespace CEbalance.Math
             }
 
             Sort(false);
-            //sortRow(false);
         }
 
         private void eliminationRow(int row, int col)

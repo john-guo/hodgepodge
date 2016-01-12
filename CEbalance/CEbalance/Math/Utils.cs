@@ -13,6 +13,7 @@ namespace CEbalance.Math
             int y = System.Math.Abs(b);
             int n1 = System.Math.Max(x, y);
             int n2 = System.Math.Min(x, y);
+
             while (n2 != 0)
             {
                 n1 = n1 > n2 ? n1 : n2;
