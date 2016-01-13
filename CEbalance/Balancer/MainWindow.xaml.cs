@@ -32,7 +32,7 @@ namespace Balancer
             try
             {
                 var equ = new Equation(textBox.Text);
-                equ.Trim();
+                equ.Balance();
                 label.Content = equ.ToString();
             }
             catch (Exception ex)

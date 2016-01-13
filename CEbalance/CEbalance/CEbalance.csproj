@@ -37,6 +37,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Balance.cs" />
+    <Compile Include="Calculate24.cs" />
+    <Compile Include="Math\Combination.cs" />
     <Compile Include="Math\Fraction.cs" />
     <Compile Include="Math\Matrix.cs" />
     <Compile Include="Math\Utils.cs" />

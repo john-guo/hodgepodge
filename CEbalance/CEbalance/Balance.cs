@@ -7,7 +7,7 @@ using CEbalance.Symbol;
 
 namespace CEbalance
 {
-    public static class Balance
+    public static class EquationBalance
     {
         public static Dictionary<int, Fraction> Solve(Matrix<Fraction> m)
         {
@@ -130,10 +130,10 @@ namespace CEbalance
             {
                 if (gcd == 0)
                 {
-                    gcd = pair.Value;
+                    gcd = (int)pair.Value;
                     continue;
                 }
-                gcd = Utils.GCD(gcd, pair.Value);
+                gcd = Utils.GCD(gcd, (int)pair.Value);
             }
             if (gcd > 1)
             {
@@ -211,20 +211,20 @@ namespace CEbalance
             return matrix;
         }
 
-        public static void Trim(this Equation equ)
+        public static void Balance(this Equation equ)
         {
             var matrix = equ.ToMatrix();
             var result = Solve(matrix);
             int index = 0;
             foreach (var m in equ.Left)
             {
-                m.Factor = result[index++];
+                m.Factor = (int)result[index++];
                 if (m.Factor == 0)
                     throw new Exception();
             }
             foreach (var m in equ.Right)
             {
-                m.Factor = result[index++];
+                m.Factor = (int)result[index++];
                 if (m.Factor == 0)
                     throw new Exception();
             }

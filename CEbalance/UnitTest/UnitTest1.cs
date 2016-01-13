@@ -109,7 +109,7 @@ namespace UnitTest
         {
             Fraction f1 = new Fraction(2, 4);
 
-            int i = f1 * 2;
+            int i = (int)(f1 * 2);
 
             Fraction f2 = new Fraction(1, 1);
 
@@ -170,7 +170,7 @@ namespace UnitTest
             Assert.AreEqual(2, matrix.Row);
             Assert.AreEqual(3, matrix.Col);
 
-            var result = Balance.Solve(matrix);
+            var result = EquationBalance.Solve(matrix);
 
             Assert.AreEqual(3, result.Count);
             Assert.AreEqual(1, (int)result[0]);
@@ -181,7 +181,7 @@ namespace UnitTest
             estr = "C2H2 + O2 -> CO2 + H2O";
             equ = new Equation(estr);
             matrix = equ.ToMatrix();
-            result = Balance.Solve(matrix);
+            result = EquationBalance.Solve(matrix);
             Assert.AreEqual(2, (int)result[0]);
             Assert.AreEqual(5, (int)result[1]);
             Assert.AreEqual(4, (int)result[2]);
@@ -191,8 +191,31 @@ namespace UnitTest
         [TestMethod]
         public void ComplexTest()
         {
-            var equ = new Equation("H2 + Ca(CN)2 + NaAlF4 + FeSO4 + MgSiO3 + KI + H3PO4 + PbBrO4 + BrCl + CF2Cl2 + SO2->PbBr2 + BrCl3 + MgCO3 + KAl(OH)4 + Fe(SCN)3 + PI3 + Na2SiO3 + CaF + H2O");
-            equ.Trim(); 
+            var equ = new Equation("S+HNO3=H2SO4+NO2+H2O");
+            equ.Balance();
+
+            equ = new Equation("Cu+HNO3=Cu(NO3)2+NO2+H2O");
+            equ.Balance();
+        }
+    }
+
+    [TestClass]
+    public class Calculate24Test
+    {
+        [TestMethod]
+        public void Test()
+        {
+            var cal = new Calculate24(3, 3, 3, 3);
+            var r = cal.Run();
+            Assert.IsTrue(cal.Passed);
+
+            cal = new Calculate24(6, 6, 6, 6);
+            r = cal.Run();
+            Assert.IsTrue(cal.Passed);
+
+            cal = new Calculate24(5, 5, 5, 1);
+            r = cal.Run();
+            Assert.IsTrue(cal.Passed);
         }
     }
 }

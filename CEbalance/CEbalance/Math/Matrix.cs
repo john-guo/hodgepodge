@@ -177,7 +177,7 @@ namespace CEbalance.Math
                 dynamic v2 = matrix[row2, j];
 
                 if (v1 == v2)
-                    return 0;
+                    continue;
 
                 if (v1 == 0)
                     return -1;
