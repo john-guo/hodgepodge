@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CEbalance.Math;
+using System.Linq.Expressions;
 
 namespace CEbalance
 {
@@ -39,6 +40,16 @@ namespace CEbalance
         private static IEnumerable<OpFlag>[] _ops;
         private static IEnumerable<int>[] _precedenceOp;
 
+        private static Dictionary<OpFlag, Func<Expression, Expression, Expression>> _opExpression =
+            new Dictionary<OpFlag, Func<Expression, Expression, Expression>>
+            {
+                { OpFlag.Plus, Expression.Add },
+                { OpFlag.Minus, Expression.Subtract },
+                { OpFlag.Mul, Expression.Multiply },
+                { OpFlag.Div, Expression.Divide }
+            };
+
+
         static Calculate24()
         {
             var cCount = _calculator.Count;
@@ -58,6 +69,9 @@ namespace CEbalance
         private int[] _numbers;
         private IEnumerable<int>[] _permNumbers;
         private IList<Tuple<int[], OpFlag[], int[]>> _result;
+
+        private IList<Expression> _expressions;
+
         private Calculate24(int[] numbers)
         {
             if (numbers.Length != CalculateCount)
@@ -75,6 +89,80 @@ namespace CEbalance
 
         }
 
+        private void calculate2(bool calAll)
+        { 
+            List<int> effectlist = new List<int>();
+
+            _expressions = new List<Expression>();
+            Dictionary<int, Expression> tempExp = new Dictionary<int, Expression>();
+
+            foreach (var numbers in _permNumbers)
+            {
+                foreach (var ops in _ops)
+                {
+                    var arrayNumber = numbers.ToArray();
+                    var arrayOp = ops.ToArray();
+
+                    foreach (var precendences in _precedenceOp)
+                    {
+                        effectlist.Clear();
+                        tempExp.Clear();
+                        Expression e = null;
+                        int pCount = precendences.Count();
+                        foreach (var p in precendences)
+                        {
+                            int left, right;
+                            Expression e_left, e_right;
+
+                            if (p > 0)
+                                left = p - 1;
+                            else
+                                left = p;
+                            if (p + 1 < pCount)
+                                right = p + 1;
+                            else
+                                right = p;
+
+                            if (tempExp.ContainsKey(left))
+                            {
+                                e_left = tempExp[left];
+                                effectlist.Add(left);
+                            }
+                            else
+                            {
+                                e_left = Expression.Constant((Fraction)_numbers[arrayNumber[p]]);
+                            }
+                            if (tempExp.ContainsKey(right))
+                            {
+                                e_right = tempExp[right];
+                                effectlist.Add(right);
+                            }
+                            else
+                            {
+                                e_right = Expression.Constant((Fraction)_numbers[arrayNumber[p + 1]]);
+                            }
+                            e = tempExp[p] = _opExpression[arrayOp[p]](e_left, e_right);
+
+                            foreach (var ei in effectlist)
+                            {
+                                tempExp[ei] = e;
+                            }
+                        }
+
+                        var n = Expression.Lambda<Func<Fraction>>(e).Compile()();
+                        if (n.IsInteger && n == CalculateResult)
+                        {
+                            _expressions.Add(e);
+
+                            if (!calAll)
+                                return;
+                        }
+                    }
+                }
+            }
+        }
+
+
         private void calculate(bool calAll)
         {
             _result = new List<Tuple<int[], OpFlag[], int[]>>();
@@ -90,16 +178,14 @@ namespace CEbalance
 
                     foreach (var precendences in _precedenceOp)
                     {
-                        StringBuilder sb = new StringBuilder();
-
                         for (int i = 0; i < tempResult.Length; ++i)
                         {
                             tempResult[i] = Fraction.NaN;
                         }
 
                         effectlist.Clear();
-
                         var f = Fraction.NaN;
+
                         foreach (var p in precendences)
                         {
                             Fraction f1, f2;
@@ -296,10 +382,28 @@ namespace CEbalance
             return result;
         }
 
+        public IList<string> Run2(bool calAll = true)
+        {
+            var result = new List<string>();
+            calculate2(calAll);
+
+            foreach (var e in _expressions)
+            {
+                var exp = e.ToString();
+                if (!result.Contains(exp))
+                    result.Add(exp);
+            }
+
+            return result;
+        }
+
         public bool Passed
         {
             get
             {
+                if (_expressions != null && _expressions.Count > 0)
+                    return true;
+
                 return _result == null ? false : _result.Count > 0;
             }
         }

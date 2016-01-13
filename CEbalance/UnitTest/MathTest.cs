@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MathNet.Numerics.LinearAlgebra;
+using System.Linq.Expressions;
 
 namespace UnitTest
 {
@@ -37,6 +38,17 @@ namespace UnitTest
             m.Solve(v);
             */
             
+        }
+
+        [TestMethod]
+        public void ExpressionTest()
+        {
+            var s = "3+(1*3)+2";
+            var e1 = Expression.Multiply(Expression.Constant(1), Expression.Constant(3));
+            var e2 = Expression.Add(Expression.Constant(3), e1);
+            var e3 = Expression.Add(e2, Expression.Constant(2));
+            var r = Expression.Lambda<Func<int>>(e3).Compile()();
+            Assert.AreEqual(8, r);
         }
     }
 }

@@ -203,18 +203,34 @@ namespace UnitTest
     public class Calculate24Test
     {
         [TestMethod]
-        public void Test()
+        public void Test2()
         {
             var cal = new Calculate24(3, 3, 3, 3);
-            var r = cal.Run();
+            var r = cal.Run2(false);
             Assert.IsTrue(cal.Passed);
 
             cal = new Calculate24(6, 6, 6, 6);
-            r = cal.Run();
+            r = cal.Run2(false);
             Assert.IsTrue(cal.Passed);
 
             cal = new Calculate24(5, 5, 5, 1);
-            r = cal.Run();
+            r = cal.Run2(false);
+            Assert.IsTrue(cal.Passed);
+        }
+
+        [TestMethod]
+        public void Test()
+        {
+            var cal = new Calculate24(3, 3, 3, 3);
+            var r = cal.Run(false);
+            Assert.IsTrue(cal.Passed);
+
+            cal = new Calculate24(6, 6, 6, 6);
+            r = cal.Run(false);
+            Assert.IsTrue(cal.Passed);
+
+            cal = new Calculate24(5, 5, 5, 1);
+            r = cal.Run(false);
             Assert.IsTrue(cal.Passed);
         }
     }
