@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CEbalance", "CEbalance\CEbalance.csproj", "{E04B4ACC-142B-47E9-9637-93E893CB589C}"
 EndProject
@@ -9,7 +9,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Balancer", "Balancer\Balancer.csproj", "{51FDEC37-2273-4C7E-BEEC-1933F10A6B42}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E61C45BB-4639-4FD1-A93B-3CDD3323FCD4}"
+	ProjectSection(SolutionItems) = preProject
+		Performance4.psess = Performance4.psess
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiler", "Profiler\Profiler.csproj", "{D8B5E265-D464-4559-93D8-33720EF00BF6}"
+EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -27,6 +37,10 @@ Global
 		{51FDEC37-2273-4C7E-BEEC-1933F10A6B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51FDEC37-2273-4C7E-BEEC-1933F10A6B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51FDEC37-2273-4C7E-BEEC-1933F10A6B42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8B5E265-D464-4559-93D8-33720EF00BF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8B5E265-D464-4559-93D8-33720EF00BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8B5E265-D464-4559-93D8-33720EF00BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8B5E265-D464-4559-93D8-33720EF00BF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

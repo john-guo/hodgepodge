@@ -72,6 +72,8 @@ namespace CEbalance
 
         private IList<Expression> _expressions;
 
+        private IList<ArithmeticExpression> _arithmetics;
+
         private Calculate24(int[] numbers)
         {
             if (numbers.Length != CalculateCount)
@@ -108,7 +110,7 @@ namespace CEbalance
                         effectlist.Clear();
                         tempExp.Clear();
                         Expression e = null;
-                        int pCount = precendences.Count();
+                        int pCount = CalculateCount - 1;
                         foreach (var p in precendences)
                         {
                             int left, right;
@@ -230,17 +232,21 @@ namespace CEbalance
                         if (f.IsInteger && f == CalculateResult)
                         {
                             var equ = precendences.ToArray();
+                            _result.Add(new Tuple<int[], OpFlag[], int[]>(
+                                arrayNumber,
+                                arrayOp,
+                                equ));
 
-                            if (!_result.Any(l => 
-                                l.Item1.SequenceEqual(arrayNumber)
-                                && l.Item2.SequenceEqual(arrayOp)
-                                && l.Item3.SequenceEqual(equ)))
-                            {
-                                _result.Add(new Tuple<int[], OpFlag[], int[]>(
-                                    arrayNumber,
-                                    arrayOp,
-                                    equ));
-                            }
+                            //if (!_result.Any(l =>
+                            //    l.Item1.SequenceEqual(arrayNumber)
+                            //    && l.Item2.SequenceEqual(arrayOp)
+                            //    && l.Item3.SequenceEqual(equ)))
+                            //{
+                            //    _result.Add(new Tuple<int[], OpFlag[], int[]>(
+                            //        arrayNumber,
+                            //        arrayOp,
+                            //        equ));
+                            //}
 
                             if (!calAll)
                                 return;
@@ -251,7 +257,106 @@ namespace CEbalance
             }
         }
 
-        class OpNode
+        private void calculate3(bool calAll)
+        {
+            List<int> effectlist = new List<int>();
+
+            _arithmetics = new List<ArithmeticExpression>();
+            Dictionary<int, ArithmeticExpression> tempExp = new Dictionary<int, ArithmeticExpression>();
+
+            foreach (var numbers in _permNumbers)
+            {
+                foreach (var ops in _ops)
+                {
+                    var arrayNumber = numbers.ToArray();
+                    var arrayOp = ops.ToArray();
+
+                    foreach (var precendences in _precedenceOp)
+                    {
+                        effectlist.Clear();
+                        tempExp.Clear();
+                        ArithmeticExpression e = null;
+                        int pCount = CalculateCount - 1;
+                        foreach (var p in precendences)
+                        {
+                            int left, right;
+                            ArithmeticExpression e_left = null, e_right = null;
+                            Fraction f_left = Fraction.NaN, f_right = Fraction.NaN;
+
+                            if (p > 0)
+                                left = p - 1;
+                            else
+                                left = p;
+                            if (p + 1 < pCount)
+                                right = p + 1;
+                            else
+                                right = p;
+
+                            if (tempExp.ContainsKey(left))
+                            {
+                                e_left = tempExp[left];
+                                effectlist.Add(left);
+                            }
+                            else
+                            {
+                                f_left = _numbers[arrayNumber[p]];
+                            }
+                            if (tempExp.ContainsKey(right))
+                            {
+                                e_right = tempExp[right];
+                                effectlist.Add(right);
+                            }
+                            else
+                            {
+                                f_right = _numbers[arrayNumber[p + 1]];
+                            }
+
+                            if (e_left == null)
+                            {
+                                if (e_right == null)
+                                {
+                                    e = ArithmeticExpression.Calculate(f_left, arrayOp[p], f_right);
+                                }
+                                else
+                                {
+                                    e = ArithmeticExpression.Calculate(f_left, arrayOp[p], e_right);
+                                }
+                            }
+                            else
+                            {
+                                if (e_right == null)
+                                {
+                                    e = ArithmeticExpression.Calculate(e_left, arrayOp[p], f_right);
+                                }
+                                else
+                                {
+                                    e = ArithmeticExpression.Calculate(e_left, arrayOp[p], e_right);
+                                }
+                            }
+
+                            tempExp[p] = e;
+
+                            foreach (var ei in effectlist)
+                            {
+                                tempExp[ei] = e;
+                            }
+                        }
+
+                        var n = e.Eval();
+
+                        if (n.IsInteger && n == CalculateResult)
+                        {
+                            _arithmetics.Add(e);
+
+                            if (!calAll)
+                                return;
+                        }
+                    }
+                }
+            }
+        }
+
+        class ArithmeticExpression
         {
             public static Dictionary<OpFlag, int> opPrecendence = new Dictionary<OpFlag, int>
             {
@@ -270,14 +375,80 @@ namespace CEbalance
             public const int childRight = 2;
 
             public OpFlag op = OpFlag.None;
-            public int num1 = 0;
-            public int num2 = 0;
+            public Fraction numLeft = 0;
+            public Fraction numRight = 0;
             public int index = 0;
             public int childPos = 0;
 
-            public OpNode Parent = null;
-            public OpNode Left = null;
-            public OpNode Right = null;
+            public ArithmeticExpression Parent = null;
+            public ArithmeticExpression Left = null;
+            public ArithmeticExpression Right = null;
+
+            public static ArithmeticExpression Calculate(Fraction left, OpFlag op, Fraction right)
+            {
+                ArithmeticExpression e = new ArithmeticExpression();
+                e.op = op;
+                e.numLeft = left;
+                e.numRight = right;
+                return e;
+            }
+
+            public static ArithmeticExpression Calculate(Fraction left, OpFlag op, ArithmeticExpression right)
+            {
+                ArithmeticExpression e = new ArithmeticExpression();
+                e.op = op;
+                e.numLeft = left;
+                e.Right = right;
+
+                right.Parent = e;
+                right.childPos = childRight;
+
+                return e;
+            }
+
+            public static ArithmeticExpression Calculate(ArithmeticExpression left, OpFlag op, Fraction right)
+            {
+                ArithmeticExpression e = new ArithmeticExpression();
+                e.op = op;
+                e.numRight = right;
+                e.Left = left;
+
+                left.Parent = e;
+                left.childPos = childLeft;
+
+                return e;
+            }
+
+            public static ArithmeticExpression Calculate(ArithmeticExpression left, OpFlag op, ArithmeticExpression right)
+            {
+                ArithmeticExpression e = new ArithmeticExpression();
+                e.op = op;
+                e.Left = left;
+                e.Right = right;
+
+                left.Parent = e;
+                left.childPos = childLeft;
+                right.Parent = e;
+                right.childPos = childRight;
+
+                return e;
+            }
+
+            public Fraction Eval()
+            {
+                Fraction left, right;
+                if (Left != null)
+                    left = Left.Eval();
+                else
+                    left = numLeft;
+
+                if (Right != null)
+                    right = Right.Eval();
+                else
+                    right = numRight;
+
+                return _calculator[op](left, right);
+            }
 
             public override string ToString()
             {
@@ -296,12 +467,12 @@ namespace CEbalance
                 if (Left != null)
                     leftString = Left.ToString();
                 else
-                    leftString = num1.ToString();
+                    leftString = numLeft.ToString();
 
                 if (Right != null)
                     rightString = Right.ToString();
                 else
-                    rightString = num2.ToString();
+                    rightString = numRight.ToString();
 
                 return string.Format(outputFormat, 
                     string.Format("{0}{1}{2}", 
@@ -318,14 +489,14 @@ namespace CEbalance
 
             foreach (var r in _result)
             {
-                OpNode root = null;
+                ArithmeticExpression root = null;
                 for (int i = 0; i < r.Item3.Length; ++i)
                 {
-                    OpNode n = new OpNode();
+                    ArithmeticExpression n = new ArithmeticExpression();
                     n.index = r.Item3[i];
                     n.op = r.Item2[n.index];
-                    n.num1 = _numbers[r.Item1[n.index]];
-                    n.num2 = _numbers[r.Item1[n.index + 1]];
+                    n.numLeft = _numbers[r.Item1[n.index]];
+                    n.numRight = _numbers[r.Item1[n.index + 1]];
 
                     if (root == null)
                     {
@@ -336,12 +507,12 @@ namespace CEbalance
                         if (n.index > root.index)
                         {
                             n.Left = root;
-                            root.childPos = OpNode.childLeft;
+                            root.childPos = ArithmeticExpression.childLeft;
                         }
                         else
                         {
                             n.Right = root;
-                            root.childPos = OpNode.childRight;
+                            root.childPos = ArithmeticExpression.childRight;
                         }
 
                         root.Parent = n;
@@ -361,14 +532,14 @@ namespace CEbalance
                     if (adjLeft)
                     {
                         var node = root.Left.Left == null ? root.Left.Right : root.Left.Left;
-                        node.childPos = OpNode.childRight;
+                        node.childPos = ArithmeticExpression.childRight;
                         root.Right = node;
                         root.Left.Left = root.Left.Right = null;
                     }
                     else
                     {
                         var node = root.Right.Left == null ? root.Right.Right : root.Right.Left;
-                        node.childPos = OpNode.childLeft;
+                        node.childPos = ArithmeticExpression.childLeft;
                         root.Left = node;
                         root.Right.Left = root.Right.Right = null;
                     }
@@ -397,11 +568,29 @@ namespace CEbalance
             return result;
         }
 
+        public IList<string> Run3(bool calAll = true)
+        {
+            var result = new List<string>();
+            calculate3(calAll);
+
+            foreach (var e in _arithmetics)
+            {
+                var exp = e.ToString();
+                if (!result.Contains(exp))
+                    result.Add(exp);
+            }
+
+            return result;
+        }
+
         public bool Passed
         {
             get
             {
                 if (_expressions != null && _expressions.Count > 0)
+                    return true;
+
+                if (_arithmetics != null && _arithmetics.Count > 0)
                     return true;
 
                 return _result == null ? false : _result.Count > 0;
