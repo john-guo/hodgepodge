@@ -10,6 +10,7 @@ namespace Profiler
 
             var test = new Calculate24Test();
             test.Test();
+            test.Test2();
             test.Test3();
 
             System.Threading.Thread.Sleep(3000);

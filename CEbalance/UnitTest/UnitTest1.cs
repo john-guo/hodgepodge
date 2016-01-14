@@ -205,17 +205,16 @@ namespace UnitTest
         [TestMethod]
         public void Test2()
         {
-            return;
             var cal = new Calculate24(3, 3, 3, 3);
-            var r = cal.Run2(false);
+            var r = cal.Run2();
             Assert.IsTrue(cal.Passed);
 
             cal = new Calculate24(6, 6, 6, 6);
-            r = cal.Run2(false);
+            r = cal.Run2();
             Assert.IsTrue(cal.Passed);
 
             cal = new Calculate24(5, 5, 5, 1);
-            r = cal.Run2(false);
+            r = cal.Run2();
             Assert.IsTrue(cal.Passed);
         }
 
