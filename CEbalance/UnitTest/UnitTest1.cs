@@ -203,34 +203,18 @@ namespace UnitTest
     public class Calculate24Test
     {
         [TestMethod]
-        public void Test2()
+        public void TestSlow()
         {
             var cal = new Calculate24(3, 3, 3, 3);
-            var r = cal.Run2();
+            var r = cal.RunSlow();
             Assert.IsTrue(cal.Passed);
 
             cal = new Calculate24(6, 6, 6, 6);
-            r = cal.Run2();
+            r = cal.RunSlow();
             Assert.IsTrue(cal.Passed);
 
             cal = new Calculate24(5, 5, 5, 1);
-            r = cal.Run2();
-            Assert.IsTrue(cal.Passed);
-        }
-
-        [TestMethod]
-        public void Test3()
-        {
-            var cal = new Calculate24(3, 3, 3, 3);
-            var r = cal.Run3();
-            Assert.IsTrue(cal.Passed);
-
-            cal = new Calculate24(6, 6, 6, 6);
-            r = cal.Run3();
-            Assert.IsTrue(cal.Passed);
-
-            cal = new Calculate24(5, 5, 5, 1);
-            r = cal.Run3();
+            r = cal.RunSlow();
             Assert.IsTrue(cal.Passed);
         }
 
@@ -247,6 +231,22 @@ namespace UnitTest
 
             cal = new Calculate24(5, 5, 5, 1);
             r = cal.Run();
+            Assert.IsTrue(cal.Passed);
+        }
+
+        [TestMethod]
+        public void TestFast()
+        {
+            var cal = new Calculate24(3, 3, 3, 3);
+            var r = cal.RunFast();
+            Assert.IsTrue(cal.Passed);
+
+            cal = new Calculate24(6, 6, 6, 6);
+            r = cal.RunFast();
+            Assert.IsTrue(cal.Passed);
+
+            cal = new Calculate24(5, 5, 5, 1);
+            r = cal.RunFast();
             Assert.IsTrue(cal.Passed);
         }
     }

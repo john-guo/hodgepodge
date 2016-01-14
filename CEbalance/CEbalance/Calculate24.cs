@@ -55,7 +55,8 @@ namespace CEbalance
             var cCount = _calculator.Count;
 
             _precedenceOp = Enumerable.Range(0, CalculateCount - 1)
-                .Permutation(CalculateCount - 1).ToArray();
+                .Permutation(CalculateCount - 1)
+                .ToArray();
 
             _ops =
                 Enumerable.Range(0, (CalculateCount - 1) * cCount)
@@ -72,7 +73,7 @@ namespace CEbalance
 
         private IList<Expression> _expressions;
 
-        private IList<ArithmeticExpression> _arithmetics;
+        private IList<CalculateExpression> _arithmetics;
 
         private Calculate24(int[] numbers)
         {
@@ -100,9 +101,10 @@ namespace CEbalance
 
             foreach (var numbers in _permNumbers)
             {
+                var arrayNumber = numbers.ToArray();
+
                 foreach (var ops in _ops)
                 {
-                    var arrayNumber = numbers.ToArray();
                     var arrayOp = ops.ToArray();
 
                     foreach (var precendences in _precedenceOp)
@@ -173,9 +175,10 @@ namespace CEbalance
 
             foreach (var numbers in _permNumbers)
             {
+                var arrayNumber = numbers.ToArray();
+
                 foreach (var ops in _ops)
                 {
-                    var arrayNumber = numbers.ToArray();
                     var arrayOp = ops.ToArray();
 
                     foreach (var precendences in _precedenceOp)
@@ -261,27 +264,26 @@ namespace CEbalance
         {
             List<int> effectlist = new List<int>();
 
-            _arithmetics = new List<ArithmeticExpression>();
-            Dictionary<int, ArithmeticExpression> tempExp = new Dictionary<int, ArithmeticExpression>();
+            _arithmetics = new List<CalculateExpression>();
+            Dictionary<int, CalculateExpression> tempExp = new Dictionary<int, CalculateExpression>();
 
             foreach (var numbers in _permNumbers)
             {
+                var arrayNumber = numbers.ToArray();
                 foreach (var ops in _ops)
                 {
-                    var arrayNumber = numbers.ToArray();
                     var arrayOp = ops.ToArray();
 
                     foreach (var precendences in _precedenceOp)
                     {
                         effectlist.Clear();
                         tempExp.Clear();
-                        ArithmeticExpression e = null;
+                        CalculateExpression e = null;
                         int pCount = CalculateCount - 1;
                         foreach (var p in precendences)
                         {
                             int left, right;
-                            ArithmeticExpression e_left = null, e_right = null;
-                            Fraction f_left = Fraction.NaN, f_right = Fraction.NaN;
+                            CalculateExpression ce_left = null, ce_right = null;
 
                             if (p > 0)
                                 left = p - 1;
@@ -294,47 +296,24 @@ namespace CEbalance
 
                             if (tempExp.ContainsKey(left))
                             {
-                                e_left = tempExp[left];
+                                ce_left = tempExp[left];
                                 effectlist.Add(left);
                             }
                             else
                             {
-                                f_left = _numbers[arrayNumber[p]];
+                                ce_left = CalculateExpression.Constant(_numbers[arrayNumber[p]]);
                             }
                             if (tempExp.ContainsKey(right))
                             {
-                                e_right = tempExp[right];
+                                ce_right = tempExp[right];
                                 effectlist.Add(right);
                             }
                             else
                             {
-                                f_right = _numbers[arrayNumber[p + 1]];
+                                ce_right = CalculateExpression.Constant(_numbers[arrayNumber[p + 1]]);
                             }
 
-                            if (e_left == null)
-                            {
-                                if (e_right == null)
-                                {
-                                    e = ArithmeticExpression.Calculate(f_left, arrayOp[p], f_right);
-                                }
-                                else
-                                {
-                                    e = ArithmeticExpression.Calculate(f_left, arrayOp[p], e_right);
-                                }
-                            }
-                            else
-                            {
-                                if (e_right == null)
-                                {
-                                    e = ArithmeticExpression.Calculate(e_left, arrayOp[p], f_right);
-                                }
-                                else
-                                {
-                                    e = ArithmeticExpression.Calculate(e_left, arrayOp[p], e_right);
-                                }
-                            }
-
-                            tempExp[p] = e;
+                            e = tempExp[p] = CalculateExpression.Calculate(ce_left, arrayOp[p], ce_right);
 
                             foreach (var ei in effectlist)
                             {
@@ -356,7 +335,63 @@ namespace CEbalance
             }
         }
 
-        class ArithmeticExpression
+        abstract class CalculateExpression
+        {
+            public const int childLeft = 1;
+            public const int childRight = 2;
+
+            public OpFlag op = OpFlag.None;
+            public Fraction numLeft = 0;
+            public Fraction numRight = 0;
+            public int index = 0;
+            public int childPos = 0;
+
+            public CalculateExpression Parent = null;
+            public CalculateExpression Left = null;
+            public CalculateExpression Right = null;
+
+            public abstract override string ToString();
+            public abstract Fraction Eval();
+
+            public static ArithmeticExpression Calculate(CalculateExpression left, OpFlag op, CalculateExpression right)
+            {
+                var e = new ArithmeticExpression();
+                e.op = op;
+                e.Left = left;
+                e.Right = right;
+
+                left.Parent = e;
+                left.childPos = childLeft;
+                right.Parent = e;
+                right.childPos = childRight;
+
+                return e;
+            }
+
+            public static FractionExpression Constant(Fraction f)
+            {
+                var e = new FractionExpression();
+                e.constant = f;
+                return e;
+            }
+        }
+
+        class FractionExpression : CalculateExpression
+        {
+            public Fraction constant = Fraction.NaN;
+
+            public override Fraction Eval()
+            {
+                return constant;
+            }
+
+            public override string ToString()
+            {
+                return constant.ToString();
+            }
+        }
+
+        class ArithmeticExpression : CalculateExpression
         {
             public static Dictionary<OpFlag, int> opPrecendence = new Dictionary<OpFlag, int>
             {
@@ -371,83 +406,9 @@ namespace CEbalance
                 OpFlag.Minus, OpFlag.Div
             };
 
-            public const int childLeft = 1;
-            public const int childRight = 2;
-
-            public OpFlag op = OpFlag.None;
-            public Fraction numLeft = 0;
-            public Fraction numRight = 0;
-            public int index = 0;
-            public int childPos = 0;
-
-            public ArithmeticExpression Parent = null;
-            public ArithmeticExpression Left = null;
-            public ArithmeticExpression Right = null;
-
-            public static ArithmeticExpression Calculate(Fraction left, OpFlag op, Fraction right)
+            public override Fraction Eval()
             {
-                ArithmeticExpression e = new ArithmeticExpression();
-                e.op = op;
-                e.numLeft = left;
-                e.numRight = right;
-                return e;
-            }
-
-            public static ArithmeticExpression Calculate(Fraction left, OpFlag op, ArithmeticExpression right)
-            {
-                ArithmeticExpression e = new ArithmeticExpression();
-                e.op = op;
-                e.numLeft = left;
-                e.Right = right;
-
-                right.Parent = e;
-                right.childPos = childRight;
-
-                return e;
-            }
-
-            public static ArithmeticExpression Calculate(ArithmeticExpression left, OpFlag op, Fraction right)
-            {
-                ArithmeticExpression e = new ArithmeticExpression();
-                e.op = op;
-                e.numRight = right;
-                e.Left = left;
-
-                left.Parent = e;
-                left.childPos = childLeft;
-
-                return e;
-            }
-
-            public static ArithmeticExpression Calculate(ArithmeticExpression left, OpFlag op, ArithmeticExpression right)
-            {
-                ArithmeticExpression e = new ArithmeticExpression();
-                e.op = op;
-                e.Left = left;
-                e.Right = right;
-
-                left.Parent = e;
-                left.childPos = childLeft;
-                right.Parent = e;
-                right.childPos = childRight;
-
-                return e;
-            }
-
-            public Fraction Eval()
-            {
-                Fraction left, right;
-                if (Left != null)
-                    left = Left.Eval();
-                else
-                    left = numLeft;
-
-                if (Right != null)
-                    right = Right.Eval();
-                else
-                    right = numRight;
-
-                return _calculator[op](left, right);
+                return _calculator[op](Left.Eval(), Right.Eval());
             }
 
             public override string ToString()
@@ -482,7 +443,7 @@ namespace CEbalance
             }
         }
 
-        public IList<string> Run(bool calAll = true)
+        public IList<string> RunFast(bool calAll = true)
         {
             var result = new List<string>();
             calculate(calAll);
@@ -507,12 +468,12 @@ namespace CEbalance
                         if (n.index > root.index)
                         {
                             n.Left = root;
-                            root.childPos = ArithmeticExpression.childLeft;
+                            root.childPos = CalculateExpression.childLeft;
                         }
                         else
                         {
                             n.Right = root;
-                            root.childPos = ArithmeticExpression.childRight;
+                            root.childPos = CalculateExpression.childRight;
                         }
 
                         root.Parent = n;
@@ -532,14 +493,14 @@ namespace CEbalance
                     if (adjLeft)
                     {
                         var node = root.Left.Left == null ? root.Left.Right : root.Left.Left;
-                        node.childPos = ArithmeticExpression.childRight;
+                        node.childPos = CalculateExpression.childRight;
                         root.Right = node;
                         root.Left.Left = root.Left.Right = null;
                     }
                     else
                     {
                         var node = root.Right.Left == null ? root.Right.Right : root.Right.Left;
-                        node.childPos = ArithmeticExpression.childLeft;
+                        node.childPos = CalculateExpression.childLeft;
                         root.Left = node;
                         root.Right.Left = root.Right.Right = null;
                     }
@@ -553,7 +514,7 @@ namespace CEbalance
             return result;
         }
 
-        public IList<string> Run2(bool calAll = true)
+        public IList<string> RunSlow(bool calAll = true)
         {
             var result = new List<string>();
             calculate2(calAll);
@@ -568,7 +529,7 @@ namespace CEbalance
             return result;
         }
 
-        public IList<string> Run3(bool calAll = true)
+        public IList<string> Run(bool calAll = true)
         {
             var result = new List<string>();
             calculate3(calAll);
@@ -597,9 +558,9 @@ namespace CEbalance
             }
         }
 
-        public IList<Tuple<int[], OpFlag[], int[]>> Result
-        {
-            get { return _result; }
-        }
+        //public IList<Tuple<int[], OpFlag[], int[]>> Result
+        //{
+        //    get { return _result; }
+        //}
     }
 }

@@ -11,12 +11,18 @@ namespace CEbalance.Math
         {
             int x = System.Math.Abs(a);
             int y = System.Math.Abs(b);
-            int n1 = System.Math.Max(x, y);
-            int n2 = System.Math.Min(x, y);
+            if (x == y)
+                return x;
+
+            int n1 = x, n2 = y;
+            if (y > x)
+            {
+                n1 = y;
+                n2 = x;
+            }
 
             while (n2 != 0)
             {
-                n1 = n1 > n2 ? n1 : n2;
                 int m = n1 % n2;
                 n1 = n2;
                 n2 = m;
