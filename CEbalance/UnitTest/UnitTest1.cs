@@ -14,21 +14,66 @@ namespace UnitTest
     public class CompareTest
     {
         [TestMethod]
-        public void Test()
+        public void Test1()
         {
-            int[,] m = new int[6, 4]
+            int[,] m = new int[10, 4]
             {
                 { 13, 33, 22, 4 },
                 { 3 , 0, 0 , 2  },
                 { 0, 9, 6, 7 },
                 { 0, 0, 0, 3 },
-                { 22, 33, 0, 0 },
-                { 1, 0, 0, 0 }
+                { 22, 6, 0, 0 },
+                { 1, 0, 0, 0 },
+                { 22, 12, 3, 61 },
+                { 1, 0, 2, 0 },
+                { 0, 3, 397, 0 },
+                { 2, 0, 5, 41 }
             };
 
-            Matrix<int> mm = new Matrix<int>(m);
+            //Matrix<int> mm = new Matrix<int>(m);
 
-            mm.Sort(false);
+            //mm.Print();
+            //mm.swapRow(4, 5);
+
+            int[,] n = new int[100, 100];
+            for (int i = 0; i < 100; ++i)
+            {
+                n[i, i] = i;
+            }
+
+            Matrix<int> nn = new Matrix<int>(n);
+
+            nn.Sort(false);
+
+            nn.Print();
+        }
+
+        [TestMethod]
+        public void Test2()
+        {
+            int[,] m = new int[10, 4]
+            {
+                { 13, 33, 22, 4 },
+                { 3 , 0, 0 , 2  },
+                { 0, 9, 6, 7 },
+                { 0, 0, 0, 3 },
+                { 22, 6, 0, 0 },
+                { 1, 0, 0, 0 },
+                { 22, 12, 3, 61 },
+                { 1, 0, 2, 0 },
+                { 0, 3, 397, 0 },
+                { 2, 0, 5, 41 }
+            };
+
+            int[,] n = new int[100, 100];
+            for (int i = 0; i < 100; ++i)
+            {
+                n[i, i] = i;
+            }
+
+            Matrix<int> mm = new Matrix<int>(n);
+
+            mm.sortRow(false);
 
             mm.Print();
         }

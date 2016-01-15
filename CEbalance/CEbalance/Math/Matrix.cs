@@ -154,19 +154,10 @@ namespace CEbalance.Math
             if (row1 == row2)
                 return;
 
-            T[] tempRow = new T[Col];
-            for (int j = 0; j < Col; ++j)
-            {
-                tempRow[j] = matrix[row1, j];
-            }
-            for (int j = 0; j < Col; ++j)
-            {
-                matrix[row1, j] = matrix[row2, j];
-            }
-            for (int j = 0; j < Col; ++j)
-            {
-                matrix[row2, j] = tempRow[j];
-            }
+            T[,] tempRow = new T[1, Col];
+            Array.Copy(matrix, Col * row1, tempRow, 0, Col);
+            Array.Copy(matrix, Col * row2, matrix, Col * row1, Col);
+            Array.Copy(tempRow, 0, matrix, Col * row2, Col);
         }
 
         internal int compareRow(int row1, int row2)
@@ -202,6 +193,7 @@ namespace CEbalance.Math
             }
 
             var exchangeArray = Enumerable.Range(0, Row).ToArray();
+            var exchangeIndexedArray = Enumerable.Range(0, Row).ToArray();
             var indexedArray = (int[])exchangeArray.Clone();
 
             Array.Sort(indexedArray, (x, y) =>
@@ -212,16 +204,25 @@ namespace CEbalance.Math
             for (int i = 0; i < exchangeArray.Length; ++i)
             {
                 var newRow = indexedArray[i];
-                var targetRow = Array.FindIndex(exchangeArray, p => p == newRow);
+                var targetRow = exchangeIndexedArray[newRow];
 
-                exchangeArray[targetRow] = exchangeArray[i];
-                exchangeArray[i] = newRow;
+                var exchange1 = exchangeArray[i];
+                var exchange2 = exchangeArray[targetRow];
+
+                if (exchange1 == exchange2)
+                    continue;
+
+                exchangeArray[i] = exchange2;
+                exchangeArray[targetRow] = exchange1;
+
+                exchangeIndexedArray[exchange1] = targetRow;
+                exchangeIndexedArray[exchange2] = i;
 
                 swapRow(targetRow, i);
             }
         }
 
-        private void sortRow(bool isAsc = true)
+        internal void sortRow(bool isAsc = true)
         {
             for (int i = 0; i < Row - 1; ++i)
             {
