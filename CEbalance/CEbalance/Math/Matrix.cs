@@ -158,6 +158,20 @@ namespace CEbalance.Math
             Array.Copy(matrix, Col * row1, tempRow, 0, Col);
             Array.Copy(matrix, Col * row2, matrix, Col * row1, Col);
             Array.Copy(tempRow, 0, matrix, Col * row2, Col);
+
+            //T[] tempRow = new T[Col];
+            //for (int j = 0; j < Col; ++j)
+            //{
+            //    tempRow[j] = matrix[row1, j];
+            //}
+            //for (int j = 0; j < Col; ++j)
+            //{
+            //    matrix[row1, j] = matrix[row2, j];
+            //}
+            //for (int j = 0; j < Col; ++j)
+            //{
+            //    matrix[row2, j] = tempRow[j];
+            //}
         }
 
         internal int compareRow(int row1, int row2)
