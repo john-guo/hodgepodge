@@ -173,7 +173,9 @@ namespace CEbalance
                 {
                     foreach (var b in a.Ions)
                     {
-                        equParams[paramTable[b.Name]][i] = a.Key * b.Key;
+                        if (!equParams[paramTable[b.Name]].ContainsKey(i))
+                            equParams[paramTable[b.Name]][i] = 0;
+                        equParams[paramTable[b.Name]][i] += a.Key * b.Key;
                     }
                 }
                 ++i;
@@ -185,7 +187,10 @@ namespace CEbalance
                 {
                     foreach (var b in a.Ions)
                     {
-                        equParams[paramTable[b.Name]][i] = -(a.Key * b.Key);
+                        if (!equParams[paramTable[b.Name]].ContainsKey(i))
+                            equParams[paramTable[b.Name]][i] = 0;
+
+                        equParams[paramTable[b.Name]][i] += -(a.Key * b.Key);
                     }
                 }
                 ++i;
