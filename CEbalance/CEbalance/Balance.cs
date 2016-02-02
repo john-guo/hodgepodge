@@ -175,6 +175,7 @@ namespace CEbalance
                     {
                         if (!equParams[paramTable[b.Name]].ContainsKey(i))
                             equParams[paramTable[b.Name]][i] = 0;
+
                         equParams[paramTable[b.Name]][i] += a.Key * b.Key;
                     }
                 }
