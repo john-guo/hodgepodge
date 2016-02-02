@@ -129,6 +129,9 @@ namespace CEbalance.Math
             if (IsNaN && f.IsNaN)
                 return true;
 
+            if (IsNaN || f.IsNaN)
+                return false;
+
             if (Numerator == 0 && f.Numerator == 0)
                 return true;
 
