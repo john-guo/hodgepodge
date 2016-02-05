@@ -82,7 +82,7 @@ namespace CropperMagnetPlugin
 
     public class MagnetSettings
     {
-        Dictionary<OCRType, IOCR> _cache = new Dictionary<OCRType, IOCR>()
+        static Dictionary<OCRType, IOCR> _cache = new Dictionary<OCRType, IOCR>()
         {
             {OCRType.Tesseract, new TesseractOCR() },
             {OCRType.MODI, new MODIOCR() }
