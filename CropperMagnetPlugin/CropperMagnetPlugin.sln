@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CropperMagnetPlugin", "CropperMagnetPlugin\CropperMagnetPlugin.csproj", "{C229EBEB-A30E-4DCA-B8BA-1907C56024ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.csproj", "{E521632F-916D-4E00-AA31-6630531E1638}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPlugin", "TestPlugin\TestPlugin.csproj", "{1F4A63FE-7070-4371-9279-AA427EB1AE3E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C229EBEB-A30E-4DCA-B8BA-1907C56024ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C229EBEB-A30E-4DCA-B8BA-1907C56024ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C229EBEB-A30E-4DCA-B8BA-1907C56024ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C229EBEB-A30E-4DCA-B8BA-1907C56024ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E521632F-916D-4E00-AA31-6630531E1638}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E521632F-916D-4E00-AA31-6630531E1638}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E521632F-916D-4E00-AA31-6630531E1638}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E521632F-916D-4E00-AA31-6630531E1638}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F4A63FE-7070-4371-9279-AA427EB1AE3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F4A63FE-7070-4371-9279-AA427EB1AE3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F4A63FE-7070-4371-9279-AA427EB1AE3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F4A63FE-7070-4371-9279-AA427EB1AE3E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
