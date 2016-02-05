@@ -6,9 +6,14 @@ using System.IO;
 
 namespace CropperMagnetPlugin
 {
-    public static class OCRHelper
+    public interface IOCR
     {
-        public static string OCR(string filename)
+        string OCR(string filename);
+    }
+
+    public class MODIOCR : IOCR
+    {
+        public string OCR(string filename)
         {
             MODI.Document doc = new MODI.Document();
             doc.Create(filename);
@@ -17,6 +22,51 @@ namespace CropperMagnetPlugin
             var text = img.Layout.Text;
             doc.Close();
             return text;
+        }
+    }
+
+    public class TesseractOCR : IOCR
+    {
+        Tesseract.TesseractEngine engine;
+        public TesseractOCR()
+        {
+            engine = new Tesseract.TesseractEngine(@".\tessdata", "eng");
+        }
+
+        ~TesseractOCR()
+        {
+            if (!engine.IsDisposed)
+                engine.Dispose();
+        }
+
+        public string OCR(string filename)
+        {
+            using (var img = Tesseract.Pix.LoadFromFile(filename))
+            using (var page = engine.Process(img))
+            {
+                return page.GetText();
+            }
+        }
+
+    }
+
+    public static class OCRHelper
+    {
+        private static IOCR ocr;
+
+        static OCRHelper()
+        {
+            ocr = new TesseractOCR();
+        }
+
+        public static void SetOCR(IOCR iocr)
+        {
+            ocr = iocr;
+        }
+
+        public static string OCR(string filename)
+        {
+            return ocr.OCR(filename);
         }
 
         public static string OCR(Image img)

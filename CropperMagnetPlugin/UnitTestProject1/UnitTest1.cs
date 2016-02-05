@@ -12,7 +12,7 @@ namespace UnitTestProject1
         public void TestMethod1()
         {
             var text = OCRHelper.OCRMagnet("test.bmp");
-            OCRHelper.OCR((Image)null);
+            //OCRHelper.Exit();
         }
     }
 }
