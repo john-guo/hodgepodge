@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cropper.Extensibility">
-      <HintPath>D:\Program Files (x86)\Fusion8Design\Cropper\Cropper.Extensibility.dll</HintPath>
+      <HintPath>..\lib\Cropper.Extensibility.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

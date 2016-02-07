@@ -14,8 +14,17 @@ namespace CropperMagnetPlugin
         public OCROptionsForm()
         {
             InitializeComponent();
+        }
 
-            switch (Type)
+        
+        public OCRSettings Settings { get; set; }
+
+
+        public void InitializeSettings(OCRSettings settings)
+        {
+            Settings = settings;
+
+            switch (Settings.Type)
             {
                 case OCRType.Tesseract:
                     radioButton1.Checked = true;
@@ -23,19 +32,28 @@ namespace CropperMagnetPlugin
                 case OCRType.MODI:
                     radioButton2.Checked = true;
                     break;
+                case OCRType.OneNote:
+                    radioButton3.Checked = true;
+                    break;
             }
+            radioButton1.Enabled = Settings.IsEnable(OCRType.Tesseract);
+            radioButton2.Enabled = Settings.IsEnable(OCRType.MODI);
+            radioButton3.Enabled = Settings.IsEnable(OCRType.OneNote);
         }
-
-        public OCRType Type { get; set; }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            Type = OCRType.Tesseract;
+            Settings.Type = OCRType.Tesseract;
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-            Type = OCRType.MODI;
+            Settings.Type = OCRType.MODI;
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Type = OCRType.OneNote;
         }
     }
 }

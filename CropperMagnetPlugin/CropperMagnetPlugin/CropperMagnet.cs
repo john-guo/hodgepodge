@@ -9,7 +9,7 @@ namespace CropperMagnetPlugin
 {
     public class CropperMagnet : DesignablePlugin, IConfigurablePlugin
     {
-        private MagnetSettings pluginSettings = new MagnetSettings();
+        private OCRSettings pluginSettings = new OCRSettings();
         private OCROptionsForm configurationForm;
 
         public BaseConfigurationForm ConfigurationForm
@@ -19,8 +19,8 @@ namespace CropperMagnetPlugin
                 if (configurationForm == null)
                 {
                     configurationForm = new OCROptionsForm();
+                    configurationForm.InitializeSettings(pluginSettings);
                     configurationForm.OptionsSaved += ConfigurationForm_OptionsSaved;
-                    configurationForm.Type = pluginSettings.Type;
                 }
 
                 return configurationForm;
@@ -29,7 +29,6 @@ namespace CropperMagnetPlugin
 
         private void ConfigurationForm_OptionsSaved(object sender, EventArgs e)
         {
-            pluginSettings.Type = configurationForm.Type;
             OCRHelper.SetOCR(pluginSettings.GetOCR());
         }
 
@@ -66,7 +65,7 @@ namespace CropperMagnetPlugin
 
             set
             {
-                pluginSettings = (MagnetSettings)value;
+                pluginSettings = (OCRSettings)value;
             }
         }
 
@@ -76,25 +75,5 @@ namespace CropperMagnetPlugin
             Clipboard.SetText(text);
         }
 
-    }
-
-    public enum OCRType { Tesseract, MODI };
-
-    public class MagnetSettings
-    {
-        static Dictionary<OCRType, IOCR> _cache = new Dictionary<OCRType, IOCR>()
-        {
-            {OCRType.Tesseract, new TesseractOCR() },
-            {OCRType.MODI, new MODIOCR() }
-        };
-
-        public OCRType Type { get; set; }
-
-        public IOCR GetOCR()
-        {
-            IOCR ocr = null;
-            _cache.TryGetValue(Type, out ocr);
-            return ocr;
-        }
     }
 }
