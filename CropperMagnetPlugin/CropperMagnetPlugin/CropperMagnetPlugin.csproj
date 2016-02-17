@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,7 +33,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cropper.Extensibility">
-      <HintPath>D:\Program Files (x86)\Fusion8Design\Cropper\Cropper.Extensibility.dll</HintPath>
+      <HintPath>..\lib\Cropper.Extensibility.dll</HintPath>
+    </Reference>
+    <Reference Include="Skybound.VisualStyles">
+      <HintPath>..\lib\Skybound.VisualStyles.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -41,7 +44,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Tesseract, Version=2.4.1.0, Culture=neutral, PublicKeyToken=ebeb3d86bef60cbe, processorArchitecture=MSIL">
-      <HintPath>..\packages\Tesseract.2.4.1.0\lib\net20\Tesseract.dll</HintPath>
+      <HintPath>..\lib\Tesseract.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -54,9 +57,19 @@
     <Compile Include="OCROptionsForm.Designer.cs">
       <DependentUpon>OCROptionsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="OCRSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="Microsoft.Office.Interop.OneNote">
+      <Guid>{0EA692EE-BB50-4E3C-AEF0-356D91732725}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="MODI">
       <Guid>{A5EDEDF4-2BBC-45F3-822B-E60C278A1A79}</Guid>
       <VersionMajor>12</VersionMajor>
@@ -68,12 +81,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="x64\liblept168.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="x64\libtesseract302.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="x64\liblept168.dll" />
+    <Content Include="x64\libtesseract302.dll" />
     <Content Include="x86\liblept168.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -84,6 +93,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Properties\DataSources\CropperPlugins.CropperMagnet.datasource" />
+    <None Include="Properties\DataSources\OCROptionsForm.datasource" />
     <None Include="tessdata\eng.cube.bigrams">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

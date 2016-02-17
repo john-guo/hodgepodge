@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CropperMagnetPlugin;
 using System.Drawing;
+using Microsoft.Office.Interop.OneNote;
 
 namespace UnitTestProject1
 {
@@ -11,8 +12,16 @@ namespace UnitTestProject1
         [TestMethod]
         public void TestMethod1()
         {
-            var text = OCRHelper.OCRMagnet("test.bmp");
+            var o = new OneNoteOCR();
+            OCRHelper.SetOCR(o);
+            var image = Image.FromFile("test.jpg");
+            var text = OCRHelper.OCRMagnet("test.jpg");
             //OCRHelper.Exit();
+        }
+
+        [TestMethod]
+        public void OneNoteTest()
+        {
         }
     }
 }
