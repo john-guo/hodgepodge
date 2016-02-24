@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WOLTest", "WOLTest\WOLTest.csproj", "{236D8016-C7E9-4782-9491-E191F6CB663A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ARPQuery", "ARPQuery\ARPQuery.csproj", "{E997CD05-5154-4965-9566-71A0488CE252}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{236D8016-C7E9-4782-9491-E191F6CB663A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{236D8016-C7E9-4782-9491-E191F6CB663A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{236D8016-C7E9-4782-9491-E191F6CB663A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{236D8016-C7E9-4782-9491-E191F6CB663A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E997CD05-5154-4965-9566-71A0488CE252}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E997CD05-5154-4965-9566-71A0488CE252}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E997CD05-5154-4965-9566-71A0488CE252}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E997CD05-5154-4965-9566-71A0488CE252}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
