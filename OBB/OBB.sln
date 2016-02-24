@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBB", "OBB\OBB.csproj", "{FC0EAE32-5BD3-494E-BBD9-68E5A22E8A9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBBBox", "OBBBox\OBBBox.csproj", "{DB190A21-E6FF-46A3-81A7-759B8074440A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC0EAE32-5BD3-494E-BBD9-68E5A22E8A9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC0EAE32-5BD3-494E-BBD9-68E5A22E8A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC0EAE32-5BD3-494E-BBD9-68E5A22E8A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC0EAE32-5BD3-494E-BBD9-68E5A22E8A9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB190A21-E6FF-46A3-81A7-759B8074440A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB190A21-E6FF-46A3-81A7-759B8074440A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB190A21-E6FF-46A3-81A7-759B8074440A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB190A21-E6FF-46A3-81A7-759B8074440A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

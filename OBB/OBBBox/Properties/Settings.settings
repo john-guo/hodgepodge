@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OBB.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="mode" Type="OBB.OBBMode" Scope="Application">
+      <Value Profile="(Default)">Master</Value>
+    </Setting>
+    <Setting Name="notifyPort" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">12345</Value>
+    </Setting>
+    <Setting Name="servicePort" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">8080</Value>
+    </Setting>
+    <Setting Name="serviceRoot" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="scriptsPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">scripts</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

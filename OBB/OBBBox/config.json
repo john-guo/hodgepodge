@@ -1,0 +1,16 @@
+﻿{
+  "test": {
+    "name": "test",
+    "gameExe": null,
+    "gameWorkPath": null,
+    "gameArguments": null,
+    "description": null,
+    "thumbnail": null,
+    "sendKey": null,
+    "sendKeyDelay": 0,
+    "needPlay": false,
+    "playExe": null,
+    "playWorkPath": null,
+    "playArguments": null
+  }
+}
