@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="NATTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WOL.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="NATUPNPLib">

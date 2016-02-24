@@ -6,12 +6,30 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace ARPQuery
+namespace WOLApp
 {
-    public class ARP
+    public class WOL
     {
+        public static byte[] CreateMagicPacket(ulong mac)
+        {
+            return CreateMagicPacket(BitConverter.GetBytes(mac).Take(6).ToArray());
+        }
+
+        public static byte[] CreateMagicPacket(byte[] macAddress)
+        {
+            byte[] array = new byte[0x66];
+            for (int i = 0; i < 6; i++)
+            {
+                array[i] = 0xff;
+            }
+            for (int j = 1; j <= 0x10; j++)
+            {
+                macAddress.CopyTo(array, (int)(j * 6));
+            }
+            return array;
+        }
+
         public static IPAddress GetBroadcastAddress()
         {
             var link = NetworkInterface.GetAllNetworkInterfaces().Where(ni =>
@@ -29,7 +47,8 @@ namespace ARPQuery
             return new IPAddress(bytes);
         }
 
-        public static IEnumerable<IPAddress> GetAllSubAddress()
+
+        public static IEnumerable<IPAddress> GetAllSubAddress(bool exclusiveSelf = false)
         {
             var link = NetworkInterface.GetAllNetworkInterfaces().Where(ni =>
                 ni.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
@@ -38,21 +57,23 @@ namespace ARPQuery
 
             var addrInfo = link.GetIPProperties().UnicastAddresses.Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork).First();
 
+            var self = addrInfo.Address.GetAddressBytes();
             var mask = addrInfo.IPv4Mask.GetAddressBytes();
             var count = mask.Aggregate(0u, (w, b) => w << 8 | (byte)(~b));
 
-            var sub = mask.Zip(addrInfo.Address.GetAddressBytes(), (b1, b2) => (byte)(b1 & b2)).
+            var sub = mask.Zip(self, (b1, b2) => (byte)(b1 & b2)).
                        Aggregate(0u, (w, b) => w << 8 | b);
+
+            var selfIp = BitConverter.ToInt32(self, 0);
 
             for (int i = 0; i <= count; ++i)
             {
                 var ip = (uint)IPAddress.HostToNetworkOrder((int)sub + i);
+                if (exclusiveSelf && ip == selfIp)
+                    continue;
                 yield return new IPAddress(ip);
             }
         }
-
-        [DllImport("Iphlpapi.dll")]
-        public static extern uint SendARP(uint DestIP, uint SrcIP, ref ulong pMacAddr, ref uint PhyAddrLen);
 
         public static string GetMac(string ip)
         {
@@ -63,11 +84,11 @@ namespace ARPQuery
 
         public static ulong GetMacAddr(IPAddress address)
         {
-            uint DestIP = BitConverter.ToUInt32(address.GetAddressBytes(), 0);
-            ulong pMacAddr = 0;
-            uint PhyAddrLen = 6;
-            uint error_code = SendARP(DestIP, 0, ref pMacAddr, ref PhyAddrLen);
-            return pMacAddr;
+            uint destIP = BitConverter.ToUInt32(address.GetAddressBytes(), 0);
+            ulong macAddr = 0;
+            uint macAddrLen = 6;
+            uint errorCode = SendARP(destIP, 0, ref macAddr, ref macAddrLen);
+            return macAddr;
         }
 
         public static string GetMac(IPAddress address)
@@ -82,25 +103,7 @@ namespace ARPQuery
             return BitConverter.ToString(bytes, 0, 6);
         }
 
-        static void Main(string[] args)
-        {
-            if (args.Length == 0)
-            {
-                Parallel.ForEach(GetAllSubAddress(), addr =>
-                {
-                    var mac = GetMacAddr(addr);
-                    if (mac == 0)
-                        return;
-
-                    Console.WriteLine("{0} {1}", addr, ReadableMac(mac));
-                });
-
-                Console.WriteLine("OK");
-
-                return;
-            }
-
-            Console.WriteLine("{0}", GetMac(args[0]));
-        }
+        [DllImport("Iphlpapi.dll")]
+        public static extern uint SendARP(uint destIP, uint srcIP, ref ulong macAddr, ref uint macAddrLen);
     }
 }
