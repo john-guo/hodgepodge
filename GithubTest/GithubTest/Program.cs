@@ -40,7 +40,7 @@ namespace GithubTest
         {
             var client = new GitHubClient(new ProductHeaderValue("Test"));
             var username = "john-guo";
-            var password = "q1w2e3r4`";
+            var password = "";
             client.Credentials = new Credentials(username, password);
            
             var content = await client.Repository.Content.GetAllContents(username, "test");
