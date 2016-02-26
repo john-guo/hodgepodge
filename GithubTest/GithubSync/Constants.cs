@@ -10,5 +10,6 @@ namespace GithubSync
     {
         public const string AppName = "GithubSync";
         public const string CryptoCfg = "crypto.cfg";
+        public const string MasterRef = @"refs/heads/master";
     }
 }

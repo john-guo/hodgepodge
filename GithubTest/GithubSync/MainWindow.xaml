@@ -1,14 +1,47 @@
-﻿<Window x:Class="GithubSync.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GithubSync"
+        xmlns:Octokit="clr-namespace:Octokit;assembly=Octokit" xmlns:ec="http://schemas.microsoft.com/expression/2010/controls" x:Class="GithubSync.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Closing="Window_Closing">
+        Title="MainWindow" Height="350" Width="550" Closing="Window_Closing" Loaded="Window_Loaded">
     <Grid>
-        <Menu x:Name="menu" HorizontalAlignment="Left" Height="27" Margin="0,10,0,0" VerticalAlignment="Top" Width="518">
-            <MenuItem Header="Credentials" Click="MenuItem_Click"/>
-        </Menu>
+        <StackPanel>
+            <Menu x:Name="menu" HorizontalAlignment="Left" VerticalAlignment="Top" Width="{Binding Width, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+                <MenuItem Header="Credentials" Click="MenuItem_Click"/>
+            </Menu>
+            <DockPanel HorizontalAlignment="Left" LastChildFill="false" VerticalAlignment="Top" Width="{Binding Width, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}">
+                <StackPanel DockPanel.Dock="Left">
+                    <WrapPanel>
+                        <TextBox x:Name="tbName" Width="100" Margin="0,0,10,0"/>
+                        <Button x:Name="btNew" Click="btNew_Click" Content="New"/>
+                    </WrapPanel>
+                    <ListView x:Name="lvRespositoris" SelectionChanged="lvRespositoris_SelectionChanged" SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Remove" Click="MenuItem_Click_1" />
+                                <MenuItem Header="Local Folder" Click="MenuItem_Click_2"/>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                    </ListView>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right"  Width="400">
+                    <ListView x:Name="lvFiles" Margin="0,0,5,0">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </DockPanel>
+        </StackPanel>
     </Grid>
 </Window>

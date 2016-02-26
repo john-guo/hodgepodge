@@ -11,11 +11,14 @@ namespace GithubSync
     public static class Crypto
     {
         private static SymmetricAlgorithm alg;
+        private static HashAlgorithm hash;
         const int bufferSize = 4096;
 
         static Crypto()
         {
             alg = SymmetricAlgorithm.Create("DES");
+            hash = HashAlgorithm.Create("SHA1");
+            hash.Initialize();
         }
 
         public static void GenKey()
@@ -80,6 +83,11 @@ namespace GithubSync
 
                 return Encoding.UTF8.GetString(buffer.ToArray());
             }
+        }
+
+        public static string GetSHA1(string v)
+        {
+            return BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(v))).Replace("-", string.Empty);
         }
 
     }
