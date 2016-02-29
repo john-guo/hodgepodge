@@ -117,13 +117,23 @@ namespace GithubSync
 
             lvFiles.ItemsSource = null;
 
+            git.Mapping(selected.Name, Environment.CurrentDirectory);
+
             progress.Show();
-            var files = await git.GetFiles(selected.Name);
+            //var files = await git.GetFiles(selected.Name);
+            //var ret = await git.InitializeContants(selected.Name);
+            var files = await git.GetContants(selected.Name);
             progress.Hide();
+            //if (files == null || files.Count == 0)
+            //return;
+            //if (!ret)
+            //    return;
             if (files == null || files.Count == 0)
                 return;
 
-            lvFiles.ItemsSource = files.First().Value;
+            //lvFiles.ItemsSource = files.First().Value;
+            //lvFiles.ItemsSource = git[selected.Name].Contents;
+            lvFiles.ItemsSource = files;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

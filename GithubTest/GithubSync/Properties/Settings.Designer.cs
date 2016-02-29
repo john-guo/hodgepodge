@@ -46,5 +46,16 @@ namespace GithubSync.Properties {
                 this["password"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Xml.Linq.XDocument mapping {
+            get {
+                return ((global::System.Xml.Linq.XDocument)(this["mapping"]));
+            }
+            set {
+                this["mapping"] = value;
+            }
+        }
     }
 }

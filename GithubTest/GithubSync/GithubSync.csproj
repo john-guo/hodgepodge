@@ -63,7 +63,14 @@
     </ApplicationDefinition>
     <Compile Include="AppInfo.cs" />
     <Compile Include="Crypto.cs" />
-    <Compile Include="GitFile.cs" />
+    <Compile Include="GithubContent.cs" />
+    <Compile Include="GithubPath.cs" />
+    <Compile Include="GithubCommit.cs" />
+    <Compile Include="GithubFile.cs" />
+    <Compile Include="GithubItem.cs" />
+    <Compile Include="GithubLocalRepository.cs" />
+    <Compile Include="GithubReference.cs" />
+    <Compile Include="GithubTree.cs" />
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>

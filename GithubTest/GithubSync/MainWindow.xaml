@@ -33,13 +33,13 @@
                     </ListView>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right"  Width="400">
-                    <ListView x:Name="lvFiles" Margin="0,0,5,0">
-                        <ListView.ItemTemplate>
+                    <TreeView x:Name="lvFiles">
+                        <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}"/>
                             </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
                 </StackPanel>
             </DockPanel>
         </StackPanel>
