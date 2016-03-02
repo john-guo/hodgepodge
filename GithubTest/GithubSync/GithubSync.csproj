@@ -63,6 +63,8 @@
     </ApplicationDefinition>
     <Compile Include="AppInfo.cs" />
     <Compile Include="Crypto.cs" />
+    <Compile Include="GeometryAnimation.cs" />
+    <Compile Include="GeometryAnimationBase.cs" />
     <Compile Include="GithubContent.cs" />
     <Compile Include="GithubPath.cs" />
     <Compile Include="GithubCommit.cs" />
@@ -76,6 +78,9 @@
     </Compile>
     <Compile Include="Progress.xaml.cs">
       <DependentUpon>Progress.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Test.xaml.cs">
+      <DependentUpon>Test.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
     <Page Include="Login.xaml">
@@ -97,6 +102,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Progress.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
