@@ -49,12 +49,13 @@ namespace GithubWinForm.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Xml.Linq.XDocument mapping {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string root {
             get {
-                return ((global::System.Xml.Linq.XDocument)(this["mapping"]));
+                return ((string)(this["root"]));
             }
             set {
-                this["mapping"] = value;
+                this["root"] = value;
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GithubSync.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GithubWinForm.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="username" Type="System.String" Scope="User">
@@ -8,7 +8,7 @@
     <Setting Name="password" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="mapping" Type="System.Xml.Linq.XDocument" Scope="User">
+    <Setting Name="root" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

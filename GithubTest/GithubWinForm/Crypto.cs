@@ -10,27 +10,29 @@ namespace GithubSync
 {
     public static class Crypto
     {
-        private static SymmetricAlgorithm alg;
+        private static SymmetricAlgorithm symAlg;
         private static HashAlgorithm hash;
+        private static AsymmetricAlgorithm asymAlg;
         const int bufferSize = 4096;
 
         static Crypto()
         {
-            alg = SymmetricAlgorithm.Create("DES");
+            symAlg = SymmetricAlgorithm.Create("DES");
+            asymAlg = AsymmetricAlgorithm.Create("RSA");
             hash = HashAlgorithm.Create("SHA1");
             hash.Initialize();
         }
 
         public static void GenKey()
         {
-            alg.GenerateIV();
-            alg.GenerateKey();
+            symAlg.GenerateIV();
+            symAlg.GenerateKey();
         }
 
         public static void SaveKey()
         {
-            var iv = Convert.ToBase64String(alg.IV, Base64FormattingOptions.None);
-            var key = Convert.ToBase64String(alg.Key, Base64FormattingOptions.None);
+            var iv = Convert.ToBase64String(symAlg.IV, Base64FormattingOptions.None);
+            var key = Convert.ToBase64String(symAlg.Key, Base64FormattingOptions.None);
 
             File.WriteAllLines(Constants.CryptoCfg, new string[] { iv, key });
         }
@@ -41,8 +43,8 @@ namespace GithubSync
             {
                 var lines = File.ReadAllLines(Constants.CryptoCfg);
 
-                alg.IV = Convert.FromBase64String(lines[0]);
-                alg.Key = Convert.FromBase64String(lines[1]);
+                symAlg.IV = Convert.FromBase64String(lines[0]);
+                symAlg.Key = Convert.FromBase64String(lines[1]);
             }
             catch
             {
@@ -54,7 +56,7 @@ namespace GithubSync
         public static string Encrypt(string clearText)
         {
             using (var bstream = new MemoryStream())
-            using (var cstream = new CryptoStream(bstream, alg.CreateEncryptor(), CryptoStreamMode.Write))
+            using (var cstream = new CryptoStream(bstream, symAlg.CreateEncryptor(), CryptoStreamMode.Write))
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(clearText)))
             {
                 stream.WriteTo(cstream);
@@ -71,7 +73,7 @@ namespace GithubSync
         public static string Decrypt(string encText)
         {
             using (var bstream = new MemoryStream())
-            using (var cstream = new CryptoStream(bstream, alg.CreateDecryptor(), CryptoStreamMode.Write))
+            using (var cstream = new CryptoStream(bstream, symAlg.CreateDecryptor(), CryptoStreamMode.Write))
             using (var stream = new MemoryStream(Convert.FromBase64String(encText)))
             {
                 stream.WriteTo(cstream);

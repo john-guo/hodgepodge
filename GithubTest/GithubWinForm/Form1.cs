@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,12 +65,16 @@ namespace GithubWinForm
             {
                 ShowProgress();
 
+                git.WorkSpace = Properties.Settings.Default.root;
+
                 var list = await git.GetRepositoris();
 
-                UIInvoke(() => { lvRespositoris.Items.AddRange(list.Select(i => new ListViewItem(i.Name)).ToArray()); });
+                UIInvoke(() => {
+                    lvRespositoris.Items.AddRange(list.Select(i => new ListViewItem(i.Name)).ToArray());
+                    toolStripTextBox1.Text = git.WorkSpace;
+                });
 
-                git.LoadLocal(Properties.Settings.Default.mapping);
-
+                
                 HideProgress();
             }
             catch (Octokit.AuthorizationException)
@@ -154,27 +160,38 @@ namespace GithubWinForm
             HideProgress();
         }
 
-        private void openInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void mappingToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void openInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (lvRespositoris.SelectedItems.Count <= 0)
                 return;
             var name = lvRespositoris.SelectedItems[0].Text;
 
-            var result = folderBrowserDialog1.ShowDialog();
-            if (result != DialogResult.OK)
-                return;
+            await Task.Yield();
+            Process.Start(new ProcessStartInfo(git.GetPath(name))
+            {
+                UseShellExecute = true
+            });
+        }
 
-            if (string.IsNullOrWhiteSpace(folderBrowserDialog1.SelectedPath))
-                return;
+        private static Task IdleYield()
+        {
+            var idleTcs = new TaskCompletionSource<bool>();
+            // subscribe to Application.Idle
+            EventHandler handler = null;
+            handler = (s, e) =>
+            {
+                Application.Idle -= handler;
+                idleTcs.SetResult(true);
+            };
+            Application.Idle += handler;
+            return idleTcs.Task;
+        }
 
-            git.Mapping(name, folderBrowserDialog1.SelectedPath);
-            Properties.Settings.Default.mapping = git.SaveLocal();
-            Properties.Settings.Default.Save();
+        private async Task WaitUntil<T>(Func<T> func, Func<T, bool> predicate)
+        {
+            T o = func();
+            while (!predicate(o))
+                await IdleYield();
         }
 
         private async void syncFromGithubToolStripMenuItem_Click(object sender, EventArgs e)
@@ -187,13 +204,46 @@ namespace GithubWinForm
             try
             {
                 await git.SyncAll(name);
-                git.SaveContents(name);
+                var scheduler = git.SaveContents(name);
+                do
+                {
+                    await WaitUntil(() => scheduler, o => o.IsEmpty);
+                    if (!scheduler.HasFailedJobs)
+                        break;
+                    scheduler.Retry();
+                } while (true);
             }
             catch
             {
 
             }
             HideProgress();
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            var result = folderBrowserDialog1.ShowDialog();
+            if (result != DialogResult.OK)
+                return;
+
+            if (string.IsNullOrWhiteSpace(folderBrowserDialog1.SelectedPath))
+                return;
+
+            git.WorkSpace = folderBrowserDialog1.SelectedPath;
+            toolStripTextBox1.Text = git.WorkSpace;
+
+            Properties.Settings.Default.root = git.WorkSpace;
+            Properties.Settings.Default.Save();
+        }
+
+        private void toolStripTextBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (git.WorkSpace == toolStripTextBox1.Text)
+                return;
+
+            git.WorkSpace = toolStripTextBox1.Text;
+            Properties.Settings.Default.root = git.WorkSpace;
+            Properties.Settings.Default.Save();
         }
     }
 }

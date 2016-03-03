@@ -33,13 +33,15 @@
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("/");
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.panel1 = new System.Windows.Forms.Panel();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.lvRespositoris = new System.Windows.Forms.ListView();
             this.header = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.mappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.syncFromGithubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.syncToGithubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,7 +55,10 @@
             // 
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1});
+            this.toolStripButton1,
+            this.toolStripLabel1,
+            this.toolStripTextBox1,
+            this.toolStripButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(402, 27);
@@ -69,6 +74,28 @@
             this.toolStripButton1.Size = new System.Drawing.Size(24, 24);
             this.toolStripButton1.Text = "Sign In";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(88, 24);
+            this.toolStripLabel1.Text = "Work Path:";
+            // 
+            // toolStripTextBox1
+            // 
+            this.toolStripTextBox1.Name = "toolStripTextBox1";
+            this.toolStripTextBox1.Size = new System.Drawing.Size(100, 27);
+            this.toolStripTextBox1.TextChanged += new System.EventHandler(this.toolStripTextBox1_TextChanged);
+            // 
+            // toolStripButton2
+            // 
+            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
+            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Size = new System.Drawing.Size(24, 24);
+            this.toolStripButton2.Text = "toolStripButton2";
+            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
             // progressBar1
             // 
@@ -126,37 +153,29 @@
             // 
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mappingToolStripMenuItem,
             this.syncFromGithubToolStripMenuItem,
             this.syncToGithubToolStripMenuItem,
             this.openInExplorerToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(226, 108);
-            // 
-            // mappingToolStripMenuItem
-            // 
-            this.mappingToolStripMenuItem.Name = "mappingToolStripMenuItem";
-            this.mappingToolStripMenuItem.Size = new System.Drawing.Size(225, 26);
-            this.mappingToolStripMenuItem.Text = "Mapping local path";
-            this.mappingToolStripMenuItem.Click += new System.EventHandler(this.mappingToolStripMenuItem_Click);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(211, 82);
             // 
             // syncFromGithubToolStripMenuItem
             // 
             this.syncFromGithubToolStripMenuItem.Name = "syncFromGithubToolStripMenuItem";
-            this.syncFromGithubToolStripMenuItem.Size = new System.Drawing.Size(225, 26);
+            this.syncFromGithubToolStripMenuItem.Size = new System.Drawing.Size(210, 26);
             this.syncFromGithubToolStripMenuItem.Text = "Sync from Github";
             this.syncFromGithubToolStripMenuItem.Click += new System.EventHandler(this.syncFromGithubToolStripMenuItem_Click);
             // 
             // syncToGithubToolStripMenuItem
             // 
             this.syncToGithubToolStripMenuItem.Name = "syncToGithubToolStripMenuItem";
-            this.syncToGithubToolStripMenuItem.Size = new System.Drawing.Size(225, 26);
+            this.syncToGithubToolStripMenuItem.Size = new System.Drawing.Size(210, 26);
             this.syncToGithubToolStripMenuItem.Text = "Sync to Github";
             // 
             // openInExplorerToolStripMenuItem
             // 
             this.openInExplorerToolStripMenuItem.Name = "openInExplorerToolStripMenuItem";
-            this.openInExplorerToolStripMenuItem.Size = new System.Drawing.Size(225, 26);
+            this.openInExplorerToolStripMenuItem.Size = new System.Drawing.Size(210, 26);
             this.openInExplorerToolStripMenuItem.Text = "Open in Explorer";
             this.openInExplorerToolStripMenuItem.Click += new System.EventHandler(this.openInExplorerToolStripMenuItem_Click);
             // 
@@ -191,11 +210,13 @@
         private System.Windows.Forms.ColumnHeader header;
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem mappingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem syncFromGithubToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem syncToGithubToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openInExplorerToolStripMenuItem;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
+        private System.Windows.Forms.ToolStripButton toolStripButton2;
     }
 }
 

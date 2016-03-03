@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Octokit;
 using System.IO;
 using System.Xml.Linq;
+using System.Net;
 
 namespace GithubSync
 {
@@ -14,6 +15,13 @@ namespace GithubSync
         private GitHubClient client;
         private IReadOnlyList<Repository> _cachedRepositoris;
         private Dictionary<string, GithubLocalRepository> _repositoris;
+
+        public string WorkSpace { get; set; }
+
+        public string GetPath(string name)
+        {
+            return Path.Combine(WorkSpace, this[name].Name);
+        }
 
         public GithubLocalRepository this[string name]
         {
@@ -44,50 +52,6 @@ namespace GithubSync
             client.Credentials = new Credentials(username, password);
         }
 
-        public bool IsMapping(string name)
-        {
-            GithubLocalRepository repository;
-            if (!_repositoris.TryGetValue(name, out repository))
-                return false;
-
-            return repository.IsMapping;
-        }
-
-        public bool Mapping(string name, string localPath)
-        {
-
-            if (!Directory.Exists(localPath))
-            {
-                try
-                {
-                    Directory.CreateDirectory(localPath);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-
-            GithubLocalRepository repository;
-            if (!_repositoris.TryGetValue(name, out repository))
-            {
-                repository = new GithubLocalRepository()
-                {
-                    Name = name,
-                    LocalPath = localPath
-                };
-
-                _repositoris.Add(name, repository);
-            }
-            else
-            {
-                repository.LocalPath = localPath;
-            }
-
-            return true;
-        }
-
-
         private async Task<IReadOnlyList<RepositoryContent>> GetContants(string name, string path = Constants.Root)
         {
             try
@@ -99,64 +63,6 @@ namespace GithubSync
                 return null;
             }
         }
-
-        public bool Unmapping(string name)
-        {
-            GithubLocalRepository repository;
-            if (!_repositoris.TryGetValue(name, out repository))
-                return false;
-
-            repository.LocalPath = string.Empty;
-            return true;
-        }
-
-        public XDocument SaveLocal()
-        {
-            XDocument doc = new XDocument();
-            foreach (var pair in _repositoris)
-            {
-                if (!pair.Value.IsMapping)
-                    continue;
-
-                doc.Add(new XElement(XName.Get("Entry"),
-                    new XAttribute(XName.Get("name"), pair.Value.Name),
-                    new XAttribute(XName.Get("path"), pair.Value.LocalPath)
-                    ));
-            }
-
-            return doc;
-        }
-
-        public bool LoadLocal(XDocument doc)
-        {
-            if (doc == null)
-                return false;
-
-            var query = from e in doc.Elements(XName.Get("Entry"))
-                        select new
-                        {
-                            Name = e.Attributes("name").First().Value,
-                            Path = e.Attributes("path").First().Value
-                        };
-
-            try
-            {
-                foreach (var item in query)
-                {
-                    _repositoris[item.Name] =
-                        new GithubLocalRepository()
-                        {
-                            Name = item.Name,
-                            LocalPath = item.Path
-                        };
-                }
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        } 
 
         public async Task<IReadOnlyList<Repository>> GetRepositoris()
         {
@@ -191,7 +97,8 @@ namespace GithubSync
             {
                 await client.Repository.Delete(Login, name);
                 _cachedRepositoris = _cachedRepositoris.Where(r => r.Name != name).ToList();
-                Unmapping(name);
+                _repositoris.Remove(name);
+
                 return true;
             }
             catch
@@ -209,6 +116,13 @@ namespace GithubSync
                 var nr = new NewRepository(name);
                 var rep = await client.Repository.Create(nr);
                 _cachedRepositoris = _cachedRepositoris.Union(new[] { rep }).ToList();
+
+                var repository = new GithubLocalRepository()
+                {
+                    Name = rep.Name,
+                };
+
+                _repositoris.Add(rep.Name, repository);
                 return true;
             }
             catch
@@ -248,17 +162,25 @@ namespace GithubSync
 
         public async Task<bool> SyncAll(string name)
         {
-            _repositoris[name].Items = await GetItems(name);
-
-            if (_repositoris[name].Items == null)
+            var rep = _repositoris[name];
+            if (!rep.IsDirty)
                 return true;
 
+            rep.Items = await GetItems(name);
 
-            foreach (var item in _repositoris[name].Items)
+            if (rep.Items == null)
+            {
+                rep.IsDirty = false;
+                return true;
+            }
+
+
+            foreach (var item in rep.Items)
             {
                 await DownloadItems(name, item);
             }
 
+            rep.IsDirty = false;
             return true;
         }
 
@@ -295,25 +217,31 @@ namespace GithubSync
             RecursionAction(items, action, item => !item.IsFile);
         }
 
-        public void SaveContents(string name)
+        public TaskTest.JobScheduler SaveContents(string name)
         {
+            var scheduler = new TaskTest.JobScheduler();
+
             var rep = _repositoris[name];
             RecursionAction(rep.Items, item =>
             {
                 try
                 {
-                    var fullpath = Path.Combine(rep.LocalPath, item.Path);
+                    var repRoot = Path.Combine(WorkSpace, rep.Name);
+
+                    if (!Directory.Exists(repRoot))
+                    {
+                        Directory.CreateDirectory(repRoot);
+                    }
+
+                    var fullpath = Path.Combine(repRoot, item.Path);
 
                     if (item.IsFile)
                     {
-                        if (item.IsTextFile)
+                        scheduler.PenddingJob(() =>
                         {
-                            File.WriteAllText(fullpath, item.TextContent);
-                        }
-                        else
-                        {
-                            File.WriteAllBytes(fullpath, item.BinaryContent);
-                        }
+                            var web = new WebClient();
+                            web.DownloadFile(item.Url, fullpath);
+                        });
                     }
                     else
                     {
@@ -325,6 +253,10 @@ namespace GithubSync
                     ;
                 }
             });
+
+            return scheduler;
         }
+
+
     }
 }
