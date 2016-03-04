@@ -11,9 +11,10 @@ namespace TaskTest
     public class JobScheduler : IDisposable
     {
         private ConcurrentBag<Job> allJobs;
-        private ConcurrentBag<Job> penddingQueue;
+        private ConcurrentQueue<Job> penddingQueue;
+        private ConcurrentQueue<Job> failedJobs;
         private ConcurrentDictionary<Job, Task> tasks;
-        private ConcurrentBag<Job> failedJobs;
+        private SemaphoreSlim semaphore;
 
         private readonly int maxRunningCount;
         private readonly object addJobLock = new object();
@@ -29,10 +30,11 @@ namespace TaskTest
         public JobScheduler(int maxRunning)
         {
             allJobs = new ConcurrentBag<Job>();
-            penddingQueue = new ConcurrentBag<Job>();
+            penddingQueue = new ConcurrentQueue<Job>();
             tasks = new ConcurrentDictionary<Job, Task>();
-            failedJobs = new ConcurrentBag<Job>();
+            failedJobs = new ConcurrentQueue<Job>();
             maxRunningCount = maxRunning;
+            semaphore = new SemaphoreSlim(maxRunningCount);
         }
 
 
@@ -40,7 +42,7 @@ namespace TaskTest
         {
             get
             {
-                return tasks.Count < maxRunningCount;
+                return semaphore.CurrentCount > 0;
             }
         }
 
@@ -50,7 +52,7 @@ namespace TaskTest
                 return;
 
             Job job;
-            if (penddingQueue.TryTake(out job))
+            if (penddingQueue.TryDequeue(out job))
             {
                 SpinWait.SpinUntil(() => StartJob(job));
             }
@@ -58,72 +60,91 @@ namespace TaskTest
 
         private void PenddingJob(Job job)
         {
-            if (CanStart)
+            allJobs.Add(job);
+
+            if (!StartJob(job))
             {
-                StartJob(job);
-            }
-            else
-            {
-                penddingQueue.Add(job);
+                job.Pendding();
+                penddingQueue.Enqueue(job);
             }
         }
 
-        public Job PenddingJob(Action action)
+        public Job PenddingJob(JobDelegate action)
         {
             var job = new Job(action);
-            allJobs.Add(job);
 
             PenddingJob(job);
 
             return job;
         }
 
-        public Job PenddingJob(Action action, Action start, Action finish)
+        public Job PenddingJob<T>(JobDelegate action, T tag)
+        {
+            var job = new Job(action);
+            job.SetTag(tag);
+
+            PenddingJob(job);
+
+            return job;
+        }
+
+        public Job PenddingJob(
+            JobDelegate action,
+            JobDelegate start,
+            JobDelegate finish,
+            JobDelegate fail)
         {
             var job = new Job(action);
             job.JobStart += start;
             job.JobFinish += finish;
+            job.JobFail += fail;
 
-            allJobs.Add(job);
+            PenddingJob(job);
 
-            if (CanStart)
-            {
-                StartJob(job);
-            }
-            else
-            {
-                penddingQueue.Add(job);
-            }
+            return job;
+        }
+
+        public Job PenddingJob<T>(
+            JobDelegate action, T tag,
+            JobDelegate start,
+            JobDelegate finish,
+            JobDelegate fail)
+        {
+            var job = new Job(action);
+            job.SetTag(tag);
+            job.JobStart += start;
+            job.JobFinish += finish;
+            job.JobFail += fail;
+
+            PenddingJob(job);
 
             return job;
         }
 
         private bool StartJob(Job job)
         {
-            Task task;
-
-            if (!CanStart)
+            job.Prepare();
+            if (!semaphore.Wait(0))
                 return false;
-            lock (addJobLock)
-            {
-                if (!CanStart)
-                    return false;
-                task = job.Start();
-                tasks.TryAdd(job, task);
-            }
+            var task = job.Start();
+            tasks.TryAdd(job, task);
 
             task.ContinueWith(t =>
             {
                 if (job.IsFailed)
                 {
-                    failedJobs.Add(job);
+                    failedJobs.Enqueue(job);
                 }
 
                 Task nt;
                 tasks.TryRemove(job, out nt);
+
+                semaphore.Release();
+
                 Schedule();
             });
             task.Start();
+
             return true;
         }
 
@@ -148,7 +169,7 @@ namespace TaskTest
             while (!failedJobs.IsEmpty)
             {
                 Job job;
-                if (!failedJobs.TryTake(out job))
+                if (!failedJobs.TryDequeue(out job))
                     continue;
 
                 PenddingJob(job);
@@ -167,5 +188,10 @@ namespace TaskTest
         {
             WaitAll().Wait();
         }
+
+        public ConcurrentBag<Job> AllJobs { get { return allJobs; } }
+        public ConcurrentQueue<Job> PenddingQueue { get { return penddingQueue; } }
+        public ConcurrentQueue<Job> FailedJobs { get { return failedJobs; } }
+        public ConcurrentDictionary<Job, Task> AllTasks { get { return tasks; } }
     }
 }

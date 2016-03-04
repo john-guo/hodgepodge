@@ -16,17 +16,19 @@ namespace TaskTestConsole
             for (int i = 1; i <= 100; ++i)
             {
                 int n = i;
-                jobs.PenddingJob(() =>
+                jobs.PenddingJob(job =>
                 {
                     Console.WriteLine("{0} {1}", Thread.CurrentThread.ManagedThreadId, n);
                     Thread.Sleep(1000);
-                }, () =>
-                {
-                    Console.WriteLine("Start");
-                }, () =>
-                {
-                    Console.WriteLine("Finish");
-                });
+                }
+                //, () =>
+                //{
+                //    Console.WriteLine("Start");
+                //}, () =>
+                //{
+                //    Console.WriteLine("Finish");
+                //}
+                );
 
             }
             jobs.WaitAll().Wait();

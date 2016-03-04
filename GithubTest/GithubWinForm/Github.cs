@@ -237,7 +237,7 @@ namespace GithubSync
 
                     if (item.IsFile)
                     {
-                        scheduler.PenddingJob(() =>
+                        scheduler.PenddingJob(job =>
                         {
                             var web = new WebClient();
                             web.DownloadFile(item.Url, fullpath);

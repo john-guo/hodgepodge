@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace TaskTest
 {
-    public enum JobStatus { Pendding, Running, Done }
+    public enum JobStatus { Pendding, PrepareToRun, Running, Fail, Done }
+
+    public delegate void JobDelegate(Job sender);
 
     public sealed class Job
     {
@@ -15,54 +17,79 @@ namespace TaskTest
         public DateTime StartTime { get; private set; }
         public DateTime FinishTime { get; private set; }
 
-        public Action JobAction { get; private set; }
+        public JobDelegate JobAction { get; private set; }
 
-        public Exception exception { get; private set; }
+        public Exception _exception { get; private set; }
 
-        public event Action JobStart = delegate { };
-        public event Action JobFinish = delegate { };
+        public event JobDelegate JobStart = delegate { };
+        public event JobDelegate JobFinish = delegate { };
+        public event JobDelegate JobFail = delegate { };
+
+        private object _tag;
 
         private Job()
         {
             CreateTime = DateTime.Now;
             Status = JobStatus.Pendding;
-            exception = null;
+            _exception = null;
+            _tag = null;
         }
 
-        public Job(Action action) : this()
+        public Job(JobDelegate action) : this()
         {
-            JobAction = delegate
+            JobAction = job =>
             {
-                JobStart();
-
+                JobStart(job);
                 try
                 {
-                    action();
+                    action(job);
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
+                    _exception = ex;
+                    Status = JobStatus.Fail;
+                    JobFail(job);
+                    return;
                 }
                 FinishTime = DateTime.Now;
                 Status = JobStatus.Done;
-
-                JobFinish();
+                JobFinish(job);
             };
+        }
+
+        public void Prepare()
+        {
+            Status = JobStatus.PrepareToRun;
+        }
+
+        public void Pendding()
+        {
+            Status = JobStatus.Pendding;
         }
 
         public Task Start()
         {
             StartTime = DateTime.Now;
             Status = JobStatus.Running;
-            return new Task(JobAction);
+            return new Task(o => JobAction((Job)o), this);
         }
 
         public bool IsFailed
         {
             get
             {
-                return exception != null;
+                return Status == JobStatus.Fail;
             }
+        }
+
+        public void SetTag<T>(T tag)
+        {
+            _tag = tag;
+        }
+
+        public T GetTag<T>()
+        {
+            return (T)_tag;
         }
     }
 }
