@@ -19,7 +19,7 @@ namespace TaskTest
         public DateTime FinishTime { get; private set; }
         public DateTime StopTime { get; private set; }
 
-        internal JobDelegate JobAction { get; private set; }
+        internal Action JobAction { get; private set; }
 
         public Exception LastException { get; private set; }
 
@@ -42,30 +42,30 @@ namespace TaskTest
 
         internal Job(JobDelegate action) : this()
         {
-            JobAction = job =>
+            JobAction = () =>
             {
-                job.JobStart(job);
+                JobStart(this);
                 try
                 {
-                    action(job);
+                    action(this);
                 }
                 catch (OperationCanceledException ex)
                 {
-                    job.LastException = ex;
-                    job.Stop();
+                    LastException = ex;
+                    Stop();
                     return;
                 }
                 catch (Exception ex)
                 {
-                    job.LastException = ex;
-                    job.Status = JobStatus.Fail;
-                    job.StopTime = DateTime.Now;
-                    job.JobFail(job);
+                    LastException = ex;
+                    Status = JobStatus.Fail;
+                    StopTime = DateTime.Now;
+                    JobFail(this);
                     return;
                 }
-                job.FinishTime = DateTime.Now;
-                job.Status = JobStatus.Done;
-                job.JobFinish(job);
+                FinishTime = DateTime.Now;
+                Status = JobStatus.Done;
+                JobFinish(this);
             };
         }
 
@@ -85,7 +85,7 @@ namespace TaskTest
             Status = JobStatus.Running;
             _tokenSource = new CancellationTokenSource();
 
-            return new Task(o => JobAction((Job)o), this, _tokenSource.Token);
+            return new Task(o => ((Job)o).JobAction(), this, _tokenSource.Token);
         }
 
         internal void Stop()
@@ -101,12 +101,12 @@ namespace TaskTest
             _tokenSource.Cancel();
         }
 
-        public void CancelProcess(Func<object> savePointGetter)
+        public void CancelProcess(Func<Job, object> savePointGetter)
         {
             if (Status != JobStatus.PrepareToStop)
                 return;
 
-            _savePoint = savePointGetter();
+            _savePoint = savePointGetter(this);
             _tokenSource.Token.ThrowIfCancellationRequested();
         }
 

@@ -44,7 +44,7 @@ namespace TaskTestWinForm
                 {
                     for (int j = sp.Item2; j < 10000; ++j)
                     {
-                        job.CancelProcess(() => new Tuple<int, int>(i, j));
+                        job.CancelProcess(nj => new Tuple<int, int>(i, j));
                     }
                     return true;
                 });
@@ -75,17 +75,17 @@ namespace TaskTestWinForm
                             where j.Status == JobStatus.Done
                             select j).ToList();
 
-            label2.Text = scheduler.AllJobs.Count.ToString();
-            label3.Text = scheduler.AllTasks.Keys.Count.ToString();
-            label4.Text = scheduler.PenddingQueue.Count.ToString();
+            label2.Text = scheduler.AllJobs.Count().ToString();
+            label3.Text = scheduler.AllTasks.Count().ToString();
+            label4.Text = scheduler.PenddingQueue.Count().ToString();
             label5.Text = doneJobs.Count.ToString();
-            label6.Text = scheduler.StopJobs.Keys.Count.ToString();
+            label6.Text = scheduler.StopJobs.Count().ToString();
 
             foreach (var job in scheduler.AllJobs)
             {
                 listView2.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), job.Status.ToString() }));
             }
-            foreach (var job in scheduler.AllTasks.Keys)
+            foreach (var job in scheduler.AllTasks)
             {
                 var sp = job.GetSavePoint<Tuple<int, int>>();
                 if (sp == null)
@@ -101,7 +101,7 @@ namespace TaskTestWinForm
             {
                 listView5.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), job.Status.ToString() }));
             }
-            foreach (var job in scheduler.StopJobs.Keys)
+            foreach (var job in scheduler.StopJobs)
             {
                 var sp = job.GetSavePoint<Tuple<int, int>>();
                 if (sp == null)

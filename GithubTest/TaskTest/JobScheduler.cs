@@ -227,10 +227,10 @@ namespace TaskTest
             WaitAll().Wait();
         }
 
-        public ConcurrentBag<Job> AllJobs { get { return allJobs; } }
-        public ConcurrentQueue<Job> PenddingQueue { get { return penddingQueue; } }
-        public ConcurrentQueue<Job> FailedJobs { get { return failedJobs; } }
-        public ConcurrentDictionary<Job, Job> StopJobs { get { return stopJobs; } }
-        public ConcurrentDictionary<Job, Task> AllTasks { get { return tasks; } }
+        public IEnumerable<Job> AllJobs { get { return allJobs.AsEnumerable(); } }
+        public IEnumerable<Job> PenddingQueue { get { return penddingQueue.AsEnumerable(); } }
+        public IEnumerable<Job> FailedJobs { get { return failedJobs.AsEnumerable(); } }
+        public IEnumerable<Job> StopJobs { get { return stopJobs.Keys.AsEnumerable(); } }
+        public IEnumerable<Job> AllTasks { get { return tasks.Keys.AsEnumerable(); } }
     }
 }
