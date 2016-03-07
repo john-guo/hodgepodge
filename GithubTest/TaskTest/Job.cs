@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TaskTest
 {
-    public enum JobStatus { Pendding, PrepareToRun, Running, Fail, Done }
+    public enum JobStatus { Pendding, PrepareToRun, Running, PrepareToStop, Stop, Fail, Done }
 
     public delegate void JobDelegate(Job sender);
 
@@ -16,65 +17,108 @@ namespace TaskTest
         public DateTime CreateTime { get; private set; }
         public DateTime StartTime { get; private set; }
         public DateTime FinishTime { get; private set; }
+        public DateTime StopTime { get; private set; }
 
-        public JobDelegate JobAction { get; private set; }
+        internal JobDelegate JobAction { get; private set; }
 
-        public Exception _exception { get; private set; }
+        public Exception LastException { get; private set; }
 
-        public event JobDelegate JobStart = delegate { };
-        public event JobDelegate JobFinish = delegate { };
-        public event JobDelegate JobFail = delegate { };
+        internal event JobDelegate JobStart = delegate { };
+        internal event JobDelegate JobFinish = delegate { };
+        internal event JobDelegate JobFail = delegate { };
+        internal event JobDelegate JobStop = delegate { };
 
         private object _tag;
+        private CancellationTokenSource _tokenSource;
+        private object _savePoint;
 
         private Job()
         {
             CreateTime = DateTime.Now;
             Status = JobStatus.Pendding;
-            _exception = null;
+            LastException = null;
             _tag = null;
         }
 
-        public Job(JobDelegate action) : this()
+        internal Job(JobDelegate action) : this()
         {
             JobAction = job =>
             {
-                JobStart(job);
+                job.JobStart(job);
                 try
                 {
                     action(job);
                 }
-                catch (Exception ex)
+                catch (OperationCanceledException ex)
                 {
-                    _exception = ex;
-                    Status = JobStatus.Fail;
-                    JobFail(job);
+                    job.LastException = ex;
+                    job.Stop();
                     return;
                 }
-                FinishTime = DateTime.Now;
-                Status = JobStatus.Done;
-                JobFinish(job);
+                catch (Exception ex)
+                {
+                    job.LastException = ex;
+                    job.Status = JobStatus.Fail;
+                    job.StopTime = DateTime.Now;
+                    job.JobFail(job);
+                    return;
+                }
+                job.FinishTime = DateTime.Now;
+                job.Status = JobStatus.Done;
+                job.JobFinish(job);
             };
         }
 
-        public void Prepare()
+        internal void Prepare()
         {
             Status = JobStatus.PrepareToRun;
         }
 
-        public void Pendding()
+        internal void Pendding()
         {
             Status = JobStatus.Pendding;
         }
 
-        public Task Start()
+        internal Task Start()
         {
             StartTime = DateTime.Now;
             Status = JobStatus.Running;
-            return new Task(o => JobAction((Job)o), this);
+            _tokenSource = new CancellationTokenSource();
+
+            return new Task(o => JobAction((Job)o), this, _tokenSource.Token);
         }
 
-        public bool IsFailed
+        internal void Stop()
+        {
+            Status = JobStatus.Stop;
+            StopTime = DateTime.Now;
+            JobStop(this);
+        }
+
+        internal void PrepareStop()
+        {
+            Status = JobStatus.PrepareToStop;
+            _tokenSource.Cancel();
+        }
+
+        public void CancelProcess(Func<object> savePointGetter)
+        {
+            if (Status != JobStatus.PrepareToStop)
+                return;
+
+            _savePoint = savePointGetter();
+            _tokenSource.Token.ThrowIfCancellationRequested();
+        }
+
+        internal bool IsStop
+        {
+            get
+            {
+                return Status == JobStatus.Stop;
+            }
+        }
+
+        internal bool IsFailed
         {
             get
             {
@@ -90,6 +134,11 @@ namespace TaskTest
         public T GetTag<T>()
         {
             return (T)_tag;
+        }
+
+        public T GetSavePoint<T>() where T : class
+        {
+            return _savePoint as T;
         }
     }
 }

@@ -13,6 +13,7 @@ namespace TaskTest
         private ConcurrentBag<Job> allJobs;
         private ConcurrentQueue<Job> penddingQueue;
         private ConcurrentQueue<Job> failedJobs;
+        private ConcurrentDictionary<Job, Job> stopJobs;
         private ConcurrentDictionary<Job, Task> tasks;
         private SemaphoreSlim semaphore;
 
@@ -33,6 +34,8 @@ namespace TaskTest
             penddingQueue = new ConcurrentQueue<Job>();
             tasks = new ConcurrentDictionary<Job, Task>();
             failedJobs = new ConcurrentQueue<Job>();
+            stopJobs = new ConcurrentDictionary<Job, Job>();
+
             maxRunningCount = maxRunning;
             semaphore = new SemaphoreSlim(maxRunningCount);
         }
@@ -58,15 +61,21 @@ namespace TaskTest
             }
         }
 
+        private void _StartJob(Job job)
+        {
+            if (StartJob(job))
+                return;
+
+            job.Pendding();
+            penddingQueue.Enqueue(job);
+
+        }
+
         private void PenddingJob(Job job)
         {
             allJobs.Add(job);
 
-            if (!StartJob(job))
-            {
-                job.Pendding();
-                penddingQueue.Enqueue(job);
-            }
+            _StartJob(job);
         }
 
         public Job PenddingJob(JobDelegate action)
@@ -131,13 +140,23 @@ namespace TaskTest
 
             task.ContinueWith(t =>
             {
-                if (job.IsFailed)
+                var j = t.AsyncState as Job;
+                if (t.IsCanceled && !j.IsStop)
                 {
-                    failedJobs.Enqueue(job);
+                    j.Stop();
+                }
+
+                if (j.IsFailed)
+                {
+                    failedJobs.Enqueue(j);
+                }
+                else if (j.IsStop)
+                {
+                    stopJobs[j] = j;
                 }
 
                 Task nt;
-                tasks.TryRemove(job, out nt);
+                tasks.TryRemove(j, out nt);
 
                 semaphore.Release();
 
@@ -146,6 +165,25 @@ namespace TaskTest
             task.Start();
 
             return true;
+        }
+
+        public void StopJob(Job job)
+        {
+            if (job.Status != JobStatus.Running)
+                return;
+
+            job.PrepareStop();
+        }
+
+        public void RestartJob(Job job)
+        {
+            Job j;
+            stopJobs.TryRemove(job, out j);
+
+            if (job.Status != JobStatus.Stop)
+                return;
+
+            _StartJob(job);
         }
 
         public async Task WaitAll()
@@ -172,7 +210,7 @@ namespace TaskTest
                 if (!failedJobs.TryDequeue(out job))
                     continue;
 
-                PenddingJob(job);
+                _StartJob(job);
             }
         }
 
@@ -192,6 +230,7 @@ namespace TaskTest
         public ConcurrentBag<Job> AllJobs { get { return allJobs; } }
         public ConcurrentQueue<Job> PenddingQueue { get { return penddingQueue; } }
         public ConcurrentQueue<Job> FailedJobs { get { return failedJobs; } }
+        public ConcurrentDictionary<Job, Job> StopJobs { get { return stopJobs; } }
         public ConcurrentDictionary<Job, Task> AllTasks { get { return tasks; } }
     }
 }

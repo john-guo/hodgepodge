@@ -24,7 +24,7 @@ namespace TaskTestWinForm
 
         private void button2_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 100; ++i)
+            for (int i = 0; i < 1; ++i)
             {
                 AddJob();
             }
@@ -33,11 +33,19 @@ namespace TaskTestWinForm
 
         private void action(Job job)
         {
-            for (int i = 0; i < 100000; ++i)
+            var sp = job.GetSavePoint<Tuple<int, int>>();
+
+            if (sp == null)
+                sp = new Tuple<int, int>(0, 0);
+
+            for (int i = sp.Item1; i < 100000; ++i)
             {
                 SpinWait.SpinUntil(() =>
                 {
-                    for (int j = 0; j < 10000; ++j) ;
+                    for (int j = sp.Item2; j < 10000; ++j)
+                    {
+                        job.CancelProcess(() => new Tuple<int, int>(i, j));
+                    }
                     return true;
                 });
             }
@@ -61,6 +69,7 @@ namespace TaskTestWinForm
             listView3.Items.Clear();
             listView4.Items.Clear();
             listView5.Items.Clear();
+            listView6.Items.Clear();
 
             var doneJobs = (from j in scheduler.AllJobs
                             where j.Status == JobStatus.Done
@@ -70,15 +79,19 @@ namespace TaskTestWinForm
             label3.Text = scheduler.AllTasks.Keys.Count.ToString();
             label4.Text = scheduler.PenddingQueue.Count.ToString();
             label5.Text = doneJobs.Count.ToString();
+            label6.Text = scheduler.StopJobs.Keys.Count.ToString();
 
             foreach (var job in scheduler.AllJobs)
             {
                 listView2.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), job.Status.ToString() }));
             }
-
             foreach (var job in scheduler.AllTasks.Keys)
             {
-                listView3.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), job.Status.ToString() }));
+                var sp = job.GetSavePoint<Tuple<int, int>>();
+                if (sp == null)
+                    listView3.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), job.Status.ToString() }) { Tag = job });
+                else
+                    listView3.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), String.Format("{0} {1}", sp.Item1, sp.Item2) }) { Tag = job });
             }
             foreach (var job in scheduler.PenddingQueue)
             {
@@ -88,6 +101,38 @@ namespace TaskTestWinForm
             {
                 listView5.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), job.Status.ToString() }));
             }
+            foreach (var job in scheduler.StopJobs.Keys)
+            {
+                var sp = job.GetSavePoint<Tuple<int, int>>();
+                if (sp == null)
+                    listView6.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), job.Status.ToString() }) { Tag = job });
+                else
+                    listView6.Items.Add(new ListViewItem(new string[] { job.GetTag<int>().ToString(), String.Format("{0} {1}", sp.Item1, sp.Item2) }) { Tag = job });
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (listView3.SelectedItems.Count <= 0)
+                return;
+
+            var item = listView3.SelectedItems[0];
+
+            var job = item.Tag as Job;
+
+            scheduler.StopJob(job);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (listView6.SelectedItems.Count <= 0)
+                return;
+
+            var item = listView6.SelectedItems[0];
+
+            var job = item.Tag as Job;
+
+            scheduler.RestartJob(job);
         }
     }
 }
