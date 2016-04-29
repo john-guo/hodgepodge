@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Octokit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,18 +7,16 @@ using System.Threading.Tasks;
 
 namespace GithubSync
 {
-    public class GitFile
+    public abstract class GithubItem
     {
         public string Name { get; set; }
 
-        public string Path { get; set; }
-
         public string Sha { get; set; }
 
-        public int Size { get; set; }
+        public string Url { get; set; }
 
-        public Uri Url { get; set; }
+        public virtual string Mode { get; set; }
 
-        public Octokit.EncodingType Encoding { get; set; }
+        public virtual TreeType Type { get; set; }
     }
 }

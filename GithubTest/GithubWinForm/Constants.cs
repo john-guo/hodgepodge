@@ -12,6 +12,7 @@ namespace GithubSync
         public const string CryptoCfg = "crypto.cfg";
         public const string MasterRef = @"refs/heads/master";
         public const string Root = @"/";
+        public const string base64 = "base64";
 
         public sealed class TreeMode
         {
