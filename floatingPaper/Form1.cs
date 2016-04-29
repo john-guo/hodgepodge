@@ -46,7 +46,7 @@ namespace floatingPaper
             keys[KEYCLEAR] = id;
 
             id = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
-            result = RegisterHotKey(this.Handle, id, (uint)(KeyModifiers.Alt), (uint)Keys.NumLock);
+            result = RegisterHotKey(this.Handle, id, (uint)(KeyModifiers.Alt), (uint)Keys.Scroll);
             if (!result)
                 throw new Exception();
 
@@ -402,13 +402,13 @@ namespace floatingPaper
                     continue;
 
                 var img = generateImage(f.Width, f.Height);
-                var form = newFloatingForm(f.Width, f.Height, (Bitmap)img);
+                var form = newFloatingForm(f.Width, f.Height, (Bitmap)img, f.Lock);
                 form.Opacity = f.Opacity;
                 form.Left = f.X;
                 form.Top = f.Y;
                 forms.Add(form);
                 form.Show();
-                (form as UntouchableForm).Lock = true;
+                //(form as UntouchableForm).Lock = true;
             }
         }
 
@@ -496,6 +496,13 @@ namespace floatingPaper
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetCurrentThreadId();
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int SetWindowLong(IntPtr Handle, int nIndex, uint dwNewLong);
+
+
         private static void forceSetForegroundWindow(IntPtr hWnd)
         {
             var mainThreadId = GetCurrentThreadId();
@@ -520,9 +527,15 @@ namespace floatingPaper
                 if (_lock)
                 {
                     BackColor = Color.OrangeRed;
+                    var wl = GetWindowLong(Handle, -20);
+                    wl |= 0x20;
+                    SetWindowLong(Handle, -20, wl);
                 }
                 else
                 {
+                    var wl = GetWindowLong(Handle, -20);
+                    wl ^= 0x20;
+                    SetWindowLong(Handle, -20, wl);
                     BackColor = Color.White;
                 }
             }
