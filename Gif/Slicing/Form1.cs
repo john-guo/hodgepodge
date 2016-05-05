@@ -237,7 +237,7 @@ namespace Slicing
                 width = w;
             }
 
-            if (!int.TryParse(textBox3.Text, out h))
+            if (!int.TryParse(textBox4.Text, out h))
             {
                 height = null;
             }
@@ -246,7 +246,7 @@ namespace Slicing
                 height = h;
             }
 
-            if (!int.TryParse(textBox3.Text, out d))
+            if (!int.TryParse(textBox5.Text, out d))
             {
                 delay = null;
             }
@@ -282,7 +282,7 @@ namespace Slicing
                 width = w;
             }
 
-            if (!int.TryParse(textBox3.Text, out h))
+            if (!int.TryParse(textBox4.Text, out h))
             {
                 height = null;
             }
@@ -291,7 +291,7 @@ namespace Slicing
                 height = h;
             }
 
-            if (!int.TryParse(textBox3.Text, out d))
+            if (!int.TryParse(textBox5.Text, out d))
             {
                 delay = null;
             }

@@ -26,6 +26,8 @@ namespace video2gif
                 var gifstream = File.Open(gifName, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (var gif = new GifEncoder(gifstream))
                 {
+                    if (delay.HasValue)
+                        gif.FrameDelay = TimeSpan.FromMilliseconds(delay.Value);
                     media.ProcessFrames(begin, end, width, height, delay, (img, ts, i) =>
                     {
                         if (isVerbose) 

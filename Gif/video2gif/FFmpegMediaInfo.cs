@@ -360,7 +360,7 @@ namespace FFmpeg
             ffmpeg.av_free(pConvertedFrameBuffer);
             ffmpeg.sws_freeContext(pConvertContext);
             ffmpeg.av_free(pDecodedFrame);
-            ffmpeg.avcodec_close(pCodecContext);
+            //ffmpeg.avcodec_close(pCodecContext);
             #endregion
         }
 
@@ -451,7 +451,7 @@ namespace FFmpeg
             ffmpeg.av_free(pConvertedFrameBuffer);
             ffmpeg.sws_freeContext(pConvertContext);
             ffmpeg.av_free(pDecodedFrame);
-            ffmpeg.avcodec_close(pCodecContext);
+            //ffmpeg.avcodec_close(pCodecContext);
             #endregion
         }
 

@@ -37,10 +37,12 @@
     <Reference Include="BumpKit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\BumpKit.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="FFmpeg.AutoGen, Version=1.2.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\FFmpeg.AutoGen.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -89,6 +91,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BumpKit.dll" />
+    <Content Include="FFmpeg.AutoGen.dll" />
     <Content Include="player.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
