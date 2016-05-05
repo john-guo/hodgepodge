@@ -12,6 +12,7 @@ using FFmpeg.AutoGen;
 using System.Runtime.InteropServices;
 using CommandLine;
 using CommandLine.Text;
+using video2gif;
 
 namespace Gif
 {
@@ -51,7 +52,6 @@ namespace Gif
 
     }
 
-
     class Program
     {
         static void Main(string[] args)
@@ -69,61 +69,24 @@ namespace Gif
             var gifname = options.Gif;
             int delay = options.Delay;
 
-            //var url = @"http://flv5.bn.netease.com/videolib3/1603/28/mwXEB9539/SD/mwXEB9539.flv?start=689&end=1082716";
-            //var filename = "test.flv";
-            //var gifname = "test.gif";
-            //var web = new WebClient();
-            //web.DownloadFile(url, filename);
+            TimeSpan begin = options.Begin.HasValue ? TimeSpan.FromMilliseconds(options.Begin.Value) : TimeSpan.Zero;
+            TimeSpan end = options.End.HasValue ? TimeSpan.FromMilliseconds(options.End.Value) : TimeSpan.MaxValue;
+            if (end <= begin)
+            {
+                end = TimeSpan.MaxValue;
+            }
 
             FFmpegMediaInfo.InitDllDirectory();
             if (!options.Verbose)
                 ffmpeg.av_log_set_level(ffmpeg.AV_LOG_QUIET);
 
-            using (var media = new FFmpegMediaInfo(url))
-            {
-                var stream = media.Streams.FirstOrDefault(s => s.StreamType == FFmpegStreamType.Video);
-                if (stream == null)
-                    return;
-
-                TimeSpan begin = options.Begin.HasValue ? TimeSpan.FromMilliseconds(options.Begin.Value) : TimeSpan.Zero;
-                TimeSpan end = options.End.HasValue ? TimeSpan.FromMilliseconds(options.End.Value) : TimeSpan.MaxValue;
-
-                var frames = media.GetFrames(stream.Index, begin, end, 
-                    i => {
-                        if (options.Verbose)
-                            Console.Write("=");
-                        return false;
-                    });
-                var gifstream = File.OpenWrite(gifname);
-                using (var gif = new GifEncoder(gifstream))
-                {
-                    TimeSpan prev = TimeSpan.Zero;
-
-                    foreach (var frame in frames)
-                    {
-                        int width = options.Width.HasValue ? options.Width.Value : frame.Picture.Width;
-                        int height = options.Height.HasValue ? options.Height.Value : frame.Picture.Height;
-
-                        if (prev == TimeSpan.Zero || (frame.Position - prev).TotalMilliseconds >= delay)
-                        {
-                            if (width == frame.Picture.Width && height == frame.Picture.Height)
-                                gif.AddFrame(frame.Picture);
-                            else 
-                                gif.AddFrame(frame.Picture.ScaleToFit(new Size(width, height)));
-                            if (options.Verbose)
-                                Console.Write("=");
-                            prev = frame.Position;
-                        }
-                    }
-                }
-                if (options.Verbose)
-                {
+            Video2Gif.Process(url, gifname, begin, end, 
+                options.Width, options.Height, options.Delay, 
+                i => Console.Write("="), 
+                () => {
                     Console.WriteLine();
                     Console.WriteLine("Done.");
-                }
-                gifstream.Flush();
-                gifstream.Close();
-            }
+                }, true);
         }
     }
 }
