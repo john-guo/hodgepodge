@@ -129,6 +129,149 @@ namespace FFmpeg
             _isDisposed = false;
         }
 
+        public class PlayState
+        {
+            internal AVStream *avStream;
+            internal AVCodecContext *avCodecContext;
+            internal AVPacket *avPacket;
+            internal SwsContext* swsContext;
+            internal AVFrame* avFrame;
+            internal AVPicture* avPicture;
+            internal sbyte* frameBuffer;
+            internal int targetWidth;
+            internal int targetHeight;
+            internal double timeBase;
+            internal AVPacket packet;
+        }
+
+        public PlayState BeginPlay(int? width, int? height)
+        {
+            FFmpegStreamInfo stream = this.Streams.FirstOrDefault(s => s.StreamType == FFmpegStreamType.Video);
+
+            if (stream == null || stream.StreamType != FFmpegStreamType.Video)
+                throw new Exception("No video stream selected!");
+
+            var vidStream = stream.AVStream;
+
+            #region Preparations
+            AVCodecContext codecContext = *(vidStream->codec);
+            int src_width = codecContext.width;
+            int src_height = codecContext.height;
+            int dest_width = width.HasValue ? width.Value : src_width;
+            int dest_height = height.HasValue ? height.Value : src_height;
+
+            AVPixelFormat sourcePixFmt = codecContext.pix_fmt;
+            AVCodecID codecId = codecContext.codec_id;
+            var convertToPixFmt = AVPixelFormat.AV_PIX_FMT_BGR24;
+
+            SwsContext* pConvertContext = ffmpeg.sws_getContext(src_width, src_height, sourcePixFmt, dest_width, dest_height, convertToPixFmt, ffmpeg.SWS_FAST_BILINEAR, null, null, null);
+            if (pConvertContext == null)
+                throw new Exception("Could not initialize the conversion context");
+            AVCodecContext* pCodecContext = vidStream->codec;
+
+            var pConvertedFrame = (AVPicture*)ffmpeg.av_frame_alloc();
+            int convertedFrameBufferSize = ffmpeg.avpicture_get_size(convertToPixFmt, dest_width, dest_height);
+            var pConvertedFrameBuffer = (sbyte*)ffmpeg.av_malloc((uint)convertedFrameBufferSize);
+            ffmpeg.avpicture_fill(pConvertedFrame, pConvertedFrameBuffer, convertToPixFmt, dest_width, dest_height);
+
+            AVCodec* pCodec = ffmpeg.avcodec_find_decoder(codecId);
+            if (pCodec == null)
+                throw new Exception("Unsupported codec");
+
+            if ((pCodec->capabilities & ffmpeg.CODEC_CAP_TRUNCATED) == ffmpeg.CODEC_CAP_TRUNCATED)
+                pCodecContext->flags |= ffmpeg.CODEC_FLAG_TRUNCATED;
+
+            if (ffmpeg.avcodec_open2(pCodecContext, pCodec, null) < 0)
+                throw new Exception("Could not open codec");
+
+            AVFrame* pDecodedFrame = ffmpeg.av_frame_alloc();
+
+            // Seek for key frames only - otherwise first frames are currupted until a key frame is decoded
+            this.AVFormatContext->seek2any = 0;
+
+            double timeBase = ToDouble(vidStream->time_base); // DTS or PTS timestamp to seconds multiplicator
+
+            var state = new PlayState();
+            state.packet = new AVPacket();
+            fixed (AVPacket* pPacket = &state.packet)
+            {
+                ffmpeg.av_init_packet(pPacket);
+                state.avPacket = pPacket;
+            }
+
+            state.avStream = vidStream;
+            state.avCodecContext = pCodecContext;
+            state.swsContext = pConvertContext;
+            state.avFrame = pDecodedFrame;
+            state.avPicture = pConvertedFrame;
+            state.frameBuffer = pConvertedFrameBuffer;
+            state.targetWidth = dest_width;
+            state.targetHeight = dest_height;
+            state.timeBase = timeBase;
+
+            #endregion
+
+            return state;
+        }
+
+        public Image Play(PlayState state, out TimeSpan pos)
+        {
+            return ExtractNextImage(state.avCodecContext, state.avPacket, state.avStream, state.swsContext, state.avFrame, state.avPicture, state.targetWidth, state.targetHeight, state.timeBase, out pos);
+        }
+
+        private unsafe Bitmap ExtractNextImage(AVCodecContext* pCodecContext, AVPacket* pPacket, AVStream* vidStream, SwsContext* pConvertContext, AVFrame* pDecodedFrame, AVPicture* pConvertedFrame, int width, int height, double timeBase, out TimeSpan pos)
+        {
+            pos = new TimeSpan();
+            Bitmap result = null;
+
+            int gotPicture = 0;
+
+            while (gotPicture != 1)
+            {
+                if (ffmpeg.av_read_frame(this.AVFormatContext, pPacket) < 0)
+                {
+                    result = null;
+                    break;
+                }
+
+                if (pPacket->stream_index != vidStream->index)
+                    continue;
+
+                gotPicture = 0;
+                int size = ffmpeg.avcodec_decode_video2(pCodecContext, pDecodedFrame, &gotPicture, pPacket);
+                if (size < 0)
+                    throw new Exception("Error while decoding frame!");
+
+                if (gotPicture == 1)
+                {
+                    // Get current position from frame
+                    pos = ToTimeSpan(ffmpeg.av_frame_get_best_effort_timestamp(pDecodedFrame), timeBase);
+
+                    // Extract image
+                    sbyte** src = &pDecodedFrame->data0;
+                    sbyte** dst = &pConvertedFrame->data0;
+                    int src_height = pCodecContext->height;
+                    ffmpeg.sws_scale(pConvertContext, src, pDecodedFrame->linesize, 0, src_height, dst, pConvertedFrame->linesize);
+                    var imageBufferPtr = new IntPtr(pConvertedFrame->data0);
+                    int linesize = pConvertedFrame->linesize[0];
+                    result = new Bitmap(width, height, linesize, PixelFormat.Format24bppRgb, imageBufferPtr);
+                }
+
+            }
+
+            return result;
+        }
+
+        public void EndPlay(PlayState state)
+        {
+            ffmpeg.av_free(state.frameBuffer);
+            ffmpeg.av_free(state.avPicture);
+            ffmpeg.sws_freeContext(state.swsContext);
+            ffmpeg.av_free(state.avFrame);
+            ffmpeg.avcodec_close(state.avCodecContext);
+        }
+
+
         public void ProcessFrames(TimeSpan startTime, TimeSpan endTime, int? width, int? height, int? delay, Action<Bitmap, TimeSpan, int> progress)
         {
             FFmpegStreamInfo stream = this.Streams.FirstOrDefault(s => s.StreamType == FFmpegStreamType.Video);
@@ -139,6 +282,7 @@ namespace FFmpeg
             ExtractFrames(stream.AVStream, startTime, endTime, width, height, delay, (i, ts, img) => progress(img, ts, i));
         }
 
+
         private unsafe void ExtractFrames(AVStream* vidStream, TimeSpan startTime, TimeSpan endTime, int? width, int? height, int? delay, Action<int, TimeSpan, Bitmap> progress)
         {
             #region Preparations
@@ -148,7 +292,6 @@ namespace FFmpeg
             int dest_width = width.HasValue ? width.Value : src_width;
             int dest_height = height.HasValue ? height.Value : src_height;
 
-            long duration = this.AVFormatContext->duration;
             AVPixelFormat sourcePixFmt = codecContext.pix_fmt;
             AVCodecID codecId = codecContext.codec_id;
             var convertToPixFmt = AVPixelFormat.AV_PIX_FMT_BGR24;
@@ -178,8 +321,6 @@ namespace FFmpeg
             var packet = new AVPacket();
             AVPacket* pPacket = &packet;
             ffmpeg.av_init_packet(pPacket);
-
-            AVCodecContext cont = *vidStream->codec;
             #endregion
 
             // Seek for key frames only - otherwise first frames are currupted until a key frame is decoded
@@ -213,6 +354,97 @@ namespace FFmpeg
                 if (pos >= endTime) break;
 
             } while (true); // end while
+
+            #region Free allocated memory
+            ffmpeg.av_free(pConvertedFrame);
+            ffmpeg.av_free(pConvertedFrameBuffer);
+            ffmpeg.sws_freeContext(pConvertContext);
+            ffmpeg.av_free(pDecodedFrame);
+            ffmpeg.avcodec_close(pCodecContext);
+            #endregion
+        }
+
+        public void PlaybackFrames(TimeSpan startTime, TimeSpan endTime, int? width, int? height, Action beforeProgress, Func<Bitmap, TimeSpan, int, bool> progress)
+        {
+            FFmpegStreamInfo stream = this.Streams.FirstOrDefault(s => s.StreamType == FFmpegStreamType.Video);
+
+            if (stream == null || stream.StreamType != FFmpegStreamType.Video)
+                throw new Exception("No video stream selected!");
+
+            PlaybackFrames(stream.AVStream, startTime, endTime, width, height, beforeProgress, (i, ts, img) => progress(img, ts, i));
+        }
+
+        private unsafe void PlaybackFrames(AVStream* vidStream, TimeSpan startTime, TimeSpan endTime, int? width, int? height, Action beforeProgress, Func<int, TimeSpan, Bitmap, bool> progress)
+        {
+            #region Preparations
+            AVCodecContext codecContext = *(vidStream->codec);
+            int src_width = codecContext.width;
+            int src_height = codecContext.height;
+            int dest_width = width.HasValue ? width.Value : src_width;
+            int dest_height = height.HasValue ? height.Value : src_height;
+
+            AVPixelFormat sourcePixFmt = codecContext.pix_fmt;
+            AVCodecID codecId = codecContext.codec_id;
+            var convertToPixFmt = AVPixelFormat.AV_PIX_FMT_BGR24;
+
+            SwsContext* pConvertContext = ffmpeg.sws_getContext(src_width, src_height, sourcePixFmt, dest_width, dest_height, convertToPixFmt, ffmpeg.SWS_FAST_BILINEAR, null, null, null);
+            if (pConvertContext == null)
+                throw new Exception("Could not initialize the conversion context");
+            AVCodecContext* pCodecContext = &codecContext;
+
+            var pConvertedFrame = (AVPicture*)ffmpeg.av_frame_alloc();
+            int convertedFrameBufferSize = ffmpeg.avpicture_get_size(convertToPixFmt, dest_width, dest_height);
+            var pConvertedFrameBuffer = (sbyte*)ffmpeg.av_malloc((uint)convertedFrameBufferSize);
+            ffmpeg.avpicture_fill(pConvertedFrame, pConvertedFrameBuffer, convertToPixFmt, dest_width, dest_height);
+
+            AVCodec* pCodec = ffmpeg.avcodec_find_decoder(codecId);
+            if (pCodec == null)
+                throw new Exception("Unsupported codec");
+
+            if ((pCodec->capabilities & ffmpeg.CODEC_CAP_TRUNCATED) == ffmpeg.CODEC_CAP_TRUNCATED)
+                pCodecContext->flags |= ffmpeg.CODEC_FLAG_TRUNCATED;
+
+            if (ffmpeg.avcodec_open2(pCodecContext, pCodec, null) < 0)
+                throw new Exception("Could not open codec");
+
+            AVFrame* pDecodedFrame = ffmpeg.av_frame_alloc();
+
+            var packet = new AVPacket();
+            AVPacket* pPacket = &packet;
+            ffmpeg.av_init_packet(pPacket);
+            #endregion
+
+            // Seek for key frames only - otherwise first frames are currupted until a key frame is decoded
+            this.AVFormatContext->seek2any = 0;
+
+            var currTS = startTime.Ticks / TIME_FACTOR;
+
+            if (currTS > 0)
+                ffmpeg.av_seek_frame(this.AVFormatContext, -1, currTS, ffmpeg.AVSEEK_FLAG_BACKWARD);
+
+            TimeSpan pos;
+            double timeBase = ToDouble(vidStream->time_base); // DTS or PTS timestamp to seconds multiplicator
+            Bitmap img;
+            int f = 0;
+            TimeSpan prev = TimeSpan.Zero;
+            bool running = true;
+            do
+            {
+                if (beforeProgress != null)
+                    beforeProgress();
+
+                // Decode next image - ATTENTION: Get a image copy or it will be unallocated!
+                img = ExtractNextImage(pCodecContext, pPacket, vidStream, pConvertContext, pDecodedFrame, pConvertedFrame, dest_width, dest_height, timeBase, out pos);
+
+                if (img == null) break;
+
+                prev = pos;
+
+                if (progress != null)
+                    running = progress(++f, pos, img);
+
+                img.Dispose();
+            } while (running); // end while
 
             #region Free allocated memory
             ffmpeg.av_free(pConvertedFrame);
@@ -273,6 +505,12 @@ namespace FFmpeg
             return result;
         }
 
+        public void Seek(long ms)
+        {
+            var ticks = TimeSpan.TicksPerMillisecond * ms / TIME_FACTOR;
+            ffmpeg.av_seek_frame(AVFormatContext, -1, ticks, ffmpeg.AVSEEK_FLAG_BACKWARD);
+        }
+
         private bool _isDisposed = true;
         public void Dispose()
         {
@@ -289,7 +527,7 @@ namespace FFmpeg
 
         #region InitDllDirectory
 
-        internal static void InitDllDirectory()
+        public static void InitDllDirectory()
         {
             if (_initDllDirectoryDone) return;
 
