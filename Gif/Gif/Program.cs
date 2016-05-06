@@ -63,7 +63,7 @@ namespace Gif
             {
                 Console.WriteLine("{0}", options.GetUsage());
                 return;
-            }
+            } 
 
             var url = options.Url;
             var gifname = options.Gif;
