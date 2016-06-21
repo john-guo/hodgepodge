@@ -29,6 +29,8 @@ namespace Wrench
 
         private void G_events_MouseMove(object sender, MouseEventArgs e)
         {
+            return;
+
             var hwnd = Utils.WindowFromPoint(e.Location);
             if (hwnd == Handle)
                 return;
