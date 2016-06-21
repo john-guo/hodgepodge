@@ -1,0 +1,1 @@
+﻿%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\installutil.exe TM_WSH.exe
