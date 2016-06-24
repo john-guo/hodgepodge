@@ -71,7 +71,7 @@ namespace Wrench
             if (process.MainWindowHandle == Handle)
                 return;
 
-            target = hwnd;
+            target = process.MainWindowHandle;
 
             Invoke((Action)delegate
             {
