@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowUtils", "WindowUtils\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wrench", "Wrench\Wrench.csproj", "{D4D8A9F7-3892-4FEA-BCD1-A81CE716E121}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HookTest", "HookTest\HookTest.csproj", "{12BC559E-188C-4222-A297-E5C297CA1563}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HookDll", "HookDll\HookDll.csproj", "{61095138-015D-4ECD-9BB2-3710EFADC575}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{D4D8A9F7-3892-4FEA-BCD1-A81CE716E121}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4D8A9F7-3892-4FEA-BCD1-A81CE716E121}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4D8A9F7-3892-4FEA-BCD1-A81CE716E121}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12BC559E-188C-4222-A297-E5C297CA1563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12BC559E-188C-4222-A297-E5C297CA1563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12BC559E-188C-4222-A297-E5C297CA1563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12BC559E-188C-4222-A297-E5C297CA1563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61095138-015D-4ECD-9BB2-3710EFADC575}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61095138-015D-4ECD-9BB2-3710EFADC575}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61095138-015D-4ECD-9BB2-3710EFADC575}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61095138-015D-4ECD-9BB2-3710EFADC575}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
