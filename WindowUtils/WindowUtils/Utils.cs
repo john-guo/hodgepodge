@@ -343,13 +343,23 @@ namespace WindowUtils
         public static IntPtr AddWindowExStyle(IntPtr hwnd, ExtendedWindowStyles styles)
         {
             var oldStyles = GetWindowLongPtr(hwnd, WindowLongIndex.GWL_EXSTYLE);
-            return SetWindowLongPtr(hwnd, WindowLongIndex.GWL_EXSTYLE, new IntPtr((long)styles | oldStyles.ToInt64()));
+            var ret = SetWindowLongPtr(hwnd, WindowLongIndex.GWL_EXSTYLE, new IntPtr((long)styles | oldStyles.ToInt64()));
+            if (ret != IntPtr.Zero)
+            {
+                SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP.NOMOVE | SWP.NOSIZE | SWP.NOZORDER | SWP.FRAMECHANGED);
+            }
+            return ret;
         }
 
         public static IntPtr RemoveWindowExStyle(IntPtr hwnd, ExtendedWindowStyles styles)
         {
             var oldStyles = Utils.GetWindowLongPtr(hwnd, WindowLongIndex.GWL_EXSTYLE);
-            return SetWindowLongPtr(hwnd, WindowLongIndex.GWL_EXSTYLE, new IntPtr(~(long)styles & oldStyles.ToInt64()));
+            var ret = SetWindowLongPtr(hwnd, WindowLongIndex.GWL_EXSTYLE, new IntPtr(~(long)styles & oldStyles.ToInt64()));
+            if (ret != IntPtr.Zero)
+            {
+                SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP.NOMOVE | SWP.NOSIZE | SWP.NOZORDER | SWP.FRAMECHANGED);
+            }
+            return ret;
         }
 
         /// <summary>
@@ -456,5 +466,8 @@ namespace WindowUtils
             public int right;
             public int bottom;
         }
+
+        [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern bool SetForegroundWindow(IntPtr hwnd);
     }
 }

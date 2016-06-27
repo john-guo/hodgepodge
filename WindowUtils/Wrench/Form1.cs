@@ -140,7 +140,14 @@ namespace Wrench
             }
             else
             {
-                targetExStyle = Utils.RemoveWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_TRANSPARENT | Utils.ExtendedWindowStyles.WS_EX_LAYERED);
+                if (checkBox1.Checked)
+                {
+                    targetExStyle = Utils.RemoveWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_TRANSPARENT);
+                }
+                else
+                {
+                    targetExStyle = Utils.RemoveWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_TRANSPARENT | Utils.ExtendedWindowStyles.WS_EX_LAYERED);
+                }
             }
         }
 
@@ -151,6 +158,7 @@ namespace Wrench
 
             if (checkBox3.Checked)
             {
+                Utils.SetForegroundWindow(target);
                 Utils.SetWindowPos(target, Utils.HWND.TOPMOST, 0, 0, 0, 0, Utils.SWP.NOMOVE | Utils.SWP.NOSIZE);
             }
             else
