@@ -78,7 +78,7 @@ namespace Wrench
                 label1.Text = process.MainWindowTitle;
             });
 
-
+            button2.Enabled = true;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -165,6 +165,37 @@ namespace Wrench
             {
                 Utils.SetWindowPos(target, Utils.HWND.NOTOPMOST, 0, 0, 0, 0, Utils.SWP.NOMOVE | Utils.SWP.NOSIZE);
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var x = int.Parse(textBox1.Text);
+            var y = int.Parse(textBox2.Text);
+            var w = int.Parse(textBox3.Text);
+            var h = int.Parse(textBox4.Text);
+
+            //Utils.SetWindowPos(target, Utils.HWND.NOTOPMOST, x, y, w, h, Utils.SWP.NOZORDER | Utils.SWP.SHOWWINDOW);
+            Utils.MoveWindow(target, x, y, w, h, true);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var x = int.Parse(textBox1.Text);
+            var y = int.Parse(textBox2.Text);
+            var w = int.Parse(textBox3.Text);
+            var h = int.Parse(textBox4.Text);
+
+            var f = new Form();
+            f.FormBorderStyle = FormBorderStyle.None;
+            f.MaximumSize = new Size(w, h);
+            f.Size = f.MaximumSize;
+            f.Text = f.Handle.ToInt32().ToString();
+            f.KeyPreview = true;
+            f.BackColor = Color.Red;
+            f.Show();
+            f.Activate();
+
+            Utils.MoveWindow(f.Handle, x, y, w, h, true);
         }
     }
 }

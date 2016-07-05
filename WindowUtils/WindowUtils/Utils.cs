@@ -469,5 +469,8 @@ namespace WindowUtils
 
         [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         public static extern bool SetForegroundWindow(IntPtr hwnd);
+
+        [DllImport("User32.dll", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern bool MoveWindow(IntPtr hWnd, int x, int y, int w, int h, bool Repaint);
     }
 }
