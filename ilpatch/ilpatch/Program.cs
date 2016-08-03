@@ -44,6 +44,7 @@ namespace ilpatch
 #else
         static void Main(string[] args)
         {
+            //testlib.dll ilpatchlib.dll Class1
             //Assembly-CSharp_G.dll Assembly-CSharp.dll SteamVR_ExternalCamera
             if (args.Length != 3)
             {
@@ -58,7 +59,7 @@ namespace ilpatch
             try
             {
                 //var result = Helper.CopyClass(src, dest);
-                var result = Helper.ReplaceClass(src, dest, className);
+                var result = Helper.MergeClass(src, dest, className);
                 var bak = dest + ".bak";
 
                 if (!File.Exists(bak))
@@ -114,10 +115,12 @@ namespace ilpatch
 
     static class Helper
     {
-        public static string ReplaceClass(string src, string dest, string className)
+        static ModuleDef debugMod;
+
+        public static string MergeClass(string src, string dest, string className)
         {
-            var destAssembly = AssemblyDef.Load(dest);
-            var srcAssembly = AssemblyDef.Load(src);
+            //var destAssembly = AssemblyDef.Load(dest);
+            //var srcAssembly = AssemblyDef.Load(src);
 
             var destMod = ModuleDefMD.Load(dest);
             var srcMod = ModuleDefMD.Load(src);
@@ -125,48 +128,37 @@ namespace ilpatch
 
             //DupRid(destAssembly, srcAssembly);
 
-            var query = from mod in srcAssembly.Modules
-                        from type in mod.Types
+            var query = from type in srcMod.Types
                         where type.Name == className
-                        select new { mod, type };
+                        select type;
 
-            var srcTarget = query.FirstOrDefault();
+            var srcType = query.FirstOrDefault();
 
-            if (srcTarget == null)
-                throw new Exception("srcTarget");
+            if (srcType == null)
+                throw new Exception("srcType");
 
-            query = from mod in destAssembly.Modules
-                    from type in mod.Types
+            query = from type in destMod.Types
                     where type.Name == className
-                    select new { mod, type };
+                    select type;
 
-            var destTarget = query.FirstOrDefault();
+            var destType = query.FirstOrDefault();
 
-            if (destTarget == null)
-                throw new Exception("destTarget");
+            if (destType == null)
+                throw new Exception("destType");
 
-            //var index = destTarget.mod.Types.IndexOf(destTarget.type);
-            //srcTarget.mod.Types.Remove(srcTarget.type);
-            //destTarget.mod.Types[index] = srcTarget.type;
-            //destTarget.mod.Types.Remove(destTarget.type);
+            debugMod = destMod;
 
-
-
-            ReReference(srcTarget.type, destAssembly, srcAssembly);
-            DupType(srcTarget.type, destTarget.type);
+            DupType(srcType, destType);
+            ReReference(destType, destMod);
 
             var result = "patch." + dest;
-            destAssembly.Write(result);
-
-            foreach (var mod in destAssembly.Modules)
-            {
-                mod.Dispose();
-            }
+            destMod.Write(result);
+            destMod.Dispose();
 
             return result;
         }
 
-        private static TypeSig ReferenceType(TypeSig type, AssemblyDef assembly)
+        private static TypeSig ReferenceType(TypeSig type, ModuleDef module)
         {
             if (type == null)
                 return null;
@@ -174,7 +166,7 @@ namespace ilpatch
             if (type.IsSZArray)
             {
                 var szar = type.ToSZArraySig();
-                var eleType = ReferenceType(szar.Next, assembly);
+                var eleType = ReferenceType(szar.Next, module);
                 if (eleType == null)
                     return null;
                 return new SZArraySig(eleType);
@@ -183,7 +175,7 @@ namespace ilpatch
             if (type.IsArray)
             {
                 var ar = type.ToArraySig();
-                var eleType = ReferenceType(ar.Next, assembly);
+                var eleType = ReferenceType(ar.Next, module);
                 if (eleType == null)
                     return null;
                 return new ArraySig(eleType, ar.Rank, ar.Sizes, ar.LowerBounds);
@@ -193,7 +185,7 @@ namespace ilpatch
             {
                 var g = type.ToGenericInstSig();
 
-                var gtype = assembly.Find(g.GenericType.FullName, false);
+                var gtype = module.Find(g.GenericType.FullName, false);
                 ClassOrValueTypeSig ngt;
                 if (gtype == null)
                     ngt = g.GenericType;
@@ -203,25 +195,29 @@ namespace ilpatch
                 TypeSig[] genericArgs = new TypeSig[g.GenericArguments.Count];
                 for (int i = 0; i < g.GenericArguments.Count; ++i)
                 {
-                    genericArgs[i] = ReferenceType(g.GenericArguments[i], assembly);
+                    var subArg = ReferenceType(g.GenericArguments[i], module);
+                    if (subArg != null)
+                        genericArgs[i] = subArg;
+                    else
+                        genericArgs[i] = g.GenericArguments[i];
                 }
 
                 return new GenericInstSig(ngt, genericArgs);
             }
 
-            var targetType = assembly.Find(type.FullName, false);
+            var targetType = module.Find(type.FullName, false);
             if (targetType == null)
                 return null;
 
             return targetType.ToTypeSig();
         }
 
-        private static void ReCustomAttributes(IHasCustomAttribute type, AssemblyDef assembly)
+        private static void ReCustomAttributes(IHasCustomAttribute type, ModuleDef module)
         {
 
             for (int i = 0; i < type.CustomAttributes.Count; ++i)
             {
-                var newattr = assembly.Find(type.CustomAttributes[i].TypeFullName, false);
+                var newattr = module.Find(type.CustomAttributes[i].TypeFullName, false);
                 if (newattr == null)
                     continue;
 
@@ -229,17 +225,16 @@ namespace ilpatch
             }
         }
         
-        private static void ReMethodSig(MethodSig sig, AssemblyDef assembly)
+        private static void ReMethodSig(MethodSig sig, ModuleDef module)
         {
             var retType = sig.RetType;
-            var ts = ReferenceType(sig.RetType, assembly);
+            var ts = ReferenceType(sig.RetType, module);
             if (ts != null)
                 sig.RetType = ts;
 
-            TypeSig[] newparams = new TypeSig[sig.Params.Count];
             for (var i = 0; i < sig.Params.Count; ++i)
             {
-                ts = ReferenceType(sig.Params[i], assembly);
+                ts = ReferenceType(sig.Params[i], module);
                 if (ts == null)
                     continue;
 
@@ -247,28 +242,49 @@ namespace ilpatch
             }
         }
 
-        private static void ReMethodDef(MethodDef method, AssemblyDef assembly)
+        private static void ReMethodDef(MethodDef method, ModuleDef module)
         {
-            var newtype = ReferenceType(method.ReturnType, assembly);
+            ReCustomAttributes(method, module);
+
+            var newtype = ReferenceType(method.ReturnType, module);
             if (newtype != null)
                 method.ReturnType = newtype;
 
+            for (int i = 0; i < method.ParamDefs.Count; ++i)
+            {
+                var p = method.ParamDefs[i];
+                ReCustomAttributes(p, module);
+            }
+
             for (int i = 0; i < method.Parameters.Count; ++i)
             {
-                var newparam = ReferenceType(method.Parameters[i].Type, assembly);
+                var p = method.Parameters[i];
+
+                if (p.HasParamDef)
+                    ReCustomAttributes(p.ParamDef, module);
+
+                var newparam = ReferenceType(p.Type, module);
                 if (newtype == null)
                     continue;
 
-                method.Parameters[i].Type = newparam;
+                p.Type = newparam;
             }
+
 
             for (int i = 0; i < method.GenericParameters.Count; ++i)
             {
                 var genep = method.GenericParameters[i];
-                method.GenericParameters[i] = new GenericParamUser(genep.Number, genep.Flags, genep.Name);
+                ReCustomAttributes(genep, module);
+                var negp = new GenericParamUser(genep.Number, genep.Flags, genep.Name);
+                foreach (var ca in genep.CustomAttributes)
+                {
+                    negp.CustomAttributes.Add(ca);
+                }
+
+                method.GenericParameters[i] = negp;
             }
 
-            ReMethodSig(method.MethodSig, assembly);
+            ReMethodSig(method.MethodSig, module);
         }
 
         //private static MethodDef ReMethod(string typeName, string methodName, AssemblyDef assembly)
@@ -283,8 +299,69 @@ namespace ilpatch
         //    return type.FindEvent(eventName);
         //}
 
-        private static void ReMethodBody(TypeDef type, MethodDef method, AssemblyDef assembly)
+        private static IEnumerable<TypeDef> AllNestTypes(TypeDef type)
         {
+            List<TypeDef> types = new List<TypeDef>();
+            types.Add(type);
+
+            if (!type.NestedTypes.Any())
+                return types;
+
+            foreach(var t in type.NestedTypes)
+            {
+                types.AddRange(AllNestTypes(t));
+            }
+
+            return types;
+        }
+
+        private static MethodDef FindMethod(string fullName, ModuleDef module)
+        {
+            //foreach (var type in module.Types)
+            //{
+            //    foreach (var nestType in AllNestTypes(type))
+            //    {
+            //        foreach (var method in nestType.Methods)
+            //        {
+            //            if (method.FullName == fullName)
+            //                return method;
+            //        }
+            //    }
+            //}
+
+            //return null;
+
+            var newM = (from t in module.Types
+                        from it in AllNestTypes(t)
+                        from im in it.Methods
+                        where im.FullName == fullName
+                        select im).FirstOrDefault();
+
+            return newM;
+        }
+
+        private static FieldDef FindField(string fullName, ModuleDef module)
+        {
+            var newF = (from t in module.Types
+                        from it in AllNestTypes(t)
+                        from im in it.Fields
+                        where im.FullName == fullName
+                        select im).FirstOrDefault();
+
+            return newF;
+        }
+
+        private static void ReMethodBody(TypeDef type, MethodDef method, ModuleDef module)
+        {
+            for (int i = 0; i < method.Body.Variables.Count; ++i)
+            {
+                var local = method.Body.Variables[i];
+
+                var lt = ReferenceType(local.Type, module);
+                if (lt != null)
+                    local.Type = lt;
+            }
+
             for (int i = 0; i < method.Body.Instructions.Count; ++i)
             {
                 if (method.Body.Instructions[i].Operand == null)
@@ -295,21 +372,30 @@ namespace ilpatch
                 {
                     case OperandType.InlineField:
                         var field = method.Body.Instructions[i].Operand as FieldDef;
-                        ts = field.FieldType;
-                        ts = ReferenceType(ts, assembly);
-                        if (ts != null)
-                            method.Body.Instructions[i].Operand = new FieldDefUser(field.Name, new FieldSig(ts));
+                        if (field != null)
+                        {
+                            var newfield = FindField(field.FullName, module);
+                            if (newfield != null)
+                                method.Body.Instructions[i].Operand = newfield;
+                        }
+                        var fieldR = method.Body.Instructions[i].Operand as MemberRef;
+                        if (fieldR != null)
+                        {
+                            var nfr = module.GetMemberRefs().FirstOrDefault(mr => mr.FullName == fieldR.FullName);
+                            if (nfr != null)
+                                method.Body.Instructions[i].Operand = nfr;
+                        }
                         break;
                     case OperandType.InlineMethod:
                         var m = method.Body.Instructions[i].Operand as MemberRef;
                         if (m != null)
                         {
-                            var module = type.Module;
+                            var tmodule = type.Module;
                             if (m.DeclaringType != null)
                             {
-                                ts = ReferenceType(m.DeclaringType.ToTypeSig(), assembly);
+                                ts = ReferenceType(m.DeclaringType.ToTypeSig(), module);
                                 if (ts != null)
-                                    module = ts.Module;
+                                    tmodule = ts.Module;
                             }
 
                             if (m.IsFieldRef)
@@ -319,28 +405,16 @@ namespace ilpatch
                             }
                             else if (m.IsMethodRef)
                             {
-                                var retType = m.MethodSig.RetType;
-                                ts = ReferenceType(m.MethodSig.RetType, assembly);
-                                if (ts != null)
-                                    retType = ts;
 
-                                TypeSig[] newparams = new TypeSig[m.MethodSig.Params.Count];
-                                for (var j = 0; j < m.MethodSig.Params.Count; ++j)
-                                {
-                                    ts = ReferenceType(m.MethodSig.Params[j], assembly);
-                                    if (ts == null)
-                                        newparams[j] = m.MethodSig.Params[j];
-                                    else
-                                        newparams[j] = ts;
-                                }
+                                ReMethodSig(m.MethodSig, module);
 
-                                var msig = new MethodSig(
-                                    m.MethodSig.CallingConvention,
-                                    m.MethodSig.GenParamCount,
-                                    ts,
-                                    newparams
-                                    );
-                                method.Body.Instructions[i].Operand = new MemberRefUser(module, m.Name, msig);
+                                //var msig = new MethodSig(
+                                //    m.MethodSig.CallingConvention,
+                                //    m.MethodSig.GenParamCount,
+                                //    m.MethodSig.RetType,
+                                //    m.MethodSig.Params
+                                //    );
+                                //method.Body.Instructions[i].Operand = new MemberRefUser(tmodule, m.Name, m.MethodSig);
                             }
 
                             break;
@@ -349,63 +423,86 @@ namespace ilpatch
                         var md = method.Body.Instructions[i].Operand as MethodDef;
                         if (md != null)
                         {
-                            ts = ReferenceType(md.DeclaringType.ToTypeSig(), assembly);
-                            if (ts != null)
-                                md.DeclaringType = ts.TryGetTypeDef();
+                            var newM = FindMethod(md.FullName, module);
+                            if (newM != null)
+                            {
+                                method.Body.Instructions[i].Operand = newM;
+                            }
+                            else
+                            {
+                                var newMR = module.GetMemberRefs().FirstOrDefault(mr => mr.FullName == md.FullName);
+                                if (newMR != null)
+                                    method.Body.Instructions[i].Operand = newMR;
 
-                            ReMethodDef(md, assembly);
+                            }
+
                             break;
                         }
 
                         var ms = method.Body.Instructions[i].Operand as MethodSpec;
                         if (ms != null)
                         {
+                            var msm = module.GetMemberRefs().FirstOrDefault(mr => mr.FullName == ms.Method.FullName);
+                            if (msm != null)
+                                ms.Method = msm;
 
-                            var mru = new MemberRefUser(type.Module, ms.Method.Name, ms.Method.MethodSig);
                             for (int j = 0; j < ms.GenericInstMethodSig.GenericArguments.Count; ++j)
                             {
-                                var ga = ReferenceType(ms.GenericInstMethodSig.GenericArguments[j], assembly);
+                                var ga = ReferenceType(ms.GenericInstMethodSig.GenericArguments[j], module);
                                 if (ga == null)
                                     continue;
 
                                 ms.GenericInstMethodSig.GenericArguments[j] = ga;
                             }
-                            method.Body.Instructions[i].Operand = new MethodSpecUser(mru, ms.GenericInstMethodSig);
                             break;
                         }
 
-                        throw new Exception("XXXX");
+                        throw new NotSupportedException();
 
-                        break;
-                    case OperandType.InlineString:
                         break;
                     case OperandType.InlineType:
                         var it = method.Body.Instructions[i].Operand as TypeDef;
-                        ts = ReferenceType(it.ToTypeSig(), assembly);
-                        method.Body.Instructions[i].Operand = ts.TryGetTypeDef();
+                        if (it == null)
+                        {
+                            Console.WriteLine("InlineType {0}", (method.Body.Instructions[i].Operand as Instruction).Operand);
+                            break;
+                        }
+                        ts = ReferenceType(it.ToTypeSig(), module);
+                        if (ts != null)
+                            method.Body.Instructions[i].Operand = ts.TryGetTypeDef();
                         //Console.WriteLine("{0}", (method.Body.Instructions[i].Operand).ToString());
+                        break;
+                    case OperandType.ShortInlineVar:
+                        var local = method.Body.Instructions[i].Operand as Local;
+                        if (local == null)
+                        {
+                            Console.WriteLine("ShortInlineVar {0}", (method.Body.Instructions[i].Operand as Instruction).Operand);
+                            break;
+                        }
+                        ts = ReferenceType(local.Type, module);
+                        if (ts != null)
+                            local.Type = ts;
                         break;
                     default:
                         if (method.Body.Instructions[i].Operand is Instruction)
                         {
-                            Console.WriteLine("{0}", (method.Body.Instructions[i].Operand as Instruction).Operand);
+                            //Console.WriteLine("{0}", (method.Body.Instructions[i].Operand as Instruction).Operand);
                             continue;
                         }
-                        throw new Exception(method.Body.Instructions[i].OpCode.OperandType.ToString());
+                        break;
+                        //throw new Exception(method.Body.Instructions[i].OpCode.OperandType.ToString());
                 }
-
-
             }
         }
 
-        private static void ReReference(TypeDef type, AssemblyDef assembly, AssemblyDef srcAssembly)
+        private static void ReReference(TypeDef type, ModuleDef module)
         {
-            ReCustomAttributes(type, assembly);
+            ReCustomAttributes(type, module);
 
             var baseType = type.BaseType.ToTypeSig();
             if (baseType != null)
             {
-                baseType = ReferenceType(baseType, assembly);
+                baseType = ReferenceType(baseType, module);
                 if (baseType != null)
                     type.BaseType = baseType.ToTypeDefOrRef();
             }
@@ -413,7 +510,7 @@ namespace ilpatch
             for (int i = 0; i < type.Interfaces.Count; ++i)
             {
                 var intype = type.Interfaces[i].Interface.ToTypeSig();
-                intype = ReferenceType(intype, assembly);
+                intype = ReferenceType(intype, module);
                 if (intype == null)
                     continue;
 
@@ -424,9 +521,9 @@ namespace ilpatch
             for (int i = 0; i < type.Fields.Count; ++i)
             {
                 var field = type.Fields[i];
-                ReCustomAttributes(field, assembly);
+                ReCustomAttributes(field, module);
 
-                var newtype = ReferenceType(field.FieldType, assembly);
+                var newtype = ReferenceType(field.FieldType, module);
                 if (newtype == null)
                     continue;
 
@@ -436,42 +533,65 @@ namespace ilpatch
             for (int i = 0; i < type.Events.Count; ++i)
             {
                 var e = type.Events[i];
-                ReMethodDef(e.AddMethod, assembly);
-                ReMethodDef(e.RemoveMethod, assembly);
-                ReCustomAttributes(e, assembly);
+                if (e.AddMethod != null)
+                    ReMethodDef(e.AddMethod, module);
+                if (e.RemoveMethod != null)
+                    ReMethodDef(e.RemoveMethod, module);
+                ReCustomAttributes(e, module);
 
-                var et = ReferenceType(e.EventType.ToTypeSig(), assembly);
+                var et = ReferenceType(e.EventType.ToTypeSig(), module);
                 if (et == null)
                     continue;
 
                 e.EventType = et.ToTypeDefOrRef();
-                var ne = new EventDefUser(e.Name, et.ToTypeDefOrRef(), e.Attributes);
-                ne.AddMethod = new MethodDefUser(e.AddMethod.Name, e.AddMethod.MethodSig, e.AddMethod.ImplAttributes, e.AddMethod.Attributes);
-                ne.AddMethod.MethodBody = e.AddMethod.MethodBody;
+                //var ne = new EventDefUser(e.Name, et.ToTypeDefOrRef(), e.Attributes);
+                //ne.AddMethod = new MethodDefUser(e.AddMethod.Name, e.AddMethod.MethodSig, e.AddMethod.ImplAttributes, e.AddMethod.Attributes);
+                //ne.AddMethod.MethodBody = e.AddMethod.MethodBody;
 
-                ne.RemoveMethod = new MethodDefUser(e.RemoveMethod.Name, e.RemoveMethod.MethodSig, e.RemoveMethod.ImplAttributes, e.RemoveMethod.Attributes);
-                ne.RemoveMethod.MethodBody = e.RemoveMethod.MethodBody;
+                //ne.RemoveMethod = new MethodDefUser(e.RemoveMethod.Name, e.RemoveMethod.MethodSig, e.RemoveMethod.ImplAttributes, e.RemoveMethod.Attributes);
+                //ne.RemoveMethod.MethodBody = e.RemoveMethod.MethodBody;
 
-                type.Events[i] = ne;
+                //type.Events[i] = ne;
             }
 
 
             for (int i = 0; i < type.Properties.Count; ++i)
             {
                 var p = type.Properties[i];
-                ReCustomAttributes(p, assembly);
-                ReMethodDef(p.GetMethod, assembly);
-                ReMethodDef(p.SetMethod, assembly);
+                ReCustomAttributes(p, module);
+
+                var retType = ReferenceType(p.PropertySig.RetType, module);
+                if (retType != null)
+                    p.PropertySig.RetType = retType;
+
+                for (int j = 0; j < p.PropertySig.Params.Count; ++j)
+                {
+                    var pp = p.PropertySig.Params[j];
+                    pp = ReferenceType(pp, module);
+                    if (pp == null)
+                        continue;
+
+                    p.PropertySig.Params[j] = pp;
+                }
+
+                if (p.GetMethod != null)
+                    ReMethodDef(p.GetMethod, module);
+                if (p.SetMethod != null)
+                    ReMethodDef(p.SetMethod, module);
             }
 
-            for (int k = 0; k < type.Methods.Count; ++k)
+            for (int i = 0; i < type.Methods.Count; ++i)
             {
-                var method = type.Methods[k];
-                ReCustomAttributes(method, assembly);
+                var method = type.Methods[i];
+                ReMethodDef(method, module);
+                ReMethodBody(type, method, module);   
+            }
 
-                ReMethodDef(method, assembly);
+            for (int i = 0; i < type.NestedTypes.Count; ++i)
+            {
+                var nest = type.NestedTypes[i];
 
-                ReMethodBody(type, method, assembly);   
+                ReReference(nest, module);
             }
         }
 
@@ -481,6 +601,24 @@ namespace ilpatch
             dest.ClassLayout = src.ClassLayout;
             dest.ClassSize = src.ClassSize;
             dest.Visibility = src.Visibility;
+
+            
+            for (int i = 0; i < dest.NestedTypes.Count; ++i)
+            {
+                var dnt = dest.NestedTypes[i];
+                var snt = src.NestedTypes.FirstOrDefault(nt => nt.FullName == dnt.FullName);
+
+                if (snt == null)
+                    continue;
+
+                DupType(snt, dnt);
+            }
+
+            var ntArray = src.NestedTypes.Where(snt => !dest.NestedTypes.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
+            foreach (var nt in ntArray)
+            {
+                nt.DeclaringType = dest;
+            }
 
             dest.CustomAttributes.Clear();
             foreach (var attr in src.CustomAttributes)
@@ -496,45 +634,58 @@ namespace ilpatch
                 dest.Interfaces.Add(i);
             }
 
-            dest.Fields.Clear();
-            for (int i = 0; src.Fields.Count > 0; )
+
+            var fdArray = src.Fields.Where(snt => !dest.Fields.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
+            foreach (var fd in fdArray)
             {
-                var f = src.Fields[i];
-                f.DeclaringType = null;
-                dest.Fields.Add(f);
+                fd.DeclaringType = dest;
             }
 
-            dest.Methods.Clear();
-            for (int i = 0; src.Methods.Count > 0; )
+            //dest.Fields.Clear();
+            //for (int i = 0; src.Fields.Count > 0; )
+            //{
+            //    var f = src.Fields[i];
+            //    f.DeclaringType = dest;
+            //}
+
+            var mdArray = src.Methods.Where(snt => !dest.Methods.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
+            foreach (var md in mdArray)
             {
-                var m = src.Methods[i];
-                m.DeclaringType = null;
-                dest.Methods.Add(m);
+                md.DeclaringType = dest;
             }
 
-            dest.Properties.Clear();
-            for (int i = 0; src.Properties.Count > 0; )
+            //dest.Methods.Clear();
+            //for (int i = 0; src.Methods.Count > 0; )
+            //{
+            //    var m = src.Methods[i];
+            //    m.DeclaringType = dest;
+            //}
+
+            var ptArray = src.Properties.Where(snt => !dest.Properties.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
+            foreach (var pt in ptArray)
             {
-                var p = src.Properties[i];
-                p.DeclaringType = null;
-                dest.Properties.Add(p);
+                pt.DeclaringType = dest;
             }
 
-            dest.Events.Clear();
-            for (int i = 0; src.Events.Count > 0; )
+            //dest.Properties.Clear();
+            //for (int i = 0; src.Properties.Count > 0; )
+            //{
+            //    var p = src.Properties[i];
+            //    p.DeclaringType = dest;
+            //}
+
+            var evArray = src.Events.Where(snt => !dest.Events.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
+            foreach (var ev in evArray)
             {
-                var e = src.Events[i];
-                e.DeclaringType = null;
-                dest.Events.Add(e);
+                ev.DeclaringType = dest;
             }
 
-            dest.NestedTypes.Clear();
-            for (int i = 0; src.NestedTypes.Count > 0; )
-            {
-                var n = src.NestedTypes[i];
-                n.DeclaringType = null;
-                dest.NestedTypes.Add(n);
-            }
+            //dest.Events.Clear();
+            //for (int i = 0; src.Events.Count > 0; )
+            //{
+            //    var e = src.Events[i];
+            //    e.DeclaringType = dest;
+            //}
         }
 
         public static string CopyClass(string src, string dest)
