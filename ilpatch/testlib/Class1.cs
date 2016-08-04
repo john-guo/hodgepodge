@@ -8,15 +8,47 @@ namespace ilpatchlib
     [Attr]
     public class Class1
     {
+        class NC
+        {
+            int i;
+            public class NC2
+            {
+                int j;
+                void testNC2()
+                {
+                    Console.WriteLine("NC2");
+                }
+
+                public NC2()
+                {
+                    testNC2();
+                }
+            }
+
+            public NC()
+            {
+                testNC1();
+                new NC2();
+            }
+
+            void testNC1()
+            {
+                Console.WriteLine("NC1");
+            }
+        }
+
         [Attr]
         Class2 c2;
         Struct2[] s2;
         Struct2[,,] s3;
         Dictionary<Struct2[], Dictionary<Class2, List<Struct2[,]>>>[] c3;
+        NC.NC2 o; 
         public Class1()
         {
+            new NC();
             c2 = new Class2();
-            f3<Class3>();
+            f1();
+            f3<Class3>("World");
             new comm.Class1();
             Console.WriteLine("patched");
         }
@@ -25,19 +57,22 @@ namespace ilpatchlib
         [return:Attr]
         Class2 f1()
         {
+            Console.WriteLine("patched f1 hello");
             return c2;
         }
 
 
-        void f2(Class2 d)
+        void f2<T>(Class2 d, T p)
         {
             d.test();
+            Console.WriteLine("patched f2 hello {0}", p);
         }
 
-        void f3<Class3>()
+        void f3<Class3>(string world)
         {
+            Console.WriteLine("patched f3 hello {0}", world);
             Class2 a = c2;
-            f2(a);
+            f2(a, 1);
         }
 
         Class2 C
