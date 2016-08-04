@@ -42,12 +42,24 @@ namespace ilpatchlib
             f2<int, object>(0, null);
             f3<Class1>(1);
             new comm.Class1();
-            Console.WriteLine("origin");
+            TestM();
+            
+
         }
 
         void f1() { Console.WriteLine("f1 hello"); }
         void f2<T1, T2>(T1 a, T2 b) { Console.WriteLine("f2 hello"); }
         void f3<Class1>(int a) { Console.WriteLine("f3 hello"); }
+
+        void TestM()
+        {
+            Console.WriteLine("origin");
+        }
+
+        void B()
+        {
+            Console.WriteLine("B");
+        }
 
         //Class2 f1()
         //{

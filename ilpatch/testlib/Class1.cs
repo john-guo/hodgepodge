@@ -6,7 +6,7 @@ using testlib;
 namespace ilpatchlib
 {
     [Attr]
-    public class Class1
+    public class Class1 : Interface1
     {
         class NC
         {
@@ -50,6 +50,18 @@ namespace ilpatchlib
             f1();
             f3<Class3>("World");
             new comm.Class1();
+            TestM();
+
+            e += Class1_e;
+        }
+
+        private void Class1_e()
+        {
+            throw new NotImplementedException();
+        }
+
+        void TestM()
+        {
             Console.WriteLine("patched");
         }
 

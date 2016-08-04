@@ -505,8 +505,8 @@ namespace ilpatch
             dest.ClassLayout = src.ClassLayout;
             dest.ClassSize = src.ClassSize;
             dest.Visibility = src.Visibility;
+            dest.BaseType = src.BaseType;
 
-            
             for (int i = 0; i < dest.NestedTypes.Count; ++i)
             {
                 var dnt = dest.NestedTypes[i];
@@ -524,16 +524,15 @@ namespace ilpatch
                 nt.DeclaringType = dest;
             }
 
-            dest.CustomAttributes.Clear();
-            foreach (var attr in src.CustomAttributes)
+            var caArray = src.CustomAttributes.Where(snt => !dest.CustomAttributes.Any(dnt => dnt.TypeFullName == snt.TypeFullName)).ToArray();
+            foreach (var attr in caArray)
             {
+
                 dest.CustomAttributes.Add(attr);
             }
 
-            dest.BaseType = src.BaseType;
-
-            dest.Interfaces.Clear();
-            foreach (var i in src.Interfaces)
+            var iArray = src.Interfaces.Where(snt => !dest.Interfaces.Any(dnt => dnt.Interface.FullName == snt.Interface.FullName)).ToArray();
+            foreach (var i in iArray)
             {
                 dest.Interfaces.Add(i);
             }
