@@ -1,0 +1,45 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Text;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace AeroWatch
+{
+    public class FontClock : GraphicsClock
+    {
+        private Font paintFont;
+        private Brush paintBrush;
+        private Color paintColor;
+        int fontSize;
+
+        public FontClock(Color color, int size)
+        {
+            fontSize = size;
+            paintColor = color;
+            paintBrush = new SolidBrush(color);
+        }
+
+        public override void Initialize(Graphics obj, string fileName)
+        {
+            base.Initialize(obj, fileName);
+
+            var privateFonts = new PrivateFontCollection();
+            privateFonts.AddFontFile(fileName);
+            paintFont = new Font(privateFonts.Families.First(), fontSize);
+        }
+
+        public override void Draw(DateTime time)
+        {
+            TextRenderer.DrawText(Canvas, time.ToLongTimeString(), paintFont, Point.Empty, paintColor);
+        }
+
+        public override Size GetSize()
+        {
+            return TextRenderer.MeasureText(DateTime.MaxValue.ToLongTimeString(), paintFont);
+        }
+    }
+}
