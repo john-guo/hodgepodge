@@ -34,6 +34,9 @@ namespace AeroWatch
 
         public override void Draw(DateTime time)
         {
+            Canvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            Canvas.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
             TextRenderer.DrawText(Canvas, time.ToLongTimeString(), paintFont, Point.Empty, paintColor);
         }
 
