@@ -89,6 +89,8 @@ namespace AeroWatch
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            TopMost = true;
+
             var now = DateTime.Now;
             bg.Graphics.Clear(transparencyKey);
             clocks[current].Draw(now);
