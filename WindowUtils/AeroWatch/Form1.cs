@@ -125,6 +125,8 @@ namespace AeroWatch
 
             TransparencyKey = transparencyKey;
 
+            toolStripMenuItem5_Click(sender, e);
+
             timer1.Start();
         }
 
