@@ -208,18 +208,13 @@ namespace ilpatch
 
         private static IEnumerable<TypeDef> AllNestTypes(TypeDef type)
         {
-            List<TypeDef> types = new List<TypeDef>();
-            types.Add(type);
-
+            yield return type;
             if (!type.NestedTypes.Any())
-                return types;
+                yield break;
 
             foreach(var t in type.NestedTypes)
-            {
-                types.AddRange(AllNestTypes(t));
-            }
-
-            return types;
+                foreach (var nt in AllNestTypes(t))
+                    yield return nt;
         }
 
         private static TypeDef FindType(string fullName, ModuleDef module)
@@ -537,11 +532,33 @@ namespace ilpatch
                 dest.Interfaces.Add(i);
             }
 
+            for (int i = 0; i < dest.Fields.Count; ++i)
+            {
+                var ditem = dest.Fields[i];
+                var sitem = src.Fields.FirstOrDefault(item => item.FullName == ditem.FullName);
+
+                if (sitem == null)
+                    continue;
+
+                ditem.Constant = sitem.Constant;
+                ditem.Attributes = sitem.Attributes;
+                ditem.FieldOffset = sitem.FieldOffset;
+                ditem.Access = sitem.Access;
+                ditem.FieldType = sitem.FieldType;
+                ditem.FieldSig = sitem.FieldSig;
+                var itemca = sitem.CustomAttributes.Where(snt => !ditem.CustomAttributes.Any(dnt => dnt.TypeFullName == snt.TypeFullName)).ToArray();
+                foreach (var attr in itemca)
+                {
+                    ditem.CustomAttributes.Add(attr);
+                }
+            }
             var fdArray = src.Fields.Where(snt => !dest.Fields.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
             foreach (var fd in fdArray)
             {
                 fd.DeclaringType = dest;
             }
+
+
 
             for (int i = 0; i < dest.Methods.Count; ++i)
             {
@@ -551,6 +568,8 @@ namespace ilpatch
                 if (smd == null)
                     continue;
 
+                dmd.Attributes = smd.Attributes;
+                dmd.Access = smd.Access;
                 dmd.ReturnType = smd.ReturnType;
                 dmd.Body = smd.Body;
                 dmd.MethodSig.Params.Clear();
@@ -558,20 +577,58 @@ namespace ilpatch
                 {
                     dmd.MethodSig.Params.Add(smd.MethodSig.Params[j]);
                 }
+                var itemca = dmd.CustomAttributes.Where(snt => !smd.CustomAttributes.Any(dnt => dnt.TypeFullName == snt.TypeFullName)).ToArray();
+                foreach (var attr in itemca)
+                {
+                    dmd.CustomAttributes.Add(attr);
+                }
             }
-
             var mdArray = src.Methods.Where(snt => !dest.Methods.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
             foreach (var md in mdArray)
             {
                 md.DeclaringType = dest;
             }
-            
+
+            for (int i = 0; i < dest.Properties.Count; ++i)
+            {
+                var ditem = dest.Properties[i];
+                var sitem = src.Properties.FirstOrDefault(item => item.FullName == ditem.FullName);
+
+                if (sitem == null)
+                    continue;
+
+                ditem.Type = sitem.Type;
+                ditem.Attributes = sitem.Attributes;
+                ditem.PropertySig = sitem.PropertySig;
+                var itemca = sitem.CustomAttributes.Where(snt => !ditem.CustomAttributes.Any(dnt => dnt.TypeFullName == snt.TypeFullName)).ToArray();
+                foreach (var attr in itemca)
+                {
+                    ditem.CustomAttributes.Add(attr);
+                }
+            }
             var ptArray = src.Properties.Where(snt => !dest.Properties.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
             foreach (var pt in ptArray)
             {
                 pt.DeclaringType = dest;
             }
 
+
+            for (int i = 0; i < dest.Events.Count; ++i)
+            {
+                var ditem = dest.Events[i];
+                var sitem = src.Events.FirstOrDefault(item => item.FullName == ditem.FullName);
+
+                if (sitem == null)
+                    continue;
+
+                ditem.EventType = sitem.EventType;
+                ditem.Attributes = sitem.Attributes;
+                var itemca = sitem.CustomAttributes.Where(snt => !ditem.CustomAttributes.Any(dnt => dnt.TypeFullName == snt.TypeFullName)).ToArray();
+                foreach (var attr in itemca)
+                {
+                    ditem.CustomAttributes.Add(attr);
+                }
+            }
             var evArray = src.Events.Where(snt => !dest.Events.Any(dnt => dnt.FullName == snt.FullName)).ToArray();
             foreach (var ev in evArray)
             {

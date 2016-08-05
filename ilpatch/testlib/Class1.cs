@@ -8,7 +8,7 @@ namespace ilpatchlib
     [Attr]
     public class Class1 : Interface1
     {
-        class NC
+        public class NC
         {
             int i;
             public class NC2
@@ -31,7 +31,7 @@ namespace ilpatchlib
                 new NC2();
             }
 
-            void testNC1()
+            public void testNC1()
             {
                 Console.WriteLine("NC1");
             }
@@ -62,6 +62,8 @@ namespace ilpatchlib
 
         void TestM()
         {
+            var d = new NC();
+            d.testNC1();
             Console.WriteLine("patched");
         }
 

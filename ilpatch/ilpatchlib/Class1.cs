@@ -5,7 +5,7 @@ namespace ilpatchlib
 {
     public class Class1
     {
-        class NC
+        public class NC
         {
             int i;
             public class NC2
@@ -59,6 +59,11 @@ namespace ilpatchlib
         void B()
         {
             Console.WriteLine("B");
+        }
+
+        Class2 C
+        {
+            get; set;
         }
 
         //Class2 f1()

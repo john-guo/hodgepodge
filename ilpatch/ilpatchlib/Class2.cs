@@ -14,6 +14,7 @@ namespace testlib
     {
         public void test()
         {
+            ilpatchlib.Class1.NC nc = new ilpatchlib.Class1.NC();
             Console.WriteLine("Class2");
         }
 
