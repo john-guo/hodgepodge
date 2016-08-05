@@ -47,6 +47,17 @@ namespace AeroWatch
         Color color = Color.WhiteSmoke;
         int size = 12;
         ClockType current = ClockType.FontClock;
+        ClockType Current
+        {
+            set
+            {
+                current = value;
+
+                var g = CreateGraphics();
+                SetupClock(g);
+            }
+        }
+
 
         enum ClockType
         {
@@ -107,16 +118,10 @@ namespace AeroWatch
         {
             //Utils.AddWindowExStyle(Handle, Utils.ExtendedWindowStyles.WS_EX_TRANSPARENT | Utils.ExtendedWindowStyles.WS_EX_LAYERED | Utils.ExtendedWindowStyles.WS_EX_TOOLWINDOW);
             var g = CreateGraphics();
+            g.PageUnit = GraphicsUnit.Pixel;
             LoadClock(g);
 
-            var size = clocks[current].GetSize();
-            Width = size.Width;
-            Height = size.Height;
-            Left = Screen.PrimaryScreen.Bounds.Width - Width;
-            Top = Screen.PrimaryScreen.Bounds.Top;
-
-            bg = bgContext.Allocate(g, ClientRectangle);
-            UpdateClockCanvas(bg.Graphics);
+            SetupClock(g);
 
             TransparencyKey = transparencyKey;
 
@@ -129,6 +134,20 @@ namespace AeroWatch
             bg.Dispose();
         }
 
+        private void SetupClock(Graphics g)
+        {
+            var size = clocks[current].GetSize();
+            Width = size.Width;
+            Height = size.Height;
+            Left = Screen.PrimaryScreen.Bounds.Width - Width;
+            Top = Screen.PrimaryScreen.Bounds.Top;
+
+            bgContext.Invalidate();
+            bg = bgContext.Allocate(g, ClientRectangle);
+            bg.Graphics.PageUnit = GraphicsUnit.Pixel;
+            UpdateClockCanvas(bg.Graphics);
+        }
+
         private void LoadClock(Graphics g)
         {
             GraphicsClock iclock;
@@ -138,7 +157,7 @@ namespace AeroWatch
             clocks.Add(ClockType.FontClock, iclock);
 
             iclock = new ImageClock();
-            iclock.Initialize(g, "clock.jpg");
+            iclock.Initialize(g, "clock.png");
             clocks.Add(ClockType.ImageClock, iclock);
         }
 
@@ -184,6 +203,20 @@ namespace AeroWatch
             toolStripMenuItem4.Checked = false;
             toolStripMenuItem5.Checked = false;
             toolStripMenuItem6.Checked = true;
+        }
+
+        private void watchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Current = ClockType.FontClock;
+            watchToolStripMenuItem.Checked = true;
+            clockToolStripMenuItem.Checked = false;
+        }
+
+        private void clockToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Current = ClockType.ImageClock;
+            watchToolStripMenuItem.Checked = false;
+            clockToolStripMenuItem.Checked = true;
         }
     }
 }

@@ -41,6 +41,9 @@
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.watchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -59,12 +62,13 @@
             // 
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2,
             this.toolStripMenuItem1,
             this.tsmDisplay,
             this.toolStripSeparator1,
             this.tsmExit});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 116);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 142);
             // 
             // tsmDisplay
             // 
@@ -130,10 +134,37 @@
             this.toolStripMenuItem6.Text = "100";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
             // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.watchToolStripMenuItem,
+            this.clockToolStripMenuItem});
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(181, 26);
+            this.toolStripMenuItem2.Text = "Mode";
+            // 
+            // watchToolStripMenuItem
+            // 
+            this.watchToolStripMenuItem.Checked = true;
+            this.watchToolStripMenuItem.CheckOnClick = true;
+            this.watchToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.watchToolStripMenuItem.Name = "watchToolStripMenuItem";
+            this.watchToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.watchToolStripMenuItem.Text = "Watch";
+            this.watchToolStripMenuItem.Click += new System.EventHandler(this.watchToolStripMenuItem_Click);
+            // 
+            // clockToolStripMenuItem
+            // 
+            this.clockToolStripMenuItem.CheckOnClick = true;
+            this.clockToolStripMenuItem.Name = "clockToolStripMenuItem";
+            this.clockToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.clockToolStripMenuItem.Text = "Clock";
+            this.clockToolStripMenuItem.Click += new System.EventHandler(this.clockToolStripMenuItem_Click);
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(326, 135);
             this.ControlBox = false;
             this.DoubleBuffered = true;
@@ -167,6 +198,9 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem watchToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clockToolStripMenuItem;
     }
 }
 
