@@ -11,10 +11,17 @@ using System.Windows.Forms;
 
 namespace AeroWatch
 {
+    enum ClockType
+    {
+        FontClock,
+        ImageClock
+    }
+
+
     public partial class Form1 : Form
     {
         bool _isShow = true;
-        bool ShowMe
+        public bool ShowMe
         {
             get
             {
@@ -30,16 +37,19 @@ namespace AeroWatch
                 {
                     timer1.Start();
                     Show();
-                    tsmDisplay.Text = "Hide";
+                    ClockShow(this, EventArgs.Empty);
                 }
                 else
                 {
                     timer1.Stop();
                     Hide();
-                    tsmDisplay.Text = "Show";
+                    ClockHide(this, EventArgs.Empty);
                 }
             }
         }
+
+        public event EventHandler ClockShow = delegate { };
+        public event EventHandler ClockHide = delegate { };
 
         BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
         BufferedGraphics bg;
@@ -47,7 +57,7 @@ namespace AeroWatch
         Color color = Color.WhiteSmoke;
         int size = 12;
         ClockType current = ClockType.FontClock;
-        ClockType Current
+        internal ClockType Current
         {
             set
             {
@@ -58,12 +68,8 @@ namespace AeroWatch
             }
         }
 
+        internal bool DonotRefresh = false;
 
-        enum ClockType
-        {
-            FontClock,
-            ImageClock
-        }
         Dictionary<ClockType, GraphicsClock> clocks = new Dictionary<ClockType, GraphicsClock>();
 
 
@@ -72,24 +78,11 @@ namespace AeroWatch
             InitializeComponent();
         }
 
-        private void tsmExit_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
-        private void tsmDisplay_Click(object sender, EventArgs e)
-        {
-            ShowMe = !ShowMe;
-        }
-
-        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
-        {
-            ShowMe = true;
-        }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            TopMost = true;
+            if (!DonotRefresh)
+                TopMost = true;
 
             var now = DateTime.Now;
             bg.Graphics.Clear(transparencyKey);
@@ -118,16 +111,12 @@ namespace AeroWatch
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Utils.AddWindowExStyle(Handle, Utils.ExtendedWindowStyles.WS_EX_TRANSPARENT | Utils.ExtendedWindowStyles.WS_EX_LAYERED | Utils.ExtendedWindowStyles.WS_EX_TOOLWINDOW);
             var g = CreateGraphics();
-            g.PageUnit = GraphicsUnit.Pixel;
             LoadClock(g);
 
             SetupClock(g);
 
             TransparencyKey = transparencyKey;
-
-            toolStripMenuItem5_Click(sender, e);
 
             timer1.Start();
         }
@@ -148,7 +137,6 @@ namespace AeroWatch
 
             bgContext.Invalidate();
             bg = bgContext.Allocate(g, ClientRectangle);
-            bg.Graphics.PageUnit = GraphicsUnit.Pixel;
             UpdateClockCanvas(bg.Graphics);
         }
 
@@ -171,56 +159,6 @@ namespace AeroWatch
             {
                 clock.Value.SetCanvas(g);
             }
-        }
-
-        private void toolStripMenuItem3_Click(object sender, EventArgs e)
-        {
-            Opacity = 0.25;
-            toolStripMenuItem3.Checked = true;
-            toolStripMenuItem4.Checked = false;
-            toolStripMenuItem5.Checked = false;
-            toolStripMenuItem6.Checked = false;
-        }
-
-        private void toolStripMenuItem4_Click(object sender, EventArgs e)
-        {
-            Opacity = 0.5;
-            toolStripMenuItem3.Checked = false;
-            toolStripMenuItem4.Checked = true;
-            toolStripMenuItem5.Checked = false;
-            toolStripMenuItem6.Checked = false;
-        }
-
-        private void toolStripMenuItem5_Click(object sender, EventArgs e)
-        {
-            Opacity = 0.75;
-            toolStripMenuItem3.Checked = false;
-            toolStripMenuItem4.Checked = false;
-            toolStripMenuItem5.Checked = true;
-            toolStripMenuItem6.Checked = false;
-        }
-
-        private void toolStripMenuItem6_Click(object sender, EventArgs e)
-        {
-            Opacity = 1.0;
-            toolStripMenuItem3.Checked = false;
-            toolStripMenuItem4.Checked = false;
-            toolStripMenuItem5.Checked = false;
-            toolStripMenuItem6.Checked = true;
-        }
-
-        private void watchToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Current = ClockType.FontClock;
-            watchToolStripMenuItem.Checked = true;
-            clockToolStripMenuItem.Checked = false;
-        }
-
-        private void clockToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Current = ClockType.ImageClock;
-            watchToolStripMenuItem.Checked = false;
-            clockToolStripMenuItem.Checked = true;
         }
     }
 }
