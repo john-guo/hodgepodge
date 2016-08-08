@@ -7,21 +7,16 @@ using System.Threading.Tasks;
 
 namespace AeroWatch
 {
-    public abstract class GraphicsClock : IClock<Graphics>
+    enum ClockType
     {
-        public abstract void Draw(DateTime time);
+        FontClock,
+        ImageClock
+    }
+
+    public abstract class GraphicsClock : IFloatingCanvas
+    {
         public abstract Size GetSize();
-
-        protected Graphics Canvas { get; private set; }
-
-        public void SetCanvas(Graphics g)
-        {
-            Canvas = g;
-        }
-
-        public virtual void Initialize(Graphics obj, string fileName)
-        {
-            SetCanvas(obj);
-        }
+        public abstract void Draw(Graphics canvas);
+        public abstract void Initialize(string fileName);
     }
 }

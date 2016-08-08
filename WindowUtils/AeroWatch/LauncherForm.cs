@@ -90,8 +90,8 @@ namespace AeroWatch
         private void LauncherForm_Load(object sender, EventArgs e)
         {
             clockForm = new Form1();
-            clockForm.ClockShow += ClockForm_ClockShow;
-            clockForm.ClockHide += ClockForm_ClockHide;
+            clockForm.FormShow += ClockForm_ClockShow;
+            clockForm.FormHide += ClockForm_ClockHide;
             clockForm.Load += ClockForm_Load;
             clockForm.Show();
         }

@@ -19,10 +19,8 @@ namespace AeroWatch
 
         Graphics innerCanvas;
 
-        public override void Initialize(Graphics obj, string fileName)
+        public override void Initialize(string fileName)
         {
-            base.Initialize(obj, fileName);
-
             clockImg = new Bitmap(101, 101);
             //image = new Bitmap(100 * 32 + 1, 100 * 32 + 1);
             image = new Bitmap(101, 101);
@@ -65,8 +63,10 @@ namespace AeroWatch
             //}
         }
 
-        public override void Draw(DateTime time)
+        public override void Draw(Graphics canvas)
         {
+            var time = DateTime.Now;
+
             innerCanvas.Clear(Color.Transparent);
             //innerCanvas.SmoothingMode = SmoothingMode.AntiAlias;
             //innerCanvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -136,7 +136,7 @@ namespace AeroWatch
             //Canvas.CompositingMode = CompositingMode.SourceOver;
             //Canvas.CompositingQuality = CompositingQuality.HighQuality;
             //Canvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            Canvas.DrawImage(image, new Rectangle(Point.Empty, clockImg.Size), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
+            canvas.DrawImage(image, new Rectangle(Point.Empty, clockImg.Size), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
 
             ////Canvas.DrawImage(clockImg, Point.Empty);
             //Canvas.TranslateTransform(clock.Width / 2, clock.Height / 2);

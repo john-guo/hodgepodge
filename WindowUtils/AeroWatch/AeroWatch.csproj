@@ -49,11 +49,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FontClock.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="TransparentForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="TransparentForm.Designer.cs">
+      <DependentUpon>TransparentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="LauncherForm.cs">
       <SubType>Form</SubType>
@@ -62,12 +65,12 @@
       <DependentUpon>LauncherForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GraphicsClock.cs" />
-    <Compile Include="IClock.cs" />
+    <Compile Include="IFloatingCanvas.cs" />
     <Compile Include="ImageClock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="TransparentForm.resx">
+      <DependentUpon>TransparentForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LauncherForm.resx">
       <DependentUpon>LauncherForm.cs</DependentUpon>

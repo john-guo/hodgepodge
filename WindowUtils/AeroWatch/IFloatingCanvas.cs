@@ -7,14 +7,10 @@ using System.Threading.Tasks;
 
 namespace AeroWatch
 {
-    public interface IClock
+    public interface IFloatingCanvas
     {
         Size GetSize();
-        void Draw(DateTime time);
-    }
-
-    public interface IClock<T> : IClock
-    {
-        void Initialize(T obj, string fileName);
+        void Draw(Graphics canvas);
+        void Initialize(string fileName);
     }
 }
