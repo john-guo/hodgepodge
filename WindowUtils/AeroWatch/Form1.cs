@@ -27,7 +27,6 @@ namespace AeroWatch
 
         Dictionary<ClockType, GraphicsClock> clocks = new Dictionary<ClockType, GraphicsClock>();
 
-
         public Form1()
         {
         }

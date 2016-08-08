@@ -12,7 +12,7 @@ using System.Windows.Forms;
 namespace AeroWatch
 {
 
-    public partial class TransparentForm : Form
+    public abstract partial class TransparentForm : Form
     {
         bool _isShow = true;
         public bool ShowMe
@@ -55,8 +55,7 @@ namespace AeroWatch
             InitializeComponent();
         }
 
-        protected virtual void OnDraw(Graphics canvas)
-        { }
+        protected abstract void OnDraw(Graphics canvas);
 
         private void timer1_Tick(object sender, EventArgs e)
         {
