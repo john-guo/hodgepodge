@@ -21,7 +21,7 @@ namespace AeroWatch
             set
             {
                 current = value;
-                SetupClock();
+                ResizeCanvas();
             }
         }
 
@@ -42,9 +42,13 @@ namespace AeroWatch
             base.OnLoad(e);
         }
 
-        private void SetupClock()
+        protected override Rectangle OnResizeCanvas()
         {
-            SetupCanvas(clocks[current].GetSize());
+            GraphicsClock v;
+            if (!clocks.TryGetValue(current, out v))
+                return Rectangle.Empty;
+
+            return v.GetBounds();
         }
 
         private void LoadClock()
@@ -58,8 +62,6 @@ namespace AeroWatch
             iclock = new ImageClock();
             iclock.Initialize("clock.png");
             clocks.Add(ClockType.ImageClock, iclock);
-
-            SetupClock();
         }
     }
 }

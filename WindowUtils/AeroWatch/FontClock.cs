@@ -40,7 +40,7 @@ namespace AeroWatch
             TextRenderer.DrawText(canvas, time.ToLongTimeString(), paintFont, Point.Empty, paintColor);
         }
 
-        public override Size GetSize()
+        protected override Size GetSize()
         {
             return TextRenderer.MeasureText(DateTime.MaxValue.ToLongTimeString(), paintFont);
         }

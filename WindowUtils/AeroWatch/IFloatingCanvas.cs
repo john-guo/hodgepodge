@@ -9,7 +9,7 @@ namespace AeroWatch
 {
     public interface IFloatingCanvas
     {
-        Size GetSize();
+        Rectangle GetBounds();
         void Draw(Graphics canvas);
         void Initialize(string fileName);
     }

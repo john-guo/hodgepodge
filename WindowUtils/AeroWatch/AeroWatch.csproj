@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FontClock.cs" />
+    <Compile Include="ToolWinScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="TransparentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -107,6 +110,12 @@
     </Content>
     <Content Include="clock_off.ico" />
     <Content Include="clock_on.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WindowUtils\WindowUtils.csproj">
+      <Project>{04be7046-6b02-4a5b-a9fe-dafc496cec32}</Project>
+      <Name>WindowUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

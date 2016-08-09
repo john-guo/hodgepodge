@@ -94,6 +94,16 @@ namespace AeroWatch
             clockForm.FormHide += ClockForm_ClockHide;
             clockForm.Load += ClockForm_Load;
             clockForm.Show();
+
+            //var toolWin = new ToolWinScreen();
+            //if (toolWin.ShowDialog() == DialogResult.OK)
+            //{
+            //    clockForm.Width = toolWin.Width;
+            //    clockForm.Height = toolWin.Height;
+            //    clockForm.Left = toolWin.Left;
+            //    clockForm.Top = toolWin.Top;
+            //}
+            //toolWin.Show();
         }
 
         private void ClockForm_Load(object sender, EventArgs e)
@@ -113,12 +123,12 @@ namespace AeroWatch
 
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
-            clockForm.DonotRefresh = true;
+            TransparentForm.DonotRefresh = true;
         }
 
         private void contextMenuStrip1_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
-            clockForm.DonotRefresh = false;
+            TransparentForm.DonotRefresh = false;
         }
     }
 }

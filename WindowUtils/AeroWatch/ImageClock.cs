@@ -149,7 +149,7 @@ namespace AeroWatch
             ////Canvas.DrawImageUnscaledAndClipped(image, new Rectangle(Point.Empty, image.Size));
         }
 
-        public override Size GetSize()
+        protected override Size GetSize()
         {
             return clockImg.Size;
         }

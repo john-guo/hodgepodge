@@ -8,13 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static WindowUtils.Utils;
 
 namespace AeroWatch
 {
 
     public abstract partial class TransparentForm : Form
     {
-        bool _isShow = true;
+        private bool _isShow = true;
         public bool ShowMe
         {
             get
@@ -29,13 +30,13 @@ namespace AeroWatch
                 _isShow = value;
                 if (_isShow)
                 {
-                    timer1.Start();
+                    StartTimerCanvas();
                     Show();
                     FormShow(this, EventArgs.Empty);
                 }
                 else
                 {
-                    timer1.Stop();
+                    StopTimerCanvas();
                     Hide();
                     FormHide(this, EventArgs.Empty);
                 }
@@ -45,10 +46,30 @@ namespace AeroWatch
         public event EventHandler FormShow = delegate { };
         public event EventHandler FormHide = delegate { };
 
-        BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
         BufferedGraphics bg;
         readonly Color transparencyKey = Color.White;
-        internal bool DonotRefresh = false;
+        internal static bool DonotRefresh = false;
+        BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
+        private bool useTimerCanvas = true;
+        protected bool UseTimerCanvas
+        {
+            get
+            {
+                return useTimerCanvas;
+            }
+            set
+            {
+                if (useTimerCanvas == value)
+                    return;
+
+                useTimerCanvas = value;
+                if (useTimerCanvas)
+                    StartTimerCanvas();
+                else
+                    StopTimerCanvas();
+            }
+        }
+
 
         public TransparentForm()
         {
@@ -59,6 +80,9 @@ namespace AeroWatch
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+            if (!useTimerCanvas)
+                return;
+
             if (!DonotRefresh)
                 TopMost = true;
 
@@ -66,6 +90,19 @@ namespace AeroWatch
             OnDraw(bg.Graphics);
             bg.Graphics.Flush();
             bg.Render();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (useTimerCanvas)
+            {
+                base.OnPaint(e);
+                return;
+            }
+
+            e.Graphics.Clear(transparencyKey);
+            OnDraw(e.Graphics);
+            e.Graphics.Flush();
         }
 
         protected override void OnHandleCreated(EventArgs e)
@@ -76,12 +113,20 @@ namespace AeroWatch
             base.OnHandleCreated(e);
         }
 
+        protected virtual int ApplyExStyle(int exStyle)
+        {
+            return exStyle 
+                    | (int)ExtendedWindowStyles.WS_EX_TRANSPARENT
+                    | (int)ExtendedWindowStyles.WS_EX_TOOLWINDOW
+                    | (int)ExtendedWindowStyles.WS_EX_LAYERED;
+        }
+
         protected override CreateParams CreateParams
         {
             get
             {
                 var cp = base.CreateParams;
-                cp.ExStyle |= 0x00000020 | 0x00080000 | 0x00000080;
+                cp.ExStyle = ApplyExStyle(cp.ExStyle);
                 return cp;
             }
         }
@@ -89,14 +134,40 @@ namespace AeroWatch
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            ResizeCanvas();
             TransparencyKey = transparencyKey;
-            timer1.Start();
+
+            StartTimerCanvas();
+        }
+
+        protected virtual Rectangle OnResizeCanvas()
+        {
+            return ClientRectangle;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            timer1.Stop();
+            StopTimerCanvas();
             bg.Dispose();
+        }
+
+        protected virtual void ResizeCanvas()
+        {
+            SetupCanvas(OnResizeCanvas());
+        }
+
+        private void StartTimerCanvas()
+        {
+            if (!useTimerCanvas)
+                return;
+
+            timer1.Start();
+        }
+
+        private void StopTimerCanvas()
+        {
+            if (timer1.Enabled)
+                timer1.Stop();
         }
 
         private void SetupCanvas()
@@ -106,14 +177,25 @@ namespace AeroWatch
             bg = bgContext.Allocate(g, ClientRectangle);
         }
 
-        protected void SetupCanvas(Size size)
+        private void SetupCanvas(Rectangle bounds)
         {
-            Width = size.Width;
-            Height = size.Height;
-            Left = Screen.PrimaryScreen.Bounds.Width - Width;
-            Top = Screen.PrimaryScreen.Bounds.Top;
+            Width = bounds.Width;
+            Height = bounds.Height;
+            Left = bounds.Left;
+            Top = bounds.Top;
 
             SetupCanvas();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            if (!useTimerCanvas)
+            {
+                base.OnResize(e);
+                return;
+            }
+
+            ResizeCanvas();
         }
     }
 }
