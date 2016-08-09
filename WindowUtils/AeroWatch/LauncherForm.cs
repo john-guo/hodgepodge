@@ -104,6 +104,12 @@ namespace AeroWatch
             //    clockForm.Top = toolWin.Top;
             //}
             //toolWin.Show();
+
+            //var bs = new BulletScreen();
+            //bs.Show();
+
+            //bs.bm.Shot("测试", Color.Red);
+            //bs.bm.Shot("测试测试测试测试", Color.GreenYellow);
         }
 
         private void ClockForm_Load(object sender, EventArgs e)

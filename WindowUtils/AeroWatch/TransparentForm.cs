@@ -145,6 +145,11 @@ namespace AeroWatch
             return ClientRectangle;
         }
 
+        protected virtual void OnCanvasCreated(Graphics canvas)
+        {
+
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             StopTimerCanvas();
@@ -175,6 +180,8 @@ namespace AeroWatch
             var g = CreateGraphics();
             bgContext.Invalidate();
             bg = bgContext.Allocate(g, ClientRectangle);
+
+            OnCanvasCreated(bg.Graphics);
         }
 
         private void SetupCanvas(Rectangle bounds)
@@ -185,17 +192,6 @@ namespace AeroWatch
             Top = bounds.Top;
 
             SetupCanvas();
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            if (!useTimerCanvas)
-            {
-                base.OnResize(e);
-                return;
-            }
-
-            ResizeCanvas();
         }
     }
 }
