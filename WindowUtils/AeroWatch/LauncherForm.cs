@@ -95,6 +95,9 @@ namespace AeroWatch
             clockForm.Load += ClockForm_Load;
             clockForm.Show();
 
+            var test = new BreathingGalaxies();
+            test.Show();
+
             //var toolWin = new ToolWinScreen();
             //if (toolWin.ShowDialog() == DialogResult.OK)
             //{

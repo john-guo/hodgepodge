@@ -48,11 +48,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BreathingGalaxies.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="BulletManager.cs" />
     <Compile Include="BulletScreen.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FontClock.cs" />
+    <Compile Include="ToolWinForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ToolWinScreen.cs">
       <SubType>Form</SubType>
     </Compile>

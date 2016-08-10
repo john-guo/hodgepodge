@@ -47,7 +47,7 @@ namespace AeroWatch
         public event EventHandler FormHide = delegate { };
 
         BufferedGraphics bg;
-        readonly Color transparencyKey = Color.White;
+        internal protected Color transparencyKey = Color.Black;
         internal static bool DonotRefresh = false;
         BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
         private bool useTimerCanvas = true;
@@ -70,10 +70,13 @@ namespace AeroWatch
             }
         }
 
+        protected Timer CanvasTimer { get { return timer1; } }
 
         public TransparentForm()
         {
             InitializeComponent();
+
+            AllowTransparency = true;
         }
 
         protected abstract void OnDraw(Graphics canvas);
@@ -142,7 +145,7 @@ namespace AeroWatch
 
         protected virtual Rectangle OnResizeCanvas()
         {
-            return ClientRectangle;
+            return RectangleToScreen(ClientRectangle);
         }
 
         protected virtual void OnCanvasCreated(Graphics canvas)

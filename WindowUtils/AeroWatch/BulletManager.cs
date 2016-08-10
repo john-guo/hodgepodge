@@ -216,7 +216,9 @@ namespace AeroWatch
         private void AddBullet(LinkedList<Bullet> row, Bullet bullet)
         {
             if (row.Count > 0)
-                bullet.X = row.Sum(b => GetBulletWidth(b));
+            {
+                bullet.X = Math.Max(Width, row.Sum(b => GetBulletWidth(b)));
+            }
 
             row.AddLast(new LinkedListNode<Bullet>(bullet));
         }
@@ -233,21 +235,12 @@ namespace AeroWatch
 
         private int GetBulletHidePart(Bullet bullet)
         {
-            var diff = GetBulletWidth(bullet) - Width;
-
-            if (diff < 0)
-                diff = 0;
-
-            return diff;
+            return Math.Max(0, GetBulletWidth(bullet) - Width);
         }
 
         private int GetBulletDisplayPart(Bullet bullet)
         {
-            var diff = GetBulletActualWidth(bullet) - GetBulletHidePart(bullet);
-
-            if (diff < 0)
-                return 0;
-            return diff;
+            return Math.Max(0, GetBulletActualWidth(bullet) - GetBulletHidePart(bullet));
         }
     }
 }
