@@ -194,14 +194,14 @@ namespace BulletScreen
             return (int)Math.Round(milliseconds / baseTime * speed);
         }
 
-        public void Shot(string content, Color color)
+        public void Shot(string content, Color color, int delayMS = 0)
         {
-            var b = new Bullet() { Content = content, Color = color, X = Width, State = BulletState.Ready };
+            var b = new Bullet() { Content = content, Color = color, X = Width + (delayMS == 0 ? 0 : GetCurrentSpeed(delayMS)), State = BulletState.Ready };
 
-            Shot(b);
+            Shot(b, delayMS);
         }
 
-        private void Shot(Bullet bullet)
+        private void Shot(Bullet bullet, int delayMS)
         {
             if (Rows.Count == 0)
                 return;
@@ -211,13 +211,13 @@ namespace BulletScreen
                 if (IsFull(i))
                     continue;
 
-                AddBullet(Rows[i], bullet);
+                AddBullet(Rows[i], bullet, delayMS);
                 return;
             }
 
 
-            var row = Rows.OrderBy(r => r.Sum(b => GetBulletHidePart(b))).FirstOrDefault();
-            AddBullet(row, bullet);
+            var row = Rows.OrderBy(r => r.Min(b => GetBulletHidePart(b))).FirstOrDefault();
+            AddBullet(row, bullet, delayMS);
         }
 
         private bool IsFull(int rowIndex)
@@ -232,11 +232,11 @@ namespace BulletScreen
             return GetBulletWidth(last) >= Width;
         }
 
-        private void AddBullet(LinkedList<Bullet> row, Bullet bullet)
+        private void AddBullet(LinkedList<Bullet> row, Bullet bullet, int delayMS)
         {
             if (row.Count > 0)
             {
-                bullet.X = Math.Max(Width, GetBulletWidth(row.Last()));
+                bullet.X = Math.Max(Width, GetBulletWidth(row.Last())) + (delayMS == 0 ? 0 : GetCurrentSpeed(delayMS));
             }
 
             row.AddLast(new LinkedListNode<Bullet>(bullet));

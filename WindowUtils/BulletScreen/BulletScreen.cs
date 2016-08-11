@@ -12,6 +12,7 @@ namespace BulletScreen
     public class BulletScreen : TransparentForm
     {
         private BulletManager bm;
+        private const int maxMessageLength = 10;
 
         public BulletScreen()
         {
@@ -59,12 +60,12 @@ namespace BulletScreen
             }
         }
 
-        public void AddMessage(string message, Color color)
+        public void AddMessage(string message, Color color, int delayMS = 0)
         {
             if (color == transparencyKey)
                 color = Color.FromArgb(transparencyKey.ToArgb() + 1); 
 
-            bm.Shot(message, color);
+            bm.Shot(message.Substring(0, Math.Min(message.Length, maxMessageLength)), color, delayMS);
         }
 
         public void ReBoundScreen(Rectangle bounds)

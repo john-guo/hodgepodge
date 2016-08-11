@@ -15,11 +15,14 @@ namespace BulletScreen
     {
         BulletScreen screen;
         ToolWinScreen tws;
+        IBulletSource source;
 
         public Form1()
         {
             InitializeComponent();
             screen = new BulletScreen();
+
+            source = new BulletSource_Tieba();
 
             tws = new ToolWinScreen();
             tws.Width = 400;
@@ -68,6 +71,41 @@ namespace BulletScreen
                 return;
 
             screen.ReBoundScreen(tws.DesktopBounds);
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    foreach (var message in source.GetMessage())
+                    {
+                        Invoke((Action)delegate
+                        {
+                            try
+                            {
+                                screen.AddMessage(message.Content, button2.ForeColor, message.Delay);
+                            }
+                            catch
+                            {
+                            }
+                        });
+                    }
+                }
+                catch
+                {
+                }
+            });
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(textBox2.Text.Trim()))
+                return;
+
+            (source as BulletSource_Tieba).ThreadId = textBox2.Text;
+            timer1.Start();
         }
     }
 }
