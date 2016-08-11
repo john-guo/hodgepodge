@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static WindowUtils.Utils;
 
-namespace AeroWatch
+namespace WindowUtils
 {
     public abstract class ToolWinForm : TransparentForm
     {

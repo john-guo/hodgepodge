@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowUtils;
 
-namespace AeroWatch
+namespace BulletScreen
 {
     //(see: http://en.wikipedia.org/wiki/Hypotrochoid)
     public class BreathingGalaxies : ToolWinForm

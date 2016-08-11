@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace AeroWatch
+namespace BulletScreen
 {
     enum BulletState
     {
@@ -32,35 +32,32 @@ namespace AeroWatch
     public class BulletManager
     {
         public Rectangle Bounds { get; set; }
-        int FontSize { get; set; }
         int MarginRow { get; set; }
         int MarginCol { get; set; }
         int DurationTime { get; set; } //seconds
+        public Font Font { get; set; }
 
-        private Font font;
         private List<LinkedList<Bullet>> Rows;
 
         private int maxRows;
         private int speed; //pixels per 100 milliseconds
+        private const int defaultFontSize = 16;
         private const double millisecondsPerSeconds = 1000;
         private const double baseTime = 100;
 
-        public BulletManager(Rectangle bounds, int fontSize = 16,
-            int durationTime = 5, int marginRow = 0, int marginCol = 0)
+        public BulletManager(Rectangle bounds, Font font = null,
+            int durationTime = 10, int marginRow = 0, int marginCol = 0)
         {
             Bounds = bounds;
-            FontSize = fontSize;
             DurationTime = durationTime;
             MarginRow = marginRow;
             MarginCol = marginCol;
 
-            Initialize();
-        }
+            if (font == null)
+                font = new Font(SystemFonts.DefaultFont.FontFamily,
+                    defaultFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
 
-        private void Initialize()
-        {
-            font = new Font(SystemFonts.DefaultFont.FontFamily,
-                FontSize, FontStyle.Regular, GraphicsUnit.Pixel);
+            Font = font;
 
             Rows = new List<LinkedList<Bullet>>();
         }
@@ -116,7 +113,7 @@ namespace AeroWatch
 
                     var pos = new Point(bullet.X, GetRowTop(canvas, i));
 
-                    TextRenderer.DrawText(canvas, bullet.Content, font, pos, bullet.Color);
+                    TextRenderer.DrawText(canvas, bullet.Content, Font, pos, bullet.Color);
                 }
             }
         }
@@ -138,6 +135,18 @@ namespace AeroWatch
             }
         }
 
+        public void UpdateLayout()
+        {
+            CalculateSpeed();
+            CalculateMaxRows();
+
+            Rows.Clear();
+            for (int i = 0; i < maxRows; ++i)
+            {
+                Rows.Add(new LinkedList<Bullet>());
+            }
+        }
+
         public void UpdateLayout(Graphics g)
         {
             CalculateSpeed();
@@ -155,19 +164,29 @@ namespace AeroWatch
             return (int)Math.Ceiling(row * GetRowHeight(g));
         }
 
-        private float GetRowHeight(Graphics g)
-        {
-            return font.GetHeight(g) + MarginRow;
-        }
-
         private void CalculateSpeed()
         {
             speed = (int)Math.Round(Width / (DurationTime * millisecondsPerSeconds / baseTime));
         }
-        
+
+        private float GetRowHeight(Graphics g)
+        {
+            return Font.GetHeight(g) + MarginRow;
+        }
+
         private void CalculateMaxRows(Graphics g)
         {
             maxRows = (int)Math.Floor(Height / GetRowHeight(g));
+        }
+
+        private float GetRowHeight()
+        {
+            return Font.GetHeight() + MarginRow;
+        }
+
+        private void CalculateMaxRows()
+        {
+            maxRows = (int)Math.Floor(Height / GetRowHeight());
         }
 
         private int GetCurrentSpeed(int milliseconds)
@@ -217,7 +236,7 @@ namespace AeroWatch
         {
             if (row.Count > 0)
             {
-                bullet.X = Math.Max(Width, row.Sum(b => GetBulletWidth(b)));
+                bullet.X = Math.Max(Width, GetBulletWidth(row.Last()));
             }
 
             row.AddLast(new LinkedListNode<Bullet>(bullet));
@@ -230,7 +249,7 @@ namespace AeroWatch
 
         private int GetBulletActualWidth(Bullet bullet)
         {
-            return bullet.GetSize(font).Width + MarginCol;
+            return bullet.GetSize(Font).Width + MarginCol;
         }
 
         private int GetBulletHidePart(Bullet bullet)

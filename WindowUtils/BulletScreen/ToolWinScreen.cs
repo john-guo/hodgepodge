@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static WindowUtils.Utils;
+using WindowUtils;
 
-namespace AeroWatch
+namespace BulletScreen
 {
     public class ToolWinScreen : ToolWinForm
     {
@@ -15,11 +15,12 @@ namespace AeroWatch
         {
             Opacity = 0.5;
             UseTimerCanvas = false;
+            StartPosition = FormStartPosition.Manual;
         }
 
         protected override void OnDraw(Graphics canvas)
         {
-            canvas.Clear(Color.Pink);
+            canvas.Clear(Color.LightCyan);
         }
     }
 }

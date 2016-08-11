@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AeroWatch
+namespace WindowUtils
 {
     public interface IFloatingCanvas
     {

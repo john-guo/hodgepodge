@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static WindowUtils.Utils;
 
-namespace AeroWatch
+namespace WindowUtils
 {
-
     public abstract partial class TransparentForm : Form
     {
         private bool _isShow = true;
@@ -46,11 +45,12 @@ namespace AeroWatch
         public event EventHandler FormShow = delegate { };
         public event EventHandler FormHide = delegate { };
 
-        BufferedGraphics bg;
-        internal protected Color transparencyKey = Color.Black;
-        internal static bool DonotRefresh = false;
-        BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
+        public static bool DonotRefresh = false;
+
+        private BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
         private bool useTimerCanvas = true;
+        private BufferedGraphics bg;
+        protected Color transparencyKey = Color.Black;
         protected bool UseTimerCanvas
         {
             get

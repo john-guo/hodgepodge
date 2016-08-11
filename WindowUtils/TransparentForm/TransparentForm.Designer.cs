@@ -1,4 +1,4 @@
-﻿namespace AeroWatch
+﻿namespace WindowUtils
 {
     partial class TransparentForm
     {
