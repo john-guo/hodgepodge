@@ -12,7 +12,7 @@ namespace BulletScreen
     public class BulletScreen : TransparentForm
     {
         private BulletManager bm;
-        private const int maxMessageLength = 10;
+        private const int maxMessageLength = 50;
 
         public BulletScreen()
         {
