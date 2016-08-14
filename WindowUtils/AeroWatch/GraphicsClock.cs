@@ -4,24 +4,29 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using WindowUtils;
 
 namespace AeroWatch
 {
-    public abstract class GraphicsClock : IClock<Graphics>
+    enum ClockType
     {
-        public abstract void Draw(DateTime time);
-        public abstract Size GetSize();
+        FontClock,
+        ImageClock
+    }
 
-        protected Graphics Canvas { get; private set; }
-
-        public void SetCanvas(Graphics g)
+    public abstract class GraphicsClock : IFloatingCanvas
+    {
+        public abstract void Draw(Graphics canvas);
+        public abstract void Initialize(string fileName);
+        public virtual Rectangle GetBounds()
         {
-            Canvas = g;
+            var size = GetSize();
+            var x = Screen.PrimaryScreen.Bounds.Width - size.Width;
+            var y = Screen.PrimaryScreen.Bounds.Top;
+            return new Rectangle(x, y, size.Width, size.Height);
         }
 
-        public virtual void Initialize(Graphics obj, string fileName)
-        {
-            SetCanvas(obj);
-        }
+        protected abstract Size GetSize();
     }
 }

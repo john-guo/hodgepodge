@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowUtils;
 
 namespace AeroWatch
 {
@@ -90,10 +91,29 @@ namespace AeroWatch
         private void LauncherForm_Load(object sender, EventArgs e)
         {
             clockForm = new Form1();
-            clockForm.ClockShow += ClockForm_ClockShow;
-            clockForm.ClockHide += ClockForm_ClockHide;
+            clockForm.FormShow += ClockForm_ClockShow;
+            clockForm.FormHide += ClockForm_ClockHide;
             clockForm.Load += ClockForm_Load;
             clockForm.Show();
+
+            //var test = new BreathingGalaxies();
+            //test.Show();
+
+            //var toolWin = new ToolWinScreen();
+            //if (toolWin.ShowDialog() == DialogResult.OK)
+            //{
+            //    clockForm.Width = toolWin.Width;
+            //    clockForm.Height = toolWin.Height;
+            //    clockForm.Left = toolWin.Left;
+            //    clockForm.Top = toolWin.Top;
+            //}
+            //toolWin.Show();
+
+            //var bs = new BulletScreen();
+            //bs.Show();
+
+            //bs.bm.Shot("测试", Color.Red);
+            //bs.bm.Shot("测试测试测试测试", Color.GreenYellow);
         }
 
         private void ClockForm_Load(object sender, EventArgs e)
@@ -113,12 +133,12 @@ namespace AeroWatch
 
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
-            clockForm.DonotRefresh = true;
+            TransparentForm.DonotRefresh = true;
         }
 
         private void contextMenuStrip1_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
-            clockForm.DonotRefresh = false;
+            TransparentForm.DonotRefresh = false;
         }
     }
 }

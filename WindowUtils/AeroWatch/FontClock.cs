@@ -23,24 +23,24 @@ namespace AeroWatch
             paintBrush = new SolidBrush(color);
         }
 
-        public override void Initialize(Graphics obj, string fileName)
+        public override void Initialize(string fileName)
         {
-            base.Initialize(obj, fileName);
-
             var privateFonts = new PrivateFontCollection();
             privateFonts.AddFontFile(fileName);
             paintFont = new Font(privateFonts.Families.First(), fontSize);
         }
 
-        public override void Draw(DateTime time)
+        public override void Draw(Graphics canvas)
         {
-            Canvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            Canvas.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var time = DateTime.Now;
 
-            TextRenderer.DrawText(Canvas, time.ToLongTimeString(), paintFont, Point.Empty, paintColor);
+            canvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            canvas.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            TextRenderer.DrawText(canvas, time.ToLongTimeString(), paintFont, Point.Empty, paintColor);
         }
 
-        public override Size GetSize()
+        protected override Size GetSize()
         {
             return TextRenderer.MeasureText(DateTime.MaxValue.ToLongTimeString(), paintFont);
         }

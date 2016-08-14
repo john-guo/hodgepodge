@@ -8,52 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowUtils;
 
 namespace AeroWatch
 {
-    enum ClockType
+    public class Form1 : TransparentForm
     {
-        FontClock,
-        ImageClock
-    }
-
-
-    public partial class Form1 : Form
-    {
-        bool _isShow = true;
-        public bool ShowMe
-        {
-            get
-            {
-                return _isShow;
-            }
-            set
-            {
-                if (_isShow == value)
-                    return;
-
-                _isShow = value;
-                if (_isShow)
-                {
-                    timer1.Start();
-                    Show();
-                    ClockShow(this, EventArgs.Empty);
-                }
-                else
-                {
-                    timer1.Stop();
-                    Hide();
-                    ClockHide(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        public event EventHandler ClockShow = delegate { };
-        public event EventHandler ClockHide = delegate { };
-
-        BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
-        BufferedGraphics bg;
-        readonly Color transparencyKey = Color.White;
         Color color = Color.WhiteSmoke;
         int size = 12;
         ClockType current = ClockType.FontClock;
@@ -62,103 +22,47 @@ namespace AeroWatch
             set
             {
                 current = value;
-
-                var g = CreateGraphics();
-                SetupClock(g);
+                ResizeCanvas();
             }
         }
-
-        internal bool DonotRefresh = false;
 
         Dictionary<ClockType, GraphicsClock> clocks = new Dictionary<ClockType, GraphicsClock>();
 
-
         public Form1()
         {
-            InitializeComponent();
         }
 
-
-        private void timer1_Tick(object sender, EventArgs e)
+        protected override void OnDraw(Graphics canvas)
         {
-            if (!DonotRefresh)
-                TopMost = true;
-
-            var now = DateTime.Now;
-            bg.Graphics.Clear(transparencyKey);
-            clocks[current].Draw(now);
-            bg.Graphics.Flush();
-            bg.Render();
+            clocks[current].Draw(canvas);
         }
 
-        protected override void OnHandleCreated(EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-            SetStyle(ControlStyles.UserPaint, true);
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            UpdateStyles();
-            base.OnHandleCreated(e);
+            LoadClock();
+            base.OnLoad(e);
         }
 
-        protected override CreateParams CreateParams
+        protected override Rectangle OnResizeCanvas()
         {
-            get
-            {
-                var cp = base.CreateParams;
-                cp.ExStyle |= 0x00000020 | 0x00080000 | 0x00000080;
-                return cp;
-            }
+            GraphicsClock v;
+            if (!clocks.TryGetValue(current, out v))
+                return Rectangle.Empty;
+
+            return v.GetBounds();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            var g = CreateGraphics();
-            LoadClock(g);
-
-            SetupClock(g);
-
-            TransparencyKey = transparencyKey;
-
-            timer1.Start();
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            timer1.Stop();
-            bg.Dispose();
-        }
-
-        private void SetupClock(Graphics g)
-        {
-            var size = clocks[current].GetSize();
-            Width = size.Width;
-            Height = size.Height;
-            Left = Screen.PrimaryScreen.Bounds.Width - Width;
-            Top = Screen.PrimaryScreen.Bounds.Top;
-
-            bgContext.Invalidate();
-            bg = bgContext.Allocate(g, ClientRectangle);
-            UpdateClockCanvas(bg.Graphics);
-        }
-
-        private void LoadClock(Graphics g)
+        private void LoadClock()
         {
             GraphicsClock iclock;
 
             iclock = new FontClock(color, size);
-            iclock.Initialize(g, "Pixel LCD-7.ttf");
+            iclock.Initialize("Pixel LCD-7.ttf");
             clocks.Add(ClockType.FontClock, iclock);
 
             iclock = new ImageClock();
-            iclock.Initialize(g, "clock.png");
+            iclock.Initialize("clock.png");
             clocks.Add(ClockType.ImageClock, iclock);
-        }
-
-        private void UpdateClockCanvas(Graphics g)
-        {
-            foreach (var clock in clocks)
-            {
-                clock.Value.SetCanvas(g);
-            }
         }
     }
 }
