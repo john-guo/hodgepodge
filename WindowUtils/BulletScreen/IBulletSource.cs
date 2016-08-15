@@ -14,9 +14,7 @@ namespace BulletScreen
 
     public interface IBulletSource
     {
-        void Start();
-        void Stop();
-        void Pause();
+        void Initialize();
         IEnumerable<BulletMessage> GetMessage();
     }
 }

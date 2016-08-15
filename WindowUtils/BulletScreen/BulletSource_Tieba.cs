@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
+using HtmlAgilityPack;
+using Fizzler.Systems.HtmlAgilityPack;
 
 namespace BulletScreen
 {
@@ -18,12 +20,26 @@ namespace BulletScreen
         public BulletSource_Tieba()
         {
             client = new WebClient();
-            //ThreadId = "4720937026";
+            client.Encoding = Encoding.UTF8;
             lastTime = 0;
             queue = new Queue<dynamic>();
         }
 
         public string ThreadId { get; set; }
+        public string Title { get; set; }
+
+        public override void Initialize()
+        {
+            var html = client.DownloadString(Properties.Settings.Default.tieba_url);
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml2(html);
+
+            var link = doc.DocumentNode.QuerySelectorAll(".listThreadTitle>a").FirstOrDefault();
+            var href = link?.Attributes["href"]?.Value;
+
+            Title = link?.InnerText.Trim();
+            ThreadId = Path.GetFileName(new Uri(href).LocalPath);
+        }
 
         public override IEnumerable<BulletMessage> GetMessage()
         {

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowUtils;
+using System.IO;
 
 namespace BulletScreen
 {
@@ -20,18 +21,22 @@ namespace BulletScreen
         public Form1()
         {
             InitializeComponent();
-            screen = new BulletScreen();
-
-            source = new BulletSource_Tieba();
 
             tws = new ToolWinScreen();
             tws.Width = 400;
             tws.Height = 400;
+
+            button2.Font = fontDialog1.Font;
+            button2.ForeColor = fontDialog1.Color;
+
+            screen = new BulletScreen(button2.Font);
+            source = new BulletSource_Tieba();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             screen.Show();
+            backgroundWorker1.RunWorkerAsync();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -59,9 +64,9 @@ namespace BulletScreen
                 return;
 
             button2.Font = fontDialog1.Font;
-            screen.Font = fontDialog1.Font;
-
             button2.ForeColor = fontDialog1.Color;
+
+            screen.Font = fontDialog1.Font;
         }
 
 
@@ -106,6 +111,17 @@ namespace BulletScreen
 
             (source as BulletSource_Tieba).ThreadId = textBox2.Text;
             timer1.Start();
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            source.Initialize();
+
+            Invoke((Action)delegate {
+                textBox2.Text = (source as BulletSource_Tieba).ThreadId;
+                label1.Text = (source as BulletSource_Tieba).Title;
+                timer1.Start();
+            });
         }
     }
 }

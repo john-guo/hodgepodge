@@ -15,19 +15,19 @@ namespace BulletScreen
         Dropped
     }
 
-    public class Bullet
+    internal class Bullet
     {
-        public string Content { get; set; }
-        public Color Color { get; set; }
-        public Size GetSize(Font font)
+        internal string Content { get; set; }
+        internal Color Color { get; set; }
+        internal Size GetSize(Font font)
         {
             return TextRenderer.MeasureText(Content, font);
         }
 
-        public int X { get; set; }
-        public DateTime ShotTime { get; set; }
-        public double Speed { get; set; }
-
+        internal int X { get; set; }
+        internal int StartX { get; set; }
+        internal DateTime ShotTime { get; set; }
+        internal double Speed { get; set; }
         internal BulletState State { get; set; }
     }
 
@@ -42,13 +42,11 @@ namespace BulletScreen
         private List<LinkedList<Bullet>> Rows;
 
         private int maxRows;
-        private int speed; //pixels per 100 milliseconds
         private const int defaultFontSize = 16;
         private const double millisecondsPerSeconds = 1000;
-        private const double baseTime = 100;
 
         public BulletManager(Rectangle bounds, Font font = null,
-            int durationTime = 8, int marginRow = 0, int marginCol = 0)
+            int durationTime = 10, int marginRow = 0, int marginCol = 0)
         {
             Bounds = bounds;
             DurationTime = durationTime;
@@ -80,9 +78,24 @@ namespace BulletScreen
             }
         }
 
-        public void Update(Graphics canvas, int ms = (int)baseTime)
+        private Func<DateTime> playTimeFunc = delegate { return DateTime.Now; };
+        public Func<DateTime> GetPlayTime {
+            get
+            {
+                return playTimeFunc;
+            }
+
+            set
+            {
+                playTimeFunc = value;
+                if (playTimeFunc == null)
+                    playTimeFunc = delegate { return DateTime.Now; };
+            }
+        }
+
+        public void Update(Graphics canvas)
         {
-            var currentSpeed = GetCurrentSpeed(ms);
+            var now = GetPlayTime();
 
             foreach (var row in Rows)
             {
@@ -93,8 +106,12 @@ namespace BulletScreen
                     if (bullet.Value.State == BulletState.Dropped)
                         row.Remove(bullet);
 
-                    bullet.Value.X -= currentSpeed;
-                    UpdateBullet(bullet.Value);
+                    var b = bullet.Value;
+
+                    var offset = (int)Math.Round(b.Speed * (now - b.ShotTime).TotalMilliseconds);
+
+                    b.X = b.StartX - offset;
+                    UpdateBullet(b);
 
                     bullet = next;
                 }
@@ -139,7 +156,6 @@ namespace BulletScreen
 
         public void UpdateLayout()
         {
-            CalculateSpeed();
             CalculateMaxRows();
 
             Rows.Clear();
@@ -151,7 +167,6 @@ namespace BulletScreen
 
         public void UpdateLayout(Graphics g)
         {
-            CalculateSpeed();
             CalculateMaxRows(g);
 
             Rows.Clear();
@@ -164,11 +179,6 @@ namespace BulletScreen
         private int GetRowTop(Graphics g, int row)
         {
             return (int)Math.Ceiling(row * GetRowHeight(g));
-        }
-
-        private void CalculateSpeed()
-        {
-            speed = (int)Math.Ceiling(Width / (DurationTime * millisecondsPerSeconds / baseTime));
         }
 
         private float GetRowHeight(Graphics g)
@@ -191,14 +201,9 @@ namespace BulletScreen
             maxRows = (int)Math.Floor(Height / GetRowHeight());
         }
 
-        private int GetCurrentSpeed(int milliseconds)
-        {
-            return (int)Math.Ceiling(milliseconds / baseTime * speed);
-        }
-
         public void Shot(string content, Color color, int delayMS = 0)
         {
-            var b = new Bullet() { Content = content, Color = color, X = Width + (delayMS == 0 ? 0 : GetCurrentSpeed(delayMS)), State = BulletState.Ready };
+            var b = new Bullet() { Content = content, Color = color, X = Width, StartX = Width, State = BulletState.Ready };
 
             Shot(b, delayMS);
         }
@@ -238,11 +243,17 @@ namespace BulletScreen
         {
             if (row.Count > 0)
             {
-                bullet.X = Math.Max(Width, GetBulletWidth(row.Last()));
+                bullet.StartX = bullet.X = Math.Max(Width, GetBulletWidth(row.Last()));
             }
 
-            bullet.ShotTime = DateTime.Now;
-            bullet.Speed = 1.0 * GetBulletWidth(bullet) / (DurationTime * millisecondsPerSeconds + delayMS);
+            bullet.ShotTime = GetPlayTime();
+            bullet.Speed = 1.0 * GetBulletWidth(bullet) / (DurationTime * millisecondsPerSeconds);
+
+            if (delayMS > 0)
+            {
+                bullet.StartX = bullet.X += (int)Math.Round(bullet.Speed * delayMS);
+            }
+
             row.AddLast(new LinkedListNode<Bullet>(bullet));
         }
 

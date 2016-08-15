@@ -14,7 +14,7 @@ namespace BulletScreen
         private BulletManager bm;
         private const int maxMessageLength = 50;
 
-        public BulletScreen()
+        public BulletScreen(Font font)
         {
             CanvasTimer.Interval = 16;
 
@@ -23,12 +23,12 @@ namespace BulletScreen
             Width = Screen.PrimaryScreen.Bounds.Width;
             Height = Screen.PrimaryScreen.Bounds.Height;
 
-            bm = new BulletManager(RectangleToScreen(ClientRectangle));
+            bm = new BulletManager(RectangleToScreen(ClientRectangle), font);
         }
 
         protected override void OnDraw(Graphics canvas)
         {
-            bm.Update(canvas, CanvasTimer.Interval);   
+            bm.Update(canvas);   
         }
 
         protected override Rectangle OnResizeCanvas()
