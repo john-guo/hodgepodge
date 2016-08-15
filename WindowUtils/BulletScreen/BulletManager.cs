@@ -25,6 +25,8 @@ namespace BulletScreen
         }
 
         public int X { get; set; }
+        public DateTime ShotTime { get; set; }
+        public double Speed { get; set; }
 
         internal BulletState State { get; set; }
     }
@@ -236,9 +238,11 @@ namespace BulletScreen
         {
             if (row.Count > 0)
             {
-                bullet.X = Math.Max(Width, GetBulletWidth(row.Last())) + (delayMS == 0 ? 0 : GetCurrentSpeed(delayMS));
+                bullet.X = Math.Max(Width, GetBulletWidth(row.Last()));
             }
 
+            bullet.ShotTime = DateTime.Now;
+            bullet.Speed = 1.0 * GetBulletWidth(bullet) / (DurationTime * millisecondsPerSeconds + delayMS);
             row.AddLast(new LinkedListNode<Bullet>(bullet));
         }
 
