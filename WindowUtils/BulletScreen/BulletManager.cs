@@ -48,7 +48,7 @@ namespace BulletScreen
         private const double baseTime = 100;
 
         public BulletManager(Rectangle bounds, Font font = null,
-            int durationTime = 10, int marginRow = 0, int marginCol = 0)
+            int durationTime = 8, int marginRow = 0, int marginCol = 0)
         {
             Bounds = bounds;
             DurationTime = durationTime;
@@ -168,7 +168,7 @@ namespace BulletScreen
 
         private void CalculateSpeed()
         {
-            speed = (int)Math.Round(Width / (DurationTime * millisecondsPerSeconds / baseTime));
+            speed = (int)Math.Ceiling(Width / (DurationTime * millisecondsPerSeconds / baseTime));
         }
 
         private float GetRowHeight(Graphics g)
@@ -193,7 +193,7 @@ namespace BulletScreen
 
         private int GetCurrentSpeed(int milliseconds)
         {
-            return (int)Math.Round(milliseconds / baseTime * speed);
+            return (int)Math.Ceiling(milliseconds / baseTime * speed);
         }
 
         public void Shot(string content, Color color, int delayMS = 0)
