@@ -57,6 +57,10 @@ namespace TunnelMonitor
 
         private void CheckTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            var exited = Settings.Tunnel?.HasExited;
+            if (!exited.HasValue || (exited.HasValue && exited.Value == true))
+                running = false;
+
             if (running && Check())
             {
                 return;
@@ -102,8 +106,13 @@ namespace TunnelMonitor
 
         private void Kill()
         {
-            Settings.Tunnel?.Kill();
-            Settings.Tunnel?.WaitForExit();
+            var exited = Settings.Tunnel?.HasExited;
+
+            if (exited.HasValue && exited.Value == false)
+            {
+                Settings.Tunnel?.Kill();
+                Settings.Tunnel?.WaitForExit();
+            }
             //var pName = Settings.Tunnel?.ProcessName;
             //if (!string.IsNullOrEmpty(pName))
             //{
