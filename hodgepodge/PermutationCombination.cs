@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace PermutationCombination
-{ 
+{
     public static class PermutationCombinationExtension
     {
         public static IEnumerable<IEnumerable<T>> Combination<T>(this IEnumerable<T> a, int choose)
@@ -25,7 +25,7 @@ namespace PermutationCombination
             {
                 for (int i = 0; i + choose <= count; ++i)
                 {
-                    foreach (var m in a.Skip(i + 1).Combination(choose - 1)) 
+                    foreach (var m in a.Skip(i + 1).Combination(choose - 1))
                     {
                         yield return a.Skip(i).Take(1).Union(m);
                     }
@@ -72,4 +72,4 @@ namespace PermutationCombination
         }
     }
 
-
+}
