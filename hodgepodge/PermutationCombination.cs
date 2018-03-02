@@ -70,6 +70,32 @@ namespace PermutationCombination
             return (from e in a.Permutation(choose)
                     select e.Aggregate(aggregate));
         }
+
+        public static IEnumerable<IEnumerable<T>> RangeCombination<T>(this IEnumerable<T> a, int range, IList<T> holder = null, IList<IEnumerable<T>> container = null)
+        {
+            if (container == null)
+            {
+                container = new List<IEnumerable<T>>();
+            }
+            if (range == 0)
+            {
+                container.Add(holder.ToArray());
+                return container;
+            }
+            if (holder == null)
+            {
+                holder = new List<T>();
+                Enumerable.Range(0, range).ToList().ForEach(i => holder.Add(default));
+                return a.RangeCombination(range, holder, container);
+            }
+            for (int i = 0; i < a.Count(); ++i)
+            {
+                holder[range - 1] = a.Skip(i).First();
+                a.RangeCombination(range - 1, holder, container);
+            }
+
+            return container;
+        }
     }
 
 }
