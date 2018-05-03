@@ -216,3 +216,7 @@ pip-log.txt
 /WCFTest
 /UdpTest
 /.vs
+/hwInfo/.vs/hwInfo/v15/Server/sqlite3
+/MathConsole/.vs/MathConsole/v15/Server/sqlite3
+/WindowUtils/.vs/WindowUtils/v15/Server/sqlite3
+/WorkingTime/.vs/WorkingTime/v15/Server/sqlite3
