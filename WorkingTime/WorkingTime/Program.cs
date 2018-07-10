@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 
 namespace WorkingTime
 {
@@ -50,7 +51,29 @@ namespace WorkingTime
 
             Dictionary<DayOfWeek, DateTime> dayTime = new Dictionary<DayOfWeek, DateTime>();
 
+            var log = new List<EventRecord>();
+            using (var reader = new EventLogReader("System"))
+            {
+                do
+                {
+                    var el = reader.ReadEvent();
+                    if (el == null)
+                        break;
+                    log.Add(el);
+                } while (true);
+            }
+            var wts = log.Where(e => e.TimeCreated >= begin && e.TimeCreated <= end)
+                .GroupBy(e => e.TimeCreated?.DayOfWeek).Select(g => {
+                    var max = g.Max(e => e.TimeCreated);
+                    if (today.DayOfWeek == g.Key)
+                        max = DateTime.Now;
+                    var wt = (max - g.Min(e => e.TimeCreated))?.Add(TimeSpan.FromSeconds(MarginSecondsPerDay));
+                    return new { g.Key, WT = wt.Value };
+                });
+
+            /*
             var log = EventLog.GetEventLogs().First(l => l.Log == "System");
+            //var log = EventLog.GetEventLogs().First(l => l.Log == "Application");
 
             var wts = log.Entries.OfType<EventLogEntry>().Where(e => e.TimeGenerated >= begin && e.TimeGenerated <= end)
                 .GroupBy(e => e.TimeGenerated.DayOfWeek).Select(g => {
@@ -60,6 +83,7 @@ namespace WorkingTime
                     var wt = (max - g.Min(e => e.TimeGenerated)).Add(TimeSpan.FromSeconds(MarginSecondsPerDay));
                     return new { g.Key, WT = wt };
                  });
+            */
 
             foreach (var wt in wts)
             {
