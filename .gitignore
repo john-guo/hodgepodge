@@ -219,3 +219,4 @@ pip-log.txt
 /UdpTest
 /WindowUtils/.vs/WindowUtils
 /.vs/hodgepodge/v15/Server/sqlite3
+*.dtbcache
