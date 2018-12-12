@@ -69,13 +69,13 @@ namespace WpfGecko
             model.Top += point.y;
 
             if (model.Left >= SystemParameters.PrimaryScreenWidth)
-                model.Left = 0;
+                model.Left = -model.Width;
             else if (model.Left <= -model.Width)
-                model.Left = SystemParameters.PrimaryScreenWidth - model.Width;
+                model.Left = SystemParameters.PrimaryScreenWidth;
             if (model.Top >= SystemParameters.PrimaryScreenHeight)
-                model.Top = 0;
+                model.Top = -model.Height;
             else if (model.Top <= -model.Height)
-                model.Top = SystemParameters.PrimaryScreenHeight - model.Height;
+                model.Top = SystemParameters.PrimaryScreenHeight;
 
         }
 
