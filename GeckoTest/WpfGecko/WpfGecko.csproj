@@ -38,11 +38,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Geckofx-Core, Version=45.0.33.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=MSIL">
-      <HintPath>..\packages\Geckofx45.64.45.0.33\lib\net45\Geckofx-Core.dll</HintPath>
+    <Reference Include="Geckofx-Core, Version=45.0.34.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=MSIL">
+      <HintPath>..\packages\Geckofx45.64.45.0.34\lib\net45\Geckofx-Core.dll</HintPath>
     </Reference>
-    <Reference Include="Geckofx-Winforms, Version=45.0.33.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=MSIL">
-      <HintPath>..\packages\Geckofx45.64.45.0.33\lib\net45\Geckofx-Winforms.dll</HintPath>
+    <Reference Include="Geckofx-Winforms, Version=45.0.34.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=MSIL">
+      <HintPath>..\packages\Geckofx45.64.45.0.34\lib\net45\Geckofx-Winforms.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -127,12 +130,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="winapp.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Firefox\AccessibleMarshal.dll" />
     <Content Include="Firefox\d3dcompiler_47.dll" />
     <Content Include="Firefox\freebl3.dll" />
-    <Content Include="Firefox\icudt56.dll" />
-    <Content Include="Firefox\icuin56.dll" />
-    <Content Include="Firefox\icuuc56.dll" />
+    <Content Include="Firefox\icudt58.dll" />
+    <Content Include="Firefox\icuin58.dll" />
+    <Content Include="Firefox\icuuc58.dll" />
     <Content Include="Firefox\lgpllibs.dll" />
     <Content Include="Firefox\libEGL.dll" />
     <Content Include="Firefox\libGLESv2.dll" />
@@ -145,16 +153,13 @@
     <Content Include="Firefox\sandboxbroker.dll" />
     <Content Include="Firefox\softokn3.dll" />
     <Content Include="Firefox\xul.dll" />
-    <None Include="winapp.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Geckofx45.64.45.0.33\build\Geckofx45.64.targets" Condition="Exists('..\packages\Geckofx45.64.45.0.33\build\Geckofx45.64.targets')" />
+  <Import Project="..\packages\Geckofx45.64.45.0.34\build\Geckofx45.64.targets" Condition="Exists('..\packages\Geckofx45.64.45.0.34\build\Geckofx45.64.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Geckofx45.64.45.0.33\build\Geckofx45.64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx45.64.45.0.33\build\Geckofx45.64.targets'))" />
+    <Error Condition="!Exists('..\packages\Geckofx45.64.45.0.34\build\Geckofx45.64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx45.64.45.0.34\build\Geckofx45.64.targets'))" />
   </Target>
 </Project>

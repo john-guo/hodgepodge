@@ -18,6 +18,7 @@ using System.Windows.Threading;
 using Gecko.Utils;
 using System.Windows.Interop;
 using Gecko.DOM;
+using Newtonsoft.Json;
 
 namespace WpfGecko
 {
@@ -59,6 +60,23 @@ namespace WpfGecko
                 var decoder = new PngBitmapDecoder(ms, BitmapCreateOptions.IgnoreImageCache | BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
                 return decoder.Frames[0];
             }
+        }
+
+        private void WinAppCallback(string json)
+        {
+            var point = JsonConvert.DeserializeAnonymousType(json, new { x = 0, y = 0 });
+            model.Left += point.x;
+            model.Top += point.y;
+
+            if (model.Left >= SystemParameters.PrimaryScreenWidth)
+                model.Left = 0;
+            else if (model.Left <= -model.Width)
+                model.Left = SystemParameters.PrimaryScreenWidth - model.Width;
+            if (model.Top >= SystemParameters.PrimaryScreenHeight)
+                model.Top = 0;
+            else if (model.Top <= -model.Height)
+                model.Top = SystemParameters.PrimaryScreenHeight - model.Height;
+
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -136,6 +154,7 @@ namespace WpfGecko
 
         private void Browser_DOMContentLoaded(object sender, DomEventArgs e)
         {
+            browser.Browser.AddMessageEventListener("WinAppCallback", args => WinAppCallback(args));
             Hide();
             timer.Start();
         }

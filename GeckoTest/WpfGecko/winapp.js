@@ -13,4 +13,8 @@ let WinApp = {
         }
         this.viewport.src = canvasElement.toDataURL("image/png");
     },
+    callback: (json) => {
+        var event = new MessageEvent("WinAppCallback", { 'view': window, 'bubbles': false, 'cancelable': false, 'data': JSON.stringify(json) });
+        document.dispatchEvent(event);
+    },
 }
