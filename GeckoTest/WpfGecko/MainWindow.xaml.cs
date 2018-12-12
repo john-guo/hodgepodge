@@ -63,6 +63,20 @@ namespace WpfGecko
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            if (canvas == null)
+            {
+                canvas = browser.Browser.Document.GetElementById("__appview") as GeckoImageElement;
+
+                if (canvas == null)
+                {
+                    return;
+                }
+
+                model.ModelWidth = int.TryParse(canvas.GetAttribute("width"), out int width) ? width : (int?)null;
+                model.ModelHeight = int.TryParse(canvas.GetAttribute("height"), out int height) ? height : (int?)null;
+                model.Show();
+            }
+
             var bs = extractBitmapSource();
             if (bs == null)
                 return;
@@ -123,14 +137,6 @@ namespace WpfGecko
         private void Browser_DOMContentLoaded(object sender, DomEventArgs e)
         {
             Hide();
-
-            canvas = browser.Browser.Document.GetElementById("__appview") as GeckoImageElement;
-
-            model.ModelWidth = int.TryParse(canvas.GetAttribute("width"), out int width) ? width : (int?)null;
-            model.ModelHeight = int.TryParse(canvas.GetAttribute("height"), out int height) ? height : (int?)null;
-            model.Show();
-
-            Timer_Tick(null, null);
             timer.Start();
         }
     }
