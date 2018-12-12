@@ -47,7 +47,7 @@ namespace WorkingTime
             var diff = 1 - (today.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)today.DayOfWeek);
 
             var begin = today.AddDays(diff);
-            var end = begin.AddDays(5);
+            var end = begin.AddDays(7);
 
             Dictionary<DayOfWeek, DateTime> dayTime = new Dictionary<DayOfWeek, DateTime>();
 
