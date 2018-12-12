@@ -82,7 +82,7 @@ namespace WpfGecko
 
             using (var context = new AutoJSContext(main.browser.Browser.Window))
             {
-                context.EvaluateScript("LApp.motion();");
+                context.EvaluateScript("WinApp.click();");
             }
         }
     }

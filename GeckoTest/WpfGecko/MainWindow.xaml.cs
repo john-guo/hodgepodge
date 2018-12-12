@@ -96,7 +96,7 @@ namespace WpfGecko
 
             using (var context = new AutoJSContext(browser.Browser.Window))
             {
-                context.EvaluateScript($"LApp.move({x}, {y});");
+                context.EvaluateScript($"WinApp.mousemove({{x:{x}, y:{y}}});");
             }
 
             model.bgImg.Source = bs;
@@ -124,7 +124,7 @@ namespace WpfGecko
         {
             Hide();
 
-            canvas = browser.Browser.Document.GetElementById("view") as GeckoImageElement;
+            canvas = browser.Browser.Document.GetElementById("__appview") as GeckoImageElement;
 
             model.ModelWidth = int.TryParse(canvas.GetAttribute("width"), out int width) ? width : (int?)null;
             model.ModelHeight = int.TryParse(canvas.GetAttribute("height"), out int height) ? height : (int?)null;
