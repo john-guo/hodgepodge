@@ -214,9 +214,10 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 /WCFTest
-/Gif
-/GithubTest
 /UdpTest
-/WindowUtils/.vs/WindowUtils
-/.vs/hodgepodge/v15/Server/sqlite3
-*.dtbcache
+/.vs
+/hwInfo/.vs/hwInfo/v15/Server/sqlite3
+/MathConsole/.vs/MathConsole/v15/Server/sqlite3
+/WindowUtils/.vs/WindowUtils/v15/Server/sqlite3
+/WorkingTime/.vs/WorkingTime/v15/Server/sqlite3
+/GeckoTest/.vs/GeckoTest/v15/Server/sqlite3

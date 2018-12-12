@@ -20,6 +20,12 @@ namespace WindowUtils
         public static extern IntPtr WindowFromPoint(System.Drawing.Point p);
 
         [DllImport("user32.dll")]
+        public static extern IntPtr GetWindow(IntPtr hwnd, GW_CMD cmd);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetAncestor(IntPtr hwnd, GA_FLAGS flags);
+
+        [DllImport("user32.dll")]
         public static extern bool AttachThreadInput(int idAttach, int idAttachTo, bool fAttach);
 
         [DllImport("user32.dll")]
@@ -43,6 +49,24 @@ namespace WindowUtils
             DWL_DLGPROC = 4,
             DWL_MSGRESULT = 0,
             DWL_USER = 8,
+        }
+
+        public enum GA_FLAGS : uint
+        {
+            GA_PARENT = 1,
+            GA_ROOT = 2,
+            GA_ROOTOWNER = 3,
+        }
+
+        public enum GW_CMD : uint
+        {
+            GW_CHILD = 5,
+            GW_ENABLEDPOPUP = 6,
+            GW_HWNDFIRST = 0,
+            GW_HWNDLAST = 1,
+            GW_HWNDNEXT = 2,
+            GW_HWNDPREV = 3,
+            GW_OWNER = 4,
         }
 
         [Flags]

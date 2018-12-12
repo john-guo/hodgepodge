@@ -12,7 +12,7 @@ namespace AeroWatch
     public class FontClock : GraphicsClock
     {
         private Font paintFont;
-        private Brush paintBrush;
+        //private Brush paintBrush;
         private Color paintColor;
         int fontSize;
 
@@ -20,7 +20,7 @@ namespace AeroWatch
         {
             fontSize = size;
             paintColor = color;
-            paintBrush = new SolidBrush(color);
+            //paintBrush = new SolidBrush(color);
         }
 
         public override void Initialize(string fileName)

@@ -47,6 +47,8 @@ namespace WindowUtils
 
         public static bool DonotRefresh = false;
 
+        private Graphics g;
+        protected bool useDoubleBuffer = true;
         private BufferedGraphicsContext bgContext = new BufferedGraphicsContext();
         private bool useTimerCanvas = true;
         private BufferedGraphics bg;
@@ -79,6 +81,7 @@ namespace WindowUtils
             AllowTransparency = true;
         }
 
+
         protected abstract void OnDraw(Graphics canvas);
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -89,10 +92,20 @@ namespace WindowUtils
             if (!DonotRefresh)
                 TopMost = true;
 
-            bg.Graphics.Clear(transparencyKey);
-            OnDraw(bg.Graphics);
-            bg.Graphics.Flush();
-            bg.Render();
+            if (useDoubleBuffer)
+            {
+                bg.Graphics.Clear(transparencyKey);
+                bg.Graphics.Flush();
+                OnDraw(bg.Graphics);
+                bg.Graphics.Flush();
+                bg.Render();
+            }
+            else
+            {
+                g.Clear(transparencyKey);
+                OnDraw(g);
+                g.Flush();
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -180,11 +193,17 @@ namespace WindowUtils
 
         private void SetupCanvas()
         {
-            var g = CreateGraphics();
-            bgContext.Invalidate();
-            bg = bgContext.Allocate(g, ClientRectangle);
-
-            OnCanvasCreated(bg.Graphics);
+            g = CreateGraphics();
+            if (useDoubleBuffer)
+            {
+                bgContext.Invalidate();
+                bg = bgContext.Allocate(g, ClientRectangle);
+                OnCanvasCreated(bg.Graphics);
+            }
+            else
+            {
+                OnCanvasCreated(g);
+            }
         }
 
         private void SetupCanvas(Rectangle bounds)

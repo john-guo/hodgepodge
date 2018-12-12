@@ -62,6 +62,9 @@ namespace Wrench
             g_events.MouseMove -= G_events_MouseMove;
 
             var hwnd = Utils.WindowFromPoint(e.Location);
+            var owner = Utils.GetAncestor(hwnd, Utils.GA_FLAGS.GA_ROOTOWNER);
+            if (owner != IntPtr.Zero)
+                hwnd = owner;
             if (hwnd == Handle)
                 return;
 
@@ -70,12 +73,19 @@ namespace Wrench
             var process = Process.GetProcessById(pid);
             if (process.MainWindowHandle == Handle)
                 return;
+            
+            var mainWnd = process.MainWindowHandle;
 
-            target = process.MainWindowHandle;
+            target = mainWnd == IntPtr.Zero ? hwnd : mainWnd;
+
+            var title = process.MainWindowTitle;
+
+            if (string.IsNullOrWhiteSpace(title))
+                title = process.ProcessName;
 
             Invoke((Action)delegate
             {
-                label1.Text = process.MainWindowTitle;
+                label1.Text = title;
             });
 
             button2.Enabled = true;

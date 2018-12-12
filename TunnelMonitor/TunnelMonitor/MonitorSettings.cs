@@ -12,7 +12,24 @@ namespace TunnelMonitor
         public int CheckIntervalInSeconds { get; set; }
         public string CheckUrl { get; set; }
         public string CheckString { get; set; }
-        public string TunnelPath { get; set; }
+
+        private string tunnelPath;
+        public string TunnelPath
+        {
+            get
+            {
+                if (Path.IsPathRooted(tunnelPath))
+                {
+                    return tunnelPath;
+                }
+
+                return Path.Combine(TunnelWorkingDirectory, tunnelPath);
+            }
+
+            set { tunnelPath = value; }
+        }
+
+
         public string TunnelArguments { get; set; }
 
         private string tunnelWorkingDirectory;

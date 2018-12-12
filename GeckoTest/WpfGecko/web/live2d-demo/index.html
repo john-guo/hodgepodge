@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <script src="winapp.js"></script>
+    <script>
+        callback = function () {
+            var canvas = document.getElementById("SAMPLE");
+            
+            WinApp.render(canvas);
+        }
+
+        function ok() {
+            LApp.motion();
+        }
+    </script>
+</head>
+<body>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+    <center>
+
+    <!-- Canvas -->
+    <canvas id="SAMPLE" width="100" height="200" style="display:none">
+        このブラウザは
+        <code>&lt;canvas&lt;</code>要素をサポートしていません。
+    </canvas>
+    
+    <!-- Live2DCubismCore -->
+    <script src="live2dcubismcore.min.js"></script>
+
+    <!-- User's Script -->
+    <script src = "./dist/index.js"></script>
+
+    <script>
+        WinApp.dblclick = LApp.motion;
+        WinApp.mousemove  = function (event) {
+            LApp.move(event.x, event.y);
+        };
+
+        window.onmousemove = (ev) =>
+        {
+            var e = WinApp.viewport;
+            if (e == null)
+                return;
+            var rect = e.getBoundingClientRect();
+            var left =  rect.left;
+            var top = rect.top;
+            var h = rect.height;
+            var w = rect.width;
+            var x = ev.clientX; 
+            var y = ev.clientY;
+
+            x -= left;
+            y -= top;
+
+            if (x < 0)
+                x = 0;
+            if (y < 0)
+                y = 0;
+            if (x >= w)
+                x = w - 1;
+            if (y >= h)
+                y = h - 1;
+
+            LApp.move(x, y);
+        };
+    </script>
+</center>
+
+</body>
+</html>

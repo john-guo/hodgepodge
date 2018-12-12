@@ -41,6 +41,7 @@ namespace BulletScreen
             canvas.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             canvas.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
             canvas.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            canvas.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
 
             bm.UpdateLayout(canvas);
         }

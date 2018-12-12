@@ -30,6 +30,7 @@ namespace AeroWatch
 
         public Form1()
         {
+            //transparencyKey = Color.Transparent;
         }
 
         protected override void OnDraw(Graphics canvas)

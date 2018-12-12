@@ -22,9 +22,13 @@ namespace AeroWatch
         public override void Initialize(string fileName)
         {
             clockImg = new Bitmap(101, 101);
-            //image = new Bitmap(100 * 32 + 1, 100 * 32 + 1);
-            image = new Bitmap(101, 101);
+            image = new Bitmap(100 * 2 + 1, 100 * 2 + 1);
+            //image = new Bitmap(101, 101);
             innerCanvas = Graphics.FromImage(image);
+            innerCanvas.CompositingMode = CompositingMode.SourceCopy;
+            //innerCanvas.SmoothingMode = SmoothingMode.AntiAlias;
+            //innerCanvas.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //innerCanvas.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
             //image = Image.FromFile(fileName);
 
@@ -136,6 +140,11 @@ namespace AeroWatch
             //Canvas.CompositingMode = CompositingMode.SourceOver;
             //Canvas.CompositingQuality = CompositingQuality.HighQuality;
             //Canvas.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            //canvas.SmoothingMode = SmoothingMode.AntiAlias;
+            //canvas.InterpolationMode = InterpolationMode.High;
+            //canvas.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            canvas.CompositingMode = CompositingMode.SourceCopy;
             canvas.DrawImage(image, new Rectangle(Point.Empty, clockImg.Size), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
 
             ////Canvas.DrawImage(clockImg, Point.Empty);
