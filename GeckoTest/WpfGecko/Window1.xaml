@@ -20,6 +20,7 @@
         <Image x:Name="bgImg" Stretch="Fill">
             <Image.ContextMenu>
                 <ContextMenu>
+                    <MenuItem InputGestureText="DoubleClick" Click="MenuItem_Click_1"/>
                     <MenuItem InputGestureText="Exit" Click="MenuItem_Click"/>
                 </ContextMenu>
             </Image.ContextMenu>

@@ -2,7 +2,7 @@
 let WinApp = {
     VIEWID: "__appview",
     viewport: null,
-    click: () => { },
+    dblclick: () => { },
     mousemove: (event) => { },
     render: function (canvasElement) {
         this.viewport = this.viewport || document.getElementById(this.VIEWID);

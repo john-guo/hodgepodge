@@ -82,8 +82,13 @@ namespace WpfGecko
 
             using (var context = new AutoJSContext(main.browser.Browser.Window))
             {
-                context.EvaluateScript("WinApp.click();");
+                context.EvaluateScript("WinApp.dblclick();");
             }
+        }
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+            Window_MouseDoubleClick(null, null);
         }
     }
 }

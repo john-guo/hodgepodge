@@ -41,6 +41,10 @@
             var context = canvasElement.getContext('2d');
             var index = 0;
             var row, col;
+			var moving = true;
+			WinApp.dblclick = function () {
+				moving = !moving;
+			};
             function start() {
 				context.clearRect(0, 0, canvasElement.width, canvasElement.height);
                 var offset = index++ % IMG_COUNT;
@@ -50,7 +54,8 @@
                 context.drawImage(img, x, y,  S_WIDTH, S_HEIGHT, 0, 0, canvasElement.width, canvasElement.height);
                 WinApp.render(canvasElement);
                 setTimeout(start, 1000 / 10);
-                WinApp.callback({x:1, y:1});
+                if (moving) 
+					WinApp.callback({x:1, y:1});
             }
             img.crossOrigin = "Anonymous";
             img.addEventListener("load", function () {
