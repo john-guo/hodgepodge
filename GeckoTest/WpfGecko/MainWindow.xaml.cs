@@ -180,6 +180,8 @@ namespace WpfGecko
                 foreach (var pair in windows)
                 {
                     var win = pair.Value.Window;
+                    if (!win.IsLoaded)
+                        return;
                     var args = $"{{id:\"{win.Id}\", left:{win.Left}, top:{win.Top}, width:{win.Width}, height:{win.Height},opacity:{win.Opacity}}}";
                     context.EvaluateScript($"WinApp._windowNotify({args});");
                 }
