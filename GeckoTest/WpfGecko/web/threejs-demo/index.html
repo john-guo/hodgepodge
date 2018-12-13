@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - keyframes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+                margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+
+		<script src="three.js"></script>
+
+		<script src="WebGL.js"></script>
+		<script src="OrbitControls.js"></script>
+		<script src="DRACOLoader.js"></script>
+        <script src="GLTFLoader.js"></script>
+        <script src="winapp.js"></script>
+
+		<script>
+            var width = 320;
+            var height = 200;
+
+			var scene, camera, pointLight;
+			var renderer, mixer, controls;
+
+			var clock = new THREE.Clock();
+			var container = document.getElementById( 'container' );
+
+			renderer = new THREE.WebGLRenderer( { alpha:true, antialias: true, preserveDrawingBuffer: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( width, height );
+			renderer.gammaOutput = true;
+			renderer.gammaFactor = 2.2;
+			container.appendChild( renderer.domElement );
+
+			scene = new THREE.Scene();
+			//scene.background = new THREE.Color( 0xbfe3dd );
+
+			camera = new THREE.PerspectiveCamera( 40, width / height, 1, 100 );
+			camera.position.set( 5, 2, 8 );
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0.5, 0 );
+            controls.enablePan = false;
+            controls.autoRotate = true;
+
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+			pointLight = new THREE.PointLight( 0xffffff, 1 );
+			pointLight.position.copy( camera.position );
+			scene.add( pointLight );
+
+			// envmap
+			var path = 'Park2/';
+			var format = '.jpg';
+			var envMap = new THREE.CubeTextureLoader().load( [
+				path + 'posx' + format, path + 'negx' + format,
+				path + 'posy' + format, path + 'negy' + format,
+				path + 'posz' + format, path + 'negz' + format
+			] );
+
+			THREE.DRACOLoader.setDecoderPath( 'gltf/' );
+
+			var loader = new THREE.GLTFLoader();
+			loader.setDRACOLoader( new THREE.DRACOLoader() );
+			loader.load( 'LittlestTokyo.glb', function ( gltf ) {
+
+				var model = gltf.scene;
+				model.position.set( 1, 1, 0 );
+				model.scale.set( 0.01, 0.01, 0.01 );
+				model.traverse( function ( child ) {
+
+					if ( child.isMesh ) child.material.envMap = envMap;
+
+				} );
+
+				scene.add( model );
+
+				mixer = new THREE.AnimationMixer( model );
+				mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+				animate();
+
+			}, undefined, function ( e ) {
+
+				console.error( e );
+
+			} );
+
+            renderer.domElement.style["display"] = "none";
+
+            var mywin = WinApp.createWindow('test');
+
+			window.onresize = function () {
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			};
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var delta = clock.getDelta();
+				mixer.update( delta );
+				controls.update( delta );
+
+				renderer.render( scene, camera );
+
+                mywin.render(renderer.domElement);
+			}
+
+
+		</script>
+
+	</body>
+
+</html>

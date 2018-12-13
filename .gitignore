@@ -223,3 +223,4 @@ pip-log.txt
 /WorkingTime/.vs/WorkingTime/v15/Server/sqlite3
 /GeckoTest/.vs/GeckoTest/v15/Server/sqlite3
 .dtbcache
+/GeckoTest/WpfGecko/web/threejs-demo/.vscode
