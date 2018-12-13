@@ -6,10 +6,11 @@
     <title>TypeScript HTML App</title>
     <script src="winapp.js"></script>
     <script>
+        var mywin = null;
         callback = function () {
             var canvas = document.getElementById("SAMPLE");
-            
-            WinApp.render(canvas);
+            if (mywin != null)
+                mywin.render(canvas);
         }
 
         function ok() {
@@ -39,14 +40,44 @@
     <script src = "./dist/index.js"></script>
 
     <script>
-        WinApp.dblclick = LApp.motion;
-        WinApp.mousemove  = function (event) {
-            LApp.move(event.x, event.y);
+        mywin = WinApp.createWindow("test");
+        mywin.width = 100;
+        mywin.height = 200;
+        mywin.dblclick = LApp.motion;
+        mywin.resizeNotify = function (args) {
+            mywin.width = args.w;
+            mywin.height = args.h;
         };
+        mywin.moveNotify = function (args) {
+            mywin.left = args.x;
+            mywin.top = args.y;
+        }
+        mywin.mousemove  = function (event) {
+            var left = mywin.left;
+            var top = mywin.top;
+            var h = mywin.height;
+            var w = mywin.width;
+            var x = event.x; 
+            var y = event.y;
+            
+            x -= left;
+            y -= top;
 
+            if (x < 0)
+                x = 0;
+            if (y < 0)
+                y = 0;
+            if (x >= w)
+                x = w - 1;
+            if (y >= h)
+                y = h - 1;
+
+            LApp.move(x, y);
+        };
+        /*
         window.onmousemove = (ev) =>
         {
-            var e = WinApp.viewport;
+            var e = mywin.viewport;
             if (e == null)
                 return;
             var rect = e.getBoundingClientRect();
@@ -71,6 +102,7 @@
 
             LApp.move(x, y);
         };
+        */
     </script>
 </center>
 

@@ -33,6 +33,7 @@
         </canvas>
         </div>
         <script>
+            var mywin = WinApp.createWindow("test");
             canvasElement = document.getElementById('SAMPLE');
             var S_WIDTH = 110;
             var S_HEIGHT = 101;
@@ -42,9 +43,32 @@
             var index = 0;
             var row, col;
 			var moving = true;
-			WinApp.dblclick = function () {
+            mywin.width = S_WIDTH;
+            mywin.height = S_HEIGHT;
+			mywin.dblclick = function () {
 				moving = !moving;
 			};
+            mywin.moveNotify = function (args) {
+                mywin.left = args.x;
+                mywin.top = args.y;
+                
+                var x = 0, y = 0;
+                if (mywin.left >= screen.width) {
+                    x = -mywin.width - mywin.left;
+                }
+                else if (mywin.left <= -mywin.width) {
+                    x = screen.width - mywin.left;
+                }
+
+                if (mywin.top >= screen.height) {
+                    y = -mywin.height - mywin.top;
+                }
+                else if (mywin.top <= -mywin.height) {
+                    y = screen.height - mywin.top;
+                }
+                if (x != 0 || y != 0)
+                    mywin.move(x, y);
+            }
             function start() {
 				context.clearRect(0, 0, canvasElement.width, canvasElement.height);
                 var offset = index++ % IMG_COUNT;
@@ -52,10 +76,10 @@
                 var y = parseInt(offset / col) * S_HEIGHT;
                 console.log(`${x}, ${y}`);
                 context.drawImage(img, x, y,  S_WIDTH, S_HEIGHT, 0, 0, canvasElement.width, canvasElement.height);
-                WinApp.render(canvasElement);
+                mywin.render(canvasElement);
                 setTimeout(start, 1000 / 10);
                 if (moving) 
-					WinApp.callback({x:1, y:1});
+                    mywin.move(1, 1);
             }
             img.crossOrigin = "Anonymous";
             img.addEventListener("load", function () {

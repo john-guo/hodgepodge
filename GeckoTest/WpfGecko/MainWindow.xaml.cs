@@ -19,6 +19,7 @@ using Gecko.Utils;
 using System.Windows.Interop;
 using Gecko.DOM;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace WpfGecko
 {
@@ -27,9 +28,15 @@ namespace WpfGecko
     /// </summary>
     public partial class MainWindow : Window
     {
+        public class CanvasWindow
+        {
+            public Window1 Window { get; set; }
+            public GeckoImageElement Canvas { get; set; }
+        }
+
         DispatcherTimer timer;
-        Window1 model;
-        GeckoImageElement canvas;
+        Dictionary<string, CanvasWindow> windows;
+        Dictionary<string, Action<string, string>> commands;
 
         public MainWindow()
         {
@@ -39,7 +46,9 @@ namespace WpfGecko
                 Interval = TimeSpan.FromMilliseconds(1000 / 24)
             };
             timer.Tick += Timer_Tick;
-            model = new Window1();
+            windows = new Dictionary<string, CanvasWindow>();
+            commands = new Dictionary<string, Action<string, string>>();
+            RegisterCommand();
             Closing += MainWindow_Closing;
         }
 
@@ -49,9 +58,8 @@ namespace WpfGecko
             Application.Current.Shutdown();
         }
 
-        private BitmapSource extractBitmapSource()
+        private BitmapSource extractBitmapSource(string data)
         {
-            var data = canvas.Src;
             if (string.IsNullOrWhiteSpace(data))
                 return null;
             var bytes = Convert.FromBase64String(data.Substring("data:image/png;base64,".Length));
@@ -62,76 +70,167 @@ namespace WpfGecko
             }
         }
 
-        private void WinAppCallback(string json)
+        private void RegisterCommand()
         {
-            var point = JsonConvert.DeserializeAnonymousType(json, new { x = 0, y = 0 });
+            commands.Add("create", ActionCreate);
+            commands.Add("move", ActionMove);
+            commands.Add("setWidth", ActionSetWidth);
+            commands.Add("setHeight", ActionSetHeight);
+            commands.Add("resize", ActionResize);
+            commands.Add("setOpacity", ActionSetOpcity);
+        }
+
+        private Window1 getModel(string id)
+        {
+            return windows[id]?.Window;
+        }
+
+        private void ActionCreate(string id, string parameters)
+        {
+            if (windows.ContainsKey(id))
+                return;
+            windows[id] = new CanvasWindow()
+            {
+                Window = new Window1(id),
+                Canvas = null,
+            };
+        }
+
+        private void ActionMove(string id, string parameters)
+        {
+            var model = getModel(id);
+            if (model == null)
+                return;
+
+            var point = JsonConvert.DeserializeAnonymousType(parameters, new {x=0, y=0});
             model.Left += point.x;
             model.Top += point.y;
+        }
 
-            if (model.Left >= SystemParameters.PrimaryScreenWidth)
-                model.Left = -model.Width;
-            else if (model.Left <= -model.Width)
-                model.Left = SystemParameters.PrimaryScreenWidth;
-            if (model.Top >= SystemParameters.PrimaryScreenHeight)
-                model.Top = -model.Height;
-            else if (model.Top <= -model.Height)
-                model.Top = SystemParameters.PrimaryScreenHeight;
+        private void ActionSetWidth(string id, string parameters)
+        {
+            var model = getModel(id);
+            if (model == null)
+                return;
+
+            var size = JsonConvert.DeserializeAnonymousType(parameters, new { w = 0, h = 0 });
+            model.ModelWidth = size.w;
+        }
+
+        private void ActionSetHeight(string id, string parameters)
+        {
+            var model = getModel(id);
+            if (model == null)
+                return;
+
+            var size = JsonConvert.DeserializeAnonymousType(parameters, new { w = 0, h = 0 });
+            model.ModelHeight = size.h;
+        }
+
+        private void ActionResize(string id, string parameters)
+        {
+            var model = getModel(id);
+            if (model == null)
+                return;
+
+            var size = JsonConvert.DeserializeAnonymousType(parameters, new { w = 0, h = 0 });
+            model.ModelWidth = size.w;
+            model.ModelHeight = size.h;
+        }
+
+        private void ActionSetOpcity(string id, string parameters)
+        {
+            var model = getModel(id);
+            if (model == null)
+                return;
+
+            var args = JsonConvert.DeserializeAnonymousType(parameters, new { opacity = .0d });
+            model.Opacity = args.opacity;
+        }
+
+        private void WinAppCallback(string json)
+        {
+            var command = JsonConvert.DeserializeAnonymousType(json, new { id="", command="", parameters="" });
+
+            
+            if (!commands.TryGetValue(command.command, out Action<string, string> action))
+                return;
+
+            action(command.id, command.parameters);
+        }
+
+        private void InformationNotify(Window1 win)
+        {
+            using (var context = new AutoJSContext(browser.Browser.Window))
+            {
+                var args = $"{{id:\"{win.Id}\", left:{win.Left}, top:{win.Top}, width:{win.Width}, height:{win.Height},opacity:{win.Opacity}}}";
+                context.EvaluateScript($"WinApp._windowNotify({args});");
+            }
+        }
+
+        private void InformationNotify()
+        {
+            var mouse = System.Windows.Forms.Control.MousePosition;
+            var point = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(new Point(mouse.X, mouse.Y));
+            var x = point.X;
+            var y = point.Y;
+
+            using (var context = new AutoJSContext(browser.Browser.Window))
+            {
+                foreach (var pair in windows)
+                {
+                    var win = pair.Value.Window;
+                    var args = $"{{id:\"{win.Id}\", left:{win.Left}, top:{win.Top}, width:{win.Width}, height:{win.Height},opacity:{win.Opacity}}}";
+                    context.EvaluateScript($"WinApp._windowNotify({args});");
+                }
+
+                context.EvaluateScript($"WinApp._onMouseMove({{x:{x}, y:{y}}});");
+            }
+        }
+
+        private void RenderModel(CanvasWindow window)
+        {
+            if (window.Canvas == null)
+            {
+                window.Canvas = browser.Browser.Document.GetElementById(window.Window.Id) as GeckoImageElement;
+
+                if (window.Canvas == null)
+                {
+                    return;
+                }
+
+                window.Window.ModelWidth = int.TryParse(window.Canvas.GetAttribute("width"), out int width) ? width : (int?)null;
+                window.Window.ModelHeight = int.TryParse(window.Canvas.GetAttribute("height"), out int height) ? height : (int?)null;
+                window.Window.Show();
+
+                InformationNotify(window.Window);
+            }
+
+            var bs = extractBitmapSource(window.Canvas.Src);
+            if (bs == null)
+                return;
+            if (!window.Window.ModelWidth.HasValue)
+            {
+                window.Window.ModelWidth = bs.Width;
+            }
+            if (!window.Window.ModelHeight.HasValue)
+            {
+                window.Window.ModelHeight = bs.Height;
+            }
+
+            window.Window.bgImg.Source = bs;
 
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (canvas == null)
+            foreach (var pair in windows)
             {
-                canvas = browser.Browser.Document.GetElementById("__appview") as GeckoImageElement;
-
-                if (canvas == null)
-                {
-                    return;
-                }
-
-                model.ModelWidth = int.TryParse(canvas.GetAttribute("width"), out int width) ? width : (int?)null;
-                model.ModelHeight = int.TryParse(canvas.GetAttribute("height"), out int height) ? height : (int?)null;
-                model.Show();
+                RenderModel(pair.Value);
             }
 
-            var bs = extractBitmapSource();
-            if (bs == null)
-                return;
-            if (!model.ModelWidth.HasValue)
-            {
-                model.ModelWidth = bs.Width;
-            }
-            if (!model.ModelHeight.HasValue)
-            {
-                model.ModelHeight = bs.Height;
-            }
+            InformationNotify();
 
-            var mouse = System.Windows.Forms.Control.MousePosition;
-            var point = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(new Point(mouse.X, mouse.Y));
-            var left = (int)model.Left;
-            var top = (int)model.Top;
-            var w = (int)model.Width;
-            var h = (int)model.Height;
-
-            var x = point.X - left;
-            var y = point.Y - top;
-
-            if (x < 0)
-                x = 0;
-            if (y < 0)
-                y = 0;
-            if (x >= w)
-                x = w - 1;
-            if (y >= h)
-                y = h - 1;
-
-            using (var context = new AutoJSContext(browser.Browser.Window))
-            {
-                context.EvaluateScript($"WinApp.mousemove({{x:{x}, y:{y}}});");
-            }
-
-            model.bgImg.Source = bs;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -139,8 +238,6 @@ namespace WpfGecko
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-            browser.Browser.EnableDefaultFullscreen();
-            browser.Browser.DOMContentLoaded += Browser_DOMContentLoaded;
             var url = Properties.Settings.Default.Url;
             if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
             {
@@ -148,15 +245,25 @@ namespace WpfGecko
                 url = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(location), url);
             }
 
+            browser.Browser.EnableDefaultFullscreen();
+            browser.Browser.DocumentCompleted += Browser_DocumentCompleted;
+            browser.Browser.ConsoleMessage += Browser_ConsoleMessage;
+            browser.Browser.AddMessageEventListener("WinAppCallback", args => WinAppCallback(args));
             browser.Browser.Navigate(url);
         }
 
-
-        private void Browser_DOMContentLoaded(object sender, DomEventArgs e)
+        private void Browser_DocumentCompleted(object sender, Gecko.Events.GeckoDocumentCompletedEventArgs e)
         {
-            browser.Browser.AddMessageEventListener("WinAppCallback", args => WinAppCallback(args));
             Hide();
             timer.Start();
+        }
+
+        private void Browser_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
+        {
+            using (var sw = File.AppendText("console.log"))
+            {
+                sw.WriteLine(e.Message);
+            }
         }
     }
 }

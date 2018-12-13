@@ -20,8 +20,10 @@ namespace WpfGecko
     /// </summary>
     public partial class Window1 : Window
     {
-        public Window1()
+        public string Id { get; private set; }
+        public Window1(string id)
         {
+            this.Id = id;
             InitializeComponent();
         }
 
@@ -82,7 +84,7 @@ namespace WpfGecko
 
             using (var context = new AutoJSContext(main.browser.Browser.Window))
             {
-                context.EvaluateScript("WinApp.dblclick();");
+                context.EvaluateScript($"WinApp._onDoubleClick(\"{this.Id}\");");
             }
         }
 

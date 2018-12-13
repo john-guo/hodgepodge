@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfGecko"
         mc:Ignorable="d"
-        Title="Window1" 
+        Title="" 
         Height="450" Width="800" 
         AllowsTransparency="True" 
         Background="Transparent" 
@@ -15,7 +15,8 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MouseDoubleClick="Window_MouseDoubleClick"
         ResizeMode="NoResize"
-        Closed="Window_Closed">
+        Closed="Window_Closed"
+        >
     <Grid>
         <Image x:Name="bgImg" Stretch="Fill">
             <Image.ContextMenu>
