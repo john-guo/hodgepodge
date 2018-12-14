@@ -28,26 +28,49 @@ namespace WpfGecko
     /// </summary>
     public partial class MainWindow : Window
     {
+        public enum RenderMode
+        {
+            Auto,
+            Manual,
+        } 
+
         public class CanvasWindow
         {
             public Window1 Window { get; set; }
-            public GeckoImageElement Canvas { get; set; }
+            public GeckoCanvasElement Canvas { get; set; }
         }
 
+        public class Settings
+        {
+            public bool Debug { get; set; }
+            public int FPS { get; set; }
+        }
+
+        RenderMode Mode;
         DispatcherTimer timer;
         Dictionary<string, CanvasWindow> windows;
         Dictionary<string, Action<string, string>> commands;
+        Settings config;
+
 
         public MainWindow()
         {
             InitializeComponent();
+
+            config = new Settings()
+            {
+                Debug = Properties.Settings.Default.Debug,
+                FPS = Properties.Settings.Default.FPS,
+            };
+
             timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(1000 / 24)
+                Interval = TimeSpan.FromMilliseconds(1000 / config.FPS)
             };
             timer.Tick += Timer_Tick;
             windows = new Dictionary<string, CanvasWindow>();
             commands = new Dictionary<string, Action<string, string>>();
+            Mode = RenderMode.Manual;
             RegisterCommand();
             Closing += MainWindow_Closing;
         }
@@ -58,7 +81,7 @@ namespace WpfGecko
             Application.Current.Shutdown();
         }
 
-        private BitmapSource extractBitmapSource(string data)
+        private BitmapSource ExtractBitmapSource(string data)
         {
             if (string.IsNullOrWhiteSpace(data))
                 return null;
@@ -90,6 +113,8 @@ namespace WpfGecko
         private void ActionConfig(string id, string parameters)
         {
             dynamic settings = JsonConvert.DeserializeObject(parameters);
+            config.Debug = settings.debug ?? Properties.Settings.Default.Debug;
+            config.FPS = settings.fps ?? Properties.Settings.Default.FPS;
         }
 
         private void ActionCreate(string id, string parameters)
@@ -204,15 +229,34 @@ namespace WpfGecko
             }
         }
 
+        private void RenderModel(CanvasWindow window)
+        {
+            if (window.Canvas == null)
+            {
+                window.Canvas = browser.Browser.Document.SelectFirst("//canvas") as GeckoCanvasElement;
+                if (window.Canvas == null)
+                {
+                    MessageBox.Show("Doesn't contain any canvas!");
+                    Close();
+                    return;
+                }
+            }
+
+            RenderModel(window, window.Canvas.ToDataURL("image/png"));
+        }
+
         private void RenderModel(CanvasWindow window, string src)
         {
             if (!window.Window.IsShow)
             {
                 window.Window.Show();
-                InformationNotify(window.Window);
+                if (Mode == RenderMode.Manual)
+                {
+                    InformationNotify(window.Window);
+                }
             }
 
-            var bs = extractBitmapSource(src);
+            var bs = ExtractBitmapSource(src);
             if (bs == null)
                 return;
             if (!window.Window.ModelWidth.HasValue)
@@ -225,12 +269,20 @@ namespace WpfGecko
             }
 
             window.Window.bgImg.Source = bs;
-
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            InformationNotify();
+            if (Mode == RenderMode.Manual)
+            {
+                InformationNotify();
+                return;
+            }
+
+            foreach (var pair in windows)
+            {
+                RenderModel(pair.Value);
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -252,9 +304,34 @@ namespace WpfGecko
             browser.Browser.Navigate(url);
         }
 
+        private void ProbeRenderMode(GeckoWindow window)
+        {
+            using (var context = new AutoJSContext(window))
+            {
+                context.EvaluateScript("WinApp !== undefined", out string result);
+                if (bool.TryParse(result, out bool bresult) && bresult)
+                {
+                    Mode = RenderMode.Manual;
+                }
+                else
+                {
+                    Mode = RenderMode.Auto;
+                }
+            }
+
+            if (Mode == RenderMode.Auto)
+            {
+                ActionCreate("__auto__", null);
+            }
+        }
+
         private void Browser_DocumentCompleted(object sender, Gecko.Events.GeckoDocumentCompletedEventArgs e)
         {
-            Hide();
+            if (!config.Debug)
+                Hide();
+
+            ProbeRenderMode(e.Window);
+
             timer.Start();
         }
 
