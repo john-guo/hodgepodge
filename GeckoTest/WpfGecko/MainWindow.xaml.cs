@@ -114,7 +114,13 @@ namespace WpfGecko
         {
             dynamic settings = JsonConvert.DeserializeObject(parameters);
             config.Debug = settings.debug ?? Properties.Settings.Default.Debug;
+
+            var prevFPS = config.FPS;
             config.FPS = settings.fps ?? Properties.Settings.Default.FPS;
+            if (prevFPS != config.FPS)
+            {
+                timer.Interval = TimeSpan.FromMilliseconds(1000 / config.FPS);
+            }
         }
 
         private void ActionCreate(string id, string parameters)
