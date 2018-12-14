@@ -17,9 +17,15 @@ namespace WpfGecko
         protected override void OnStartup(StartupEventArgs e)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             Xpcom.Initialize("Firefox64");
             base.OnStartup(e);
+        }
+
+        private void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

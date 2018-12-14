@@ -2,6 +2,10 @@
 let WinApp = {
     _windows: {},
     DEFAULT_WINDOWID: "__appview",
+    config: function (settings) {
+        settings = settings || {};
+        this._dispatchWindowEvent({ id: "", command: "config", parameters: JSON.stringify(settings) });
+    },
     _registerWindow: function (id) {
         this._dispatchWindowEvent({ id: id, command: "create"});
     },
@@ -45,20 +49,13 @@ let WinApp = {
         this._registerWindow(id);
         var win = {
             id: id,
-            viewport: null,
             dblclick: null,
             mousemove: null,
             moveNotify: null,
             resizeNotify: null,
             opacityNotify: null,
             render: function (canvasElement) {
-                this.viewport = this.viewport || document.getElementById(this.viewId);
-                if (this.viewport == null) {
-                    this.viewport = document.createElement("img");
-                    this.viewport.id = this.id;
-                    canvasElement.parentNode.insertBefore(this.viewport, canvasElement);
-                }
-                this.viewport.src = canvasElement.toDataURL("image/png");
+                this._dispatchEvent("render", { src: canvasElement.toDataURL("image/png") });
             },
             _dispatchEvent: function (command, parameters) {
                 WinApp._dispatchWindowEvent({ id: this.id, command: command, parameters: JSON.stringify(parameters) });

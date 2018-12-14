@@ -72,7 +72,9 @@ namespace WpfGecko
 
         private void RegisterCommand()
         {
+            commands.Add("config", ActionConfig);
             commands.Add("create", ActionCreate);
+            commands.Add("render", ActionRender);
             commands.Add("move", ActionMove);
             commands.Add("setWidth", ActionSetWidth);
             commands.Add("setHeight", ActionSetHeight);
@@ -85,6 +87,11 @@ namespace WpfGecko
             return windows[id]?.Window;
         }
 
+        private void ActionConfig(string id, string parameters)
+        {
+            dynamic settings = JsonConvert.DeserializeObject(parameters);
+        }
+
         private void ActionCreate(string id, string parameters)
         {
             if (windows.ContainsKey(id))
@@ -94,6 +101,15 @@ namespace WpfGecko
                 Window = new Window1(id),
                 Canvas = null,
             };
+        }
+
+        private void ActionRender(string id, string parameters)
+        {
+            if (!windows.TryGetValue(id, out CanvasWindow window))
+                return;
+
+            var img = JsonConvert.DeserializeAnonymousType(parameters, new { src = "" });
+            RenderModel(window, img.src);
         }
 
         private void ActionMove(string id, string parameters)
@@ -151,8 +167,6 @@ namespace WpfGecko
         private void WinAppCallback(string json)
         {
             var command = JsonConvert.DeserializeAnonymousType(json, new { id="", command="", parameters="" });
-
-            
             if (!commands.TryGetValue(command.command, out Action<string, string> action))
                 return;
 
@@ -181,7 +195,7 @@ namespace WpfGecko
                 {
                     var win = pair.Value.Window;
                     if (!win.IsLoaded)
-                        return;
+                        continue;
                     var args = $"{{id:\"{win.Id}\", left:{win.Left}, top:{win.Top}, width:{win.Width}, height:{win.Height},opacity:{win.Opacity}}}";
                     context.EvaluateScript($"WinApp._windowNotify({args});");
                 }
@@ -190,25 +204,15 @@ namespace WpfGecko
             }
         }
 
-        private void RenderModel(CanvasWindow window)
+        private void RenderModel(CanvasWindow window, string src)
         {
-            if (window.Canvas == null)
+            if (!window.Window.IsShow)
             {
-                window.Canvas = browser.Browser.Document.GetElementById(window.Window.Id) as GeckoImageElement;
-
-                if (window.Canvas == null)
-                {
-                    return;
-                }
-
-                window.Window.ModelWidth = int.TryParse(window.Canvas.GetAttribute("width"), out int width) ? width : (int?)null;
-                window.Window.ModelHeight = int.TryParse(window.Canvas.GetAttribute("height"), out int height) ? height : (int?)null;
                 window.Window.Show();
-
                 InformationNotify(window.Window);
             }
 
-            var bs = extractBitmapSource(window.Canvas.Src);
+            var bs = extractBitmapSource(src);
             if (bs == null)
                 return;
             if (!window.Window.ModelWidth.HasValue)
@@ -226,13 +230,7 @@ namespace WpfGecko
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            foreach (var pair in windows)
-            {
-                RenderModel(pair.Value);
-            }
-
             InformationNotify();
-
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

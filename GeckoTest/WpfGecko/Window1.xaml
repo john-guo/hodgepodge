@@ -16,6 +16,7 @@
         MouseDoubleClick="Window_MouseDoubleClick"
         ResizeMode="NoResize"
         Closed="Window_Closed"
+        ContentRendered="Window_ContentRendered"
         >
     <Grid>
         <Image x:Name="bgImg" Stretch="Fill">

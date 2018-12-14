@@ -21,9 +21,11 @@ namespace WpfGecko
     public partial class Window1 : Window
     {
         public string Id { get; private set; }
+        public bool IsShow { get; private set; }
         public Window1(string id)
         {
-            this.Id = id;
+            Id = id;
+            IsShow = false;
             InitializeComponent();
         }
 
@@ -91,6 +93,11 @@ namespace WpfGecko
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
             Window_MouseDoubleClick(null, null);
+        }
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            IsShow = true;
         }
     }
 }
