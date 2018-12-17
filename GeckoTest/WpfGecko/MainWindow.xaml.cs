@@ -308,6 +308,7 @@ namespace WpfGecko
             browser.Browser.ConsoleMessage += Browser_ConsoleMessage;
             browser.Browser.AddMessageEventListener("WinAppCallback", args => WinAppCallback(args));
             browser.Browser.Navigate(url);
+            browser.Visibility = Visibility.Collapsed;
         }
 
         private void ProbeRenderMode(GeckoWindow window)
@@ -334,7 +335,15 @@ namespace WpfGecko
         private void Browser_DocumentCompleted(object sender, Gecko.Events.GeckoDocumentCompletedEventArgs e)
         {
             if (!config.Debug)
+            {
                 Hide();
+            }
+            else
+            {
+                ShowInTaskbar = true;
+                WindowStyle = WindowStyle.ToolWindow;
+                browser.Visibility = Visibility.Visible;
+            }
 
             ProbeRenderMode(e.Window);
 
