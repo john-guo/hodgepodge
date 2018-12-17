@@ -84,6 +84,9 @@ namespace WpfGecko
         {
             var main = Application.Current.MainWindow as MainWindow;
 
+            if (main == null || main.Mode == MainWindow.RenderMode.Auto)
+                return;
+
             using (var context = new AutoJSContext(main.browser.Browser.Window))
             {
                 context.EvaluateScript($"WinApp._onDoubleClick(\"{this.Id}\");");

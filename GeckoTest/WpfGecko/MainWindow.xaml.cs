@@ -46,12 +46,11 @@ namespace WpfGecko
             public int FPS { get; set; }
         }
 
-        RenderMode Mode;
+        public RenderMode Mode { get; private set; }
         DispatcherTimer timer;
         Dictionary<string, CanvasWindow> windows;
         Dictionary<string, Action<string, string>> commands;
         Settings config;
-
 
         public MainWindow()
         {
