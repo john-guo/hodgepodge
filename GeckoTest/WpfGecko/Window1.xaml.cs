@@ -36,7 +36,7 @@ namespace WpfGecko
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            Application.Current.MainWindow.Close();
+            Application.Current.MainWindow?.Close();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
