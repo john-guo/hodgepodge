@@ -80,6 +80,12 @@ namespace WpfGecko
             }
         }
 
+        public void Clear()
+        {
+            ModelWidth = null;
+            ModelHeight = null;
+        }
+
         private void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var main = Application.Current.MainWindow as MainWindow;

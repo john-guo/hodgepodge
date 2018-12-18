@@ -125,7 +125,11 @@ namespace WpfGecko
         private void ActionCreate(string id, string parameters)
         {
             if (windows.ContainsKey(id))
+            {
+                windows[id].Canvas = null;
+                windows[id].Window.Clear();
                 return;
+            }
             windows[id] = new CanvasWindow()
             {
                 Window = new Window1(id),
@@ -241,8 +245,11 @@ namespace WpfGecko
                 window.Canvas = browser.Browser.Document.SelectFirst(Properties.Settings.Default.CanvasXPath) as GeckoCanvasElement;
                 if (window.Canvas == null)
                 {
-                    MessageBox.Show("Doesn't contain any canvas!");
-                    Close();
+                    if (!config.Debug)
+                    {
+                        MessageBox.Show("Doesn't contain any canvas!");
+                        Close();
+                    }
                     return;
                 }
             }
@@ -313,8 +320,11 @@ namespace WpfGecko
 
         private void Browser_NavigationError(object sender, Gecko.Events.GeckoNavigationErrorEventArgs e)
         {
-            MessageBox.Show($"Navigation Error {e.ErrorCode:X}");
-            Application.Current.Shutdown();
+            if (!config.Debug)
+            {
+                MessageBox.Show($"Navigation Error {e.ErrorCode:X}");
+                Application.Current.Shutdown();
+            }
         }
 
         private void ProbeRenderMode(GeckoWindow window)
@@ -365,6 +375,23 @@ namespace WpfGecko
             using (var sw = File.AppendText("console.log"))
             {
                 sw.WriteLine(e.Message);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtUrl.Text))
+                return;
+            timer.Stop();
+            browser.Browser.Navigate(txtUrl.Text);
+        }
+
+        private void TxtUrl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Button_Click(null, null);
+                e.Handled = true;
             }
         }
     }

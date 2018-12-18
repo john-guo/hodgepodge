@@ -13,6 +13,18 @@
         >
     <Grid>
         <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48"/>
-        <local:WpfGeckoWebBrowser x:Name="browser"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="txtUrl" Grid.Row="0" Grid.Column="0" KeyDown="TxtUrl_KeyDown"/>
+            <Button Click="Button_Click" Content="Go" Grid.Row="0" Grid.Column="1"/>
+            <local:WpfGeckoWebBrowser x:Name="browser" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+        </Grid>
     </Grid>
 </Window>
