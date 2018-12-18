@@ -238,7 +238,7 @@ namespace WpfGecko
         {
             if (window.Canvas == null)
             {
-                window.Canvas = browser.Browser.Document.SelectFirst("//canvas") as GeckoCanvasElement;
+                window.Canvas = browser.Browser.Document.SelectFirst(Properties.Settings.Default.CanvasXPath) as GeckoCanvasElement;
                 if (window.Canvas == null)
                 {
                     MessageBox.Show("Doesn't contain any canvas!");
@@ -303,11 +303,18 @@ namespace WpfGecko
             }
 
             browser.Browser.EnableDefaultFullscreen();
+            browser.Browser.NavigationError += Browser_NavigationError;
             browser.Browser.DocumentCompleted += Browser_DocumentCompleted;
             browser.Browser.ConsoleMessage += Browser_ConsoleMessage;
             browser.Browser.AddMessageEventListener("WinAppCallback", args => WinAppCallback(args));
             browser.Browser.Navigate(url);
             browser.Visibility = Visibility.Collapsed;
+        }
+
+        private void Browser_NavigationError(object sender, Gecko.Events.GeckoNavigationErrorEventArgs e)
+        {
+            MessageBox.Show($"Navigation Error {e.ErrorCode:X}");
+            Application.Current.Shutdown();
         }
 
         private void ProbeRenderMode(GeckoWindow window)
@@ -333,18 +340,22 @@ namespace WpfGecko
 
         private void Browser_DocumentCompleted(object sender, Gecko.Events.GeckoDocumentCompletedEventArgs e)
         {
+            browser.Visibility = Visibility.Visible;
+            ProbeRenderMode(e.Window);
+
             if (!config.Debug)
             {
+                if (Mode == RenderMode.Auto)
+                {
+                    Height = MinHeight;
+                }
                 Hide();
             }
             else
             {
                 ShowInTaskbar = true;
-                WindowStyle = WindowStyle.ToolWindow;
-                browser.Visibility = Visibility.Visible;
+                WindowStyle = WindowStyle.SingleBorderWindow;
             }
-
-            ProbeRenderMode(e.Window);
 
             timer.Start();
         }

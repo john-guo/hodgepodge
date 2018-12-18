@@ -49,5 +49,14 @@ namespace WpfGecko.Properties {
                 return ((int)(this["FPS"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("//canvas")]
+        public string CanvasXPath {
+            get {
+                return ((string)(this["CanvasXPath"]));
+            }
+        }
     }
 }
