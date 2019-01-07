@@ -33,10 +33,9 @@ namespace WpfGecko
             browser = new GeckoWebBrowser()
             {
                 Dock = System.Windows.Forms.DockStyle.Fill,
-                NoDefaultContextMenu = true
+                NoDefaultContextMenu = true,
             };
             browser.CreateWindow += Browser_CreateWindow;
-
             host.Child = browser;
         }
 

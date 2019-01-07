@@ -11,60 +11,17 @@ namespace AeroWatch
     public class ImageClock : GraphicsClock
     {
         Image image;
-        Rectangle secondPointer = new Rectangle(0, 0, 45, 402);
-        Rectangle minutePointer = new Rectangle(50, 0, 35, 277);
-        Rectangle hourPointer = new Rectangle(100, 0, 60, 205);
-        Rectangle clock = new Rectangle(200, 40, 944, 912);
-        Image clockImg, secondImg, minuteImg, hourImg;
 
         Graphics innerCanvas;
 
         public override void Initialize(string fileName)
         {
-            clockImg = new Bitmap(101, 101);
-            image = new Bitmap(100 * 2 + 1, 100 * 2 + 1);
-            //image = new Bitmap(101, 101);
+            image = new Bitmap(101, 101);
             innerCanvas = Graphics.FromImage(image);
             innerCanvas.CompositingMode = CompositingMode.SourceCopy;
             //innerCanvas.SmoothingMode = SmoothingMode.AntiAlias;
             //innerCanvas.InterpolationMode = InterpolationMode.HighQualityBicubic;
             //innerCanvas.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-            //image = Image.FromFile(fileName);
-
-            //clockImg = new Bitmap(clock.Width, clock.Height);
-            //secondImg = new Bitmap(secondPointer.Width, secondPointer.Height);
-            //minuteImg = new Bitmap(minutePointer.Width, minutePointer.Height);
-            //hourImg = new Bitmap(hourPointer.Width, hourPointer.Height);
-
-            //using (var g = Graphics.FromImage(clockImg))
-            //{
-            //    g.PageUnit = GraphicsUnit.Pixel;
-            //    g.DrawImage(image, 0, 0, clock, GraphicsUnit.Pixel);
-            //    g.Flush();
-            //}
-            //using (var g = Graphics.FromImage(secondImg))
-            //{
-            //    g.PageUnit = GraphicsUnit.Pixel;
-            //    g.DrawImage(image, 0, 0, secondPointer, GraphicsUnit.Pixel);
-            //    g.Flush();
-            //}
-
-            //secondImg.RotateFlip(RotateFlipType.Rotate180FlipNone);
-            ////secondImg.Save("test.png");
-
-            //using (var g = Graphics.FromImage(minuteImg))
-            //{
-            //    g.PageUnit = GraphicsUnit.Pixel;
-            //    g.DrawImage(image, 0, 0, minutePointer, GraphicsUnit.Pixel);
-            //    g.Flush();
-            //}
-            //using (var g = Graphics.FromImage(hourImg))
-            //{
-            //    g.PageUnit = GraphicsUnit.Pixel;
-            //    g.DrawImage(image, 0, 0, hourPointer, GraphicsUnit.Pixel);
-            //    g.Flush();
-            //}
         }
 
         public override void Draw(Graphics canvas)
@@ -145,22 +102,12 @@ namespace AeroWatch
             //canvas.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
             canvas.CompositingMode = CompositingMode.SourceCopy;
-            canvas.DrawImage(image, new Rectangle(Point.Empty, clockImg.Size), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
-
-            ////Canvas.DrawImage(clockImg, Point.Empty);
-            //Canvas.TranslateTransform(clock.Width / 2, clock.Height / 2);
-            //Canvas.RotateTransform(time.Second * 6);
-            ////Canvas.DrawImage(hourImg, 0, 0);
-            ////Canvas.DrawImage(minuteImg, 0, 0);
-            //Canvas.DrawImage(secondImg, -28, -103);
-            //Canvas.RotateTransform(-time.Second * 6);
-            //Canvas.TranslateTransform(-clock.Width / 2, -clock.Height / 2);
-            ////Canvas.DrawImageUnscaledAndClipped(image, new Rectangle(Point.Empty, image.Size));
+            canvas.DrawImage(image, new Rectangle(Point.Empty, image.Size), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
         }
 
         protected override Size GetSize()
         {
-            return clockImg.Size;
+            return image.Size;
         }
 
     }

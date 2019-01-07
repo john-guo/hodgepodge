@@ -36,7 +36,7 @@ namespace WpfGecko
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            Application.Current.MainWindow.Close();
+            Application.Current.MainWindow?.Close();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -80,9 +80,18 @@ namespace WpfGecko
             }
         }
 
+        public void Clear()
+        {
+            ModelWidth = null;
+            ModelHeight = null;
+        }
+
         private void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var main = Application.Current.MainWindow as MainWindow;
+
+            if (main == null || main.Mode == MainWindow.RenderMode.Auto)
+                return;
 
             using (var context = new AutoJSContext(main.browser.Browser.Window))
             {

@@ -62,8 +62,12 @@ namespace AeroWatch
             clocks.Add(ClockType.FontClock, iclock);
 
             iclock = new ImageClock();
-            iclock.Initialize("clock.png");
+            iclock.Initialize(string.Empty);
             clocks.Add(ClockType.ImageClock, iclock);
+
+            iclock = new PictureClock();
+            iclock.Initialize("clock.png");
+            clocks.Add(ClockType.PictureClock, iclock);
         }
     }
 }

@@ -43,6 +43,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmExit = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.pictureClockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,7 +57,7 @@
             this.toolStripSeparator1,
             this.tsmExit});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(121, 98);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 120);
             this.contextMenuStrip1.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip1_Closing);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
@@ -64,9 +65,10 @@
             // 
             this.toolStripMenuItem2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.watchToolStripMenuItem,
-            this.clockToolStripMenuItem});
+            this.clockToolStripMenuItem,
+            this.pictureClockToolStripMenuItem});
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(120, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem2.Text = "Mode";
             // 
             // watchToolStripMenuItem
@@ -75,7 +77,7 @@
             this.watchToolStripMenuItem.CheckOnClick = true;
             this.watchToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.watchToolStripMenuItem.Name = "watchToolStripMenuItem";
-            this.watchToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.watchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.watchToolStripMenuItem.Text = "Watch";
             this.watchToolStripMenuItem.Click += new System.EventHandler(this.watchToolStripMenuItem_Click);
             // 
@@ -83,8 +85,8 @@
             // 
             this.clockToolStripMenuItem.CheckOnClick = true;
             this.clockToolStripMenuItem.Name = "clockToolStripMenuItem";
-            this.clockToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.clockToolStripMenuItem.Text = "Clock";
+            this.clockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clockToolStripMenuItem.Text = "DrawClock";
             this.clockToolStripMenuItem.Click += new System.EventHandler(this.clockToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
@@ -95,7 +97,7 @@
             this.toolStripMenuItem5,
             this.toolStripMenuItem6});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(120, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem1.Text = "Opacity";
             // 
             // toolStripMenuItem3
@@ -135,19 +137,19 @@
             // tsmDisplay
             // 
             this.tsmDisplay.Name = "tsmDisplay";
-            this.tsmDisplay.Size = new System.Drawing.Size(120, 22);
+            this.tsmDisplay.Size = new System.Drawing.Size(180, 22);
             this.tsmDisplay.Text = "Hide";
             this.tsmDisplay.Click += new System.EventHandler(this.tsmDisplay_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(117, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // tsmExit
             // 
             this.tsmExit.Name = "tsmExit";
-            this.tsmExit.Size = new System.Drawing.Size(120, 22);
+            this.tsmExit.Size = new System.Drawing.Size(180, 22);
             this.tsmExit.Text = "Exit";
             this.tsmExit.Click += new System.EventHandler(this.tsmExit_Click);
             // 
@@ -157,6 +159,13 @@
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
+            // 
+            // pictureClockToolStripMenuItem
+            // 
+            this.pictureClockToolStripMenuItem.Name = "pictureClockToolStripMenuItem";
+            this.pictureClockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pictureClockToolStripMenuItem.Text = "PictureClock";
+            this.pictureClockToolStripMenuItem.Click += new System.EventHandler(this.pictureClockToolStripMenuItem_Click);
             // 
             // LauncherForm
             // 
@@ -196,5 +205,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem tsmExit;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.ToolStripMenuItem pictureClockToolStripMenuItem;
     }
 }

@@ -63,6 +63,7 @@ namespace AeroWatch
             clockForm.Current = ClockType.FontClock;
             watchToolStripMenuItem.Checked = true;
             clockToolStripMenuItem.Checked = false;
+            pictureClockToolStripMenuItem.Checked = false;
         }
 
         private void clockToolStripMenuItem_Click(object sender, EventArgs e)
@@ -70,6 +71,7 @@ namespace AeroWatch
             clockForm.Current = ClockType.ImageClock;
             watchToolStripMenuItem.Checked = false;
             clockToolStripMenuItem.Checked = true;
+            pictureClockToolStripMenuItem.Checked = false;
         }
 
         private void tsmExit_Click(object sender, EventArgs e)
@@ -139,6 +141,14 @@ namespace AeroWatch
         private void contextMenuStrip1_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
             TransparentForm.DonotRefresh = false;
+        }
+
+        private void pictureClockToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            clockForm.Current = ClockType.PictureClock;
+            watchToolStripMenuItem.Checked = false;
+            clockToolStripMenuItem.Checked = false;
+            pictureClockToolStripMenuItem.Checked = true;
         }
     }
 }

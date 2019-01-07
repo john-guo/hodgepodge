@@ -46,12 +46,11 @@ namespace WpfGecko
             public int FPS { get; set; }
         }
 
-        RenderMode Mode;
+        public RenderMode Mode { get; private set; }
         DispatcherTimer timer;
         Dictionary<string, CanvasWindow> windows;
         Dictionary<string, Action<string, string>> commands;
         Settings config;
-
 
         public MainWindow()
         {
@@ -126,7 +125,11 @@ namespace WpfGecko
         private void ActionCreate(string id, string parameters)
         {
             if (windows.ContainsKey(id))
+            {
+                windows[id].Canvas = null;
+                windows[id].Window.Clear();
                 return;
+            }
             windows[id] = new CanvasWindow()
             {
                 Window = new Window1(id),
@@ -239,11 +242,14 @@ namespace WpfGecko
         {
             if (window.Canvas == null)
             {
-                window.Canvas = browser.Browser.Document.SelectFirst("//canvas") as GeckoCanvasElement;
+                window.Canvas = browser.Browser.Document.SelectFirst(Properties.Settings.Default.CanvasXPath) as GeckoCanvasElement;
                 if (window.Canvas == null)
                 {
-                    //MessageBox.Show("Doesn't contain any canvas!");
-                    //Close();
+                    if (!config.Debug)
+                    {
+                        MessageBox.Show("Doesn't contain any canvas!");
+                        Close();
+                    }
                     return;
                 }
             }
@@ -304,10 +310,21 @@ namespace WpfGecko
             }
 
             browser.Browser.EnableDefaultFullscreen();
+            browser.Browser.NavigationError += Browser_NavigationError;
             browser.Browser.DocumentCompleted += Browser_DocumentCompleted;
             browser.Browser.ConsoleMessage += Browser_ConsoleMessage;
             browser.Browser.AddMessageEventListener("WinAppCallback", args => WinAppCallback(args));
             browser.Browser.Navigate(url);
+            browser.Visibility = Visibility.Collapsed;
+        }
+
+        private void Browser_NavigationError(object sender, Gecko.Events.GeckoNavigationErrorEventArgs e)
+        {
+            if (!config.Debug)
+            {
+                MessageBox.Show($"Navigation Error {e.ErrorCode:X}");
+                Application.Current.Shutdown();
+            }
         }
 
         private void ProbeRenderMode(GeckoWindow window)
@@ -333,10 +350,22 @@ namespace WpfGecko
 
         private void Browser_DocumentCompleted(object sender, Gecko.Events.GeckoDocumentCompletedEventArgs e)
         {
-            if (!config.Debug)
-                Hide();
-
+            browser.Visibility = Visibility.Visible;
             ProbeRenderMode(e.Window);
+
+            if (!config.Debug)
+            {
+                if (Mode == RenderMode.Auto)
+                {
+                    Height = MinHeight;
+                }
+                Hide();
+            }
+            else
+            {
+                ShowInTaskbar = true;
+                WindowStyle = WindowStyle.SingleBorderWindow;
+            }
 
             timer.Start();
         }
@@ -346,6 +375,23 @@ namespace WpfGecko
             using (var sw = File.AppendText("console.log"))
             {
                 sw.WriteLine(e.Message);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtUrl.Text))
+                return;
+            timer.Stop();
+            browser.Browser.Navigate(txtUrl.Text);
+        }
+
+        private void TxtUrl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Button_Click(null, null);
+                e.Handled = true;
             }
         }
     }

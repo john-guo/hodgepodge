@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "floatingPaper", "floatingPa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "genComb", "genComb\genComb.csproj", "{C53FF4FF-14D4-491F-9629-80CB916CBF58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidateIncomeTax", "ValidateIncomeTax\ValidateIncomeTax.csproj", "{16B2D82B-647A-4DB3-88CB-A92B1A9E2764}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{C53FF4FF-14D4-491F-9629-80CB916CBF58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C53FF4FF-14D4-491F-9629-80CB916CBF58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C53FF4FF-14D4-491F-9629-80CB916CBF58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16B2D82B-647A-4DB3-88CB-A92B1A9E2764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16B2D82B-647A-4DB3-88CB-A92B1A9E2764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16B2D82B-647A-4DB3-88CB-A92B1A9E2764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16B2D82B-647A-4DB3-88CB-A92B1A9E2764}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

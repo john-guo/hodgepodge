@@ -207,5 +207,21 @@ namespace Wrench
 
             Utils.MoveWindow(f.Handle, x, y, w, h, true);
         }
+
+        private void Paste()
+        {
+            Utils.SendMessage(target, Utils.WM.PASTE, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //var tid = Utils.GetWindowThreadProcessId(target, out int pid);
+            //var ttid = Utils.GetCurrentThreadId();
+            //Utils.AttachThreadInput(tid, ttid, true);
+            Utils.SetForegroundWindow(target);
+            Utils.GetFocus();
+            Paste();
+            //Utils.AttachThreadInput(ttid, tid, false);
+        }
     }
 }

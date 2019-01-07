@@ -5,12 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfGecko"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="MainWindow" Height="180" Width="320"
         Loaded="Window_Loaded"
         ShowInTaskbar="False"
-        WindowState="Minimized"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
         >
     <Grid>
-        <local:WpfGeckoWebBrowser x:Name="browser" />
+        <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="txtUrl" Grid.Row="0" Grid.Column="0" KeyDown="TxtUrl_KeyDown"/>
+            <Button Click="Button_Click" Content="Go" Grid.Row="0" Grid.Column="1"/>
+            <local:WpfGeckoWebBrowser x:Name="browser" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+        </Grid>
     </Grid>
 </Window>
