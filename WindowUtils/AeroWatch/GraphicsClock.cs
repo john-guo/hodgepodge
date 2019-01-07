@@ -12,7 +12,8 @@ namespace AeroWatch
     enum ClockType
     {
         FontClock,
-        ImageClock
+        ImageClock,
+        PictureClock
     }
 
     public abstract class GraphicsClock : IFloatingCanvas

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Reflection;
 
 namespace ImageUtils
 {
@@ -38,26 +39,36 @@ namespace ImageUtils
 
         private void OpenFiles_Click(object sender, RoutedEventArgs e)
         {
+            var tfd = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformFromDevice;
+            var ttd = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformToDevice;
+
+            var dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
+            var dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
+
+            var Device_dpiX = (int)dpiXProperty.GetValue(null, null);
+            var Device_dpiY = (int)dpiYProperty.GetValue(null, null);
+
+            var Logical_DpiX = Device_dpiX * tfd.M11;
+            var Logical_DpiY = Device_dpiY * tfd.M22;
+
             DrawingGroup imageDrawings = new DrawingGroup();
-
-            int row = 10, col = 16;
-
-            MeasureImage(new BitmapImage(new Uri("(1).jpg", UriKind.Relative)), row, col);
-
+            int row = 7, col = 14;
+            
+            MeasureImage(new BitmapImage(new Uri("合成 1_00001.jpg", UriKind.Relative)), row, col);
             double left = 0;
             for (int j = 0; j < row; ++j)
             {
                 left = 0; 
                 for (int i = 0; i < col; ++i)
                 {
-                    var filename = $"({j * col + i + 1}).jpg";
+                    var filename = "合成 1_" + $"{j * col + i}".PadLeft(5, '0') + ".jpg";
                     var image = new BitmapImage(new Uri(filename, UriKind.Relative));
                     var drawing = new ImageDrawing
                     {
-                        Rect = new Rect(left, j * image.Height , image.Width, image.Height),
+                        Rect = new Rect(left, j * image.Height / 2 , image.Width / 2, image.Height / 2),
                         ImageSource = image
                     };
-                    left += image.Width;
+                    left += image.Width / 2;
                     imageDrawings.Children.Add(drawing);
                 }
             }
@@ -69,7 +80,7 @@ namespace ImageUtils
                 drawingContext.DrawDrawing(imageDrawings);
             }
 
-            var bitmap = new RenderTargetBitmap((int)outWidth, (int)outHeight, outDpiX, outDpiY, PixelFormats.Pbgra32);
+            var bitmap = new RenderTargetBitmap((int)outWidth  / 2, (int)outHeight / 2, outDpiX, outDpiY, PixelFormats.Pbgra32);
             bitmap.Render(drawingVisual);
 
             var encoder = new JpegBitmapEncoder() { QualityLevel = 25 };
