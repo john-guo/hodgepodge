@@ -242,8 +242,8 @@ namespace WpfGecko
                 window.Canvas = browser.Browser.Document.SelectFirst("//canvas") as GeckoCanvasElement;
                 if (window.Canvas == null)
                 {
-                    MessageBox.Show("Doesn't contain any canvas!");
-                    Close();
+                    //MessageBox.Show("Doesn't contain any canvas!");
+                    //Close();
                     return;
                 }
             }
