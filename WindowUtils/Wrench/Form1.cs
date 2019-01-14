@@ -223,5 +223,22 @@ namespace Wrench
             Paste();
             //Utils.AttachThreadInput(ttid, tid, false);
         }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            if (target == IntPtr.Zero)
+                return;
+
+            if (checkBox4.Checked)
+            {
+                targetExStyle = Utils.RemoveWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_APPWINDOW);
+                targetExStyle = Utils.AddWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_TOOLWINDOW);
+            }
+            else
+            {
+                targetExStyle = Utils.RemoveWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_TOOLWINDOW);
+                targetExStyle = Utils.AddWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_APPWINDOW);
+            }
+        }
     }
 }

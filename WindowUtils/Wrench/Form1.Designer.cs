@@ -46,13 +46,14 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(10, 10);
-            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 18);
             this.button1.TabIndex = 0;
@@ -73,7 +74,7 @@
             // 
             this.trackBar1.Enabled = false;
             this.trackBar1.Location = new System.Drawing.Point(10, 73);
-            this.trackBar1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.trackBar1.Margin = new System.Windows.Forms.Padding(2);
             this.trackBar1.Maximum = 100;
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(193, 45);
@@ -93,7 +94,7 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(10, 53);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBox1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(66, 16);
             this.checkBox1.TabIndex = 4;
@@ -105,7 +106,7 @@
             // 
             this.checkBox2.AutoSize = true;
             this.checkBox2.Location = new System.Drawing.Point(10, 114);
-            this.checkBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBox2.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(90, 16);
             this.checkBox2.TabIndex = 5;
@@ -117,7 +118,7 @@
             // 
             this.checkBox3.AutoSize = true;
             this.checkBox3.Location = new System.Drawing.Point(10, 147);
-            this.checkBox3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBox3.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox3.Name = "checkBox3";
             this.checkBox3.Size = new System.Drawing.Size(102, 16);
             this.checkBox3.TabIndex = 5;
@@ -128,7 +129,7 @@
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(305, 8);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(76, 21);
             this.textBox1.TabIndex = 6;
@@ -137,7 +138,7 @@
             // textBox2
             // 
             this.textBox2.Location = new System.Drawing.Point(305, 33);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(2);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(76, 21);
             this.textBox2.TabIndex = 7;
@@ -146,7 +147,7 @@
             // textBox3
             // 
             this.textBox3.Location = new System.Drawing.Point(305, 58);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox3.Margin = new System.Windows.Forms.Padding(2);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(76, 21);
             this.textBox3.TabIndex = 8;
@@ -155,7 +156,7 @@
             // textBox4
             // 
             this.textBox4.Location = new System.Drawing.Point(305, 82);
-            this.textBox4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox4.Margin = new System.Windows.Forms.Padding(2);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(76, 21);
             this.textBox4.TabIndex = 9;
@@ -165,7 +166,7 @@
             // 
             this.button2.Enabled = false;
             this.button2.Location = new System.Drawing.Point(400, 86);
-            this.button2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button2.Margin = new System.Windows.Forms.Padding(2);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(56, 18);
             this.button2.TabIndex = 10;
@@ -176,7 +177,7 @@
             // button3
             // 
             this.button3.Location = new System.Drawing.Point(400, 58);
-            this.button3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button3.Margin = new System.Windows.Forms.Padding(2);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(56, 18);
             this.button3.TabIndex = 11;
@@ -234,11 +235,24 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // checkBox4
+            // 
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Location = new System.Drawing.Point(116, 147);
+            this.checkBox4.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(114, 16);
+            this.checkBox4.TabIndex = 14;
+            this.checkBox4.Text = "Hide in taskbar";
+            this.checkBox4.UseVisualStyleBackColor = true;
+            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(503, 209);
+            this.Controls.Add(this.checkBox4);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -257,7 +271,7 @@
             this.Controls.Add(this.trackBar1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
@@ -286,6 +300,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.CheckBox checkBox4;
     }
 }
 
