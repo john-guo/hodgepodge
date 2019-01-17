@@ -482,7 +482,10 @@ namespace WindowUtils
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+        [DllImport("user32.dll")]
+        public static extern bool PrintWindow(IntPtr hWnd, IntPtr hdcBlt, int nFlags);
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct RECT
         {
             public int left;

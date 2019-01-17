@@ -11,6 +11,7 @@ using Gma.System.MouseKeyHook;
 using WindowUtils;
 using System.Threading;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 
 namespace Wrench
 {
@@ -239,6 +240,34 @@ namespace Wrench
                 targetExStyle = Utils.RemoveWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_TOOLWINDOW);
                 targetExStyle = Utils.AddWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_APPWINDOW);
             }
+        }
+
+        public Bitmap PrintWindow(IntPtr hwnd)
+        {
+            Utils.RECT rc;
+            Utils.GetWindowRect(hwnd, out rc);
+
+            var width = rc.right - rc.left + 1;
+            var height = rc.bottom - rc.top + 1;
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            Graphics gfxBmp = Graphics.FromImage(bmp);
+            IntPtr hdcBitmap = gfxBmp.GetHdc();
+
+            Utils.PrintWindow(hwnd, hdcBitmap, 0);
+
+            gfxBmp.ReleaseHdc(hdcBitmap);
+            gfxBmp.Dispose();
+
+            return bmp;
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (target == IntPtr.Zero)
+                return;
+
+            var img = PrintWindow(target);
+            Clipboard.SetImage(img);
         }
     }
 }
