@@ -216,13 +216,11 @@ namespace Wrench
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //var tid = Utils.GetWindowThreadProcessId(target, out int pid);
-            //var ttid = Utils.GetCurrentThreadId();
-            //Utils.AttachThreadInput(tid, ttid, true);
-            Utils.SetForegroundWindow(target);
-            Utils.GetFocus();
-            Paste();
-            //Utils.AttachThreadInput(ttid, tid, false);
+            if (target == IntPtr.Zero)
+                return;
+
+            var img = PrintWindow2(target);
+            Clipboard.SetImage(img);
         }
 
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
@@ -250,13 +248,28 @@ namespace Wrench
             var width = rc.right - rc.left + 1;
             var height = rc.bottom - rc.top + 1;
             Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            Graphics gfxBmp = Graphics.FromImage(bmp);
-            IntPtr hdcBitmap = gfxBmp.GetHdc();
+            using (var gfxBmp = Graphics.FromImage(bmp))
+            {
+                gfxBmp.CopyFromScreen(rc.left, rc.top, 0, 0, new Size(width, height));
+            }
 
-            Utils.PrintWindow(hwnd, hdcBitmap, 0);
+            return bmp;
+        }
 
-            gfxBmp.ReleaseHdc(hdcBitmap);
-            gfxBmp.Dispose();
+        public Bitmap PrintWindow2(IntPtr hwnd)
+        {
+            Utils.RECT rc;
+            Utils.GetWindowRect(hwnd, out rc);
+
+            var width = rc.right - rc.left + 1;
+            var height = rc.bottom - rc.top + 1;
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            using (var gfxBmp = Graphics.FromImage(bmp))
+            {
+                IntPtr hdcBitmap = gfxBmp.GetHdc();
+                Utils.PrintWindow(hwnd, hdcBitmap, 0);
+                gfxBmp.ReleaseHdc(hdcBitmap);
+            }
 
             return bmp;
         }
