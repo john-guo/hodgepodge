@@ -16,7 +16,7 @@ namespace PermutationCombination
             }
             else if (choose <= 1)
             {
-                foreach (var n in (from m in a select m))
+                foreach (var n in a)
                 {
                     yield return Enumerable.Repeat(n, 1);
                 }
@@ -71,7 +71,7 @@ namespace PermutationCombination
                     select e.Aggregate(aggregate));
         }
 
-        public static IEnumerable<IEnumerable<T>> RangeCombination<T>(this IEnumerable<T> a, int range, IList<T> holder = null, IList<IEnumerable<T>> container = null)
+        public static IEnumerable<IEnumerable<T>> Selection<T>(this IEnumerable<T> a, int range, IList<T> holder = null, IList<IEnumerable<T>> container = null)
         {
             if (container == null)
             {
@@ -86,12 +86,12 @@ namespace PermutationCombination
             {
                 holder = new List<T>();
                 Enumerable.Range(0, range).ToList().ForEach(i => holder.Add(default));
-                return a.RangeCombination(range, holder, container);
+                return a.Selection(range, holder, container);
             }
             for (int i = 0; i < a.Count(); ++i)
             {
                 holder[range - 1] = a.Skip(i).First();
-                a.RangeCombination(range - 1, holder, container);
+                a.Selection(range - 1, holder, container);
             }
 
             return container;

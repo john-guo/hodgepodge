@@ -33,7 +33,7 @@ namespace ValidateIncomeTax
                 { 3, new Config() { income = 25001, rate = 0.25, deduct = 2660 } },
                 { 4, new Config() { income = 1, rate = 0.03, deduct = 0 } },
             };
-            var v = c.RangeCombination(12).Max(item =>
+            var v = c.Selection(12).Max(item =>
             {
                 var income = item.Sum(i => maxConfig[i].income) / 12.0;
                 var ic = calculate(income);
@@ -47,7 +47,7 @@ namespace ValidateIncomeTax
 
             Console.WriteLine("------------------------------------------");
 
-            v = c.RangeCombination(12).Max(item =>
+            v = c.Selection(12).Max(item =>
             {
                 var income = item.Sum(i => minConfig[i].income) / 12.0;
                 var ic = calculate(income);
