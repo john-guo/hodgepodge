@@ -44,7 +44,7 @@ namespace MyMixerChat
 
             refresh_timer = new DispatcherTimer()
             {
-                Interval = TimeSpan.FromMilliseconds(1000.0/30),
+                Interval = TimeSpan.FromMilliseconds(1000.0/60),
             };
             refresh_timer.Tick += Refresh_timer_Tick;
             calltable = new ConcurrentDictionary<int, string>();
@@ -60,7 +60,7 @@ namespace MyMixerChat
             calltable.TryAdd(await mixer.ping(), "ping");
         }
 
-        private async void shotMessage(dynamic message)
+        private async Task shotMessage(dynamic message)
         {
             StringBuilder sb = new StringBuilder();
             foreach (dynamic msg in message)
@@ -105,7 +105,7 @@ namespace MyMixerChat
                             switch (mname)
                             {
                                 case "optOutEvents":
-                                    calltable.TryAdd(await mixer.auth(12817049), "auth");
+                                    calltable.TryAdd(await mixer.auth(63441337), "auth");
                                     break;
                                 case "auth":
                                     calltable.TryAdd(await mixer.history(), "history");
