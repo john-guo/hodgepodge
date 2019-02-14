@@ -14,6 +14,7 @@ namespace AeroWatch
 {
     public class Form1 : TransparentForm
     {
+        Screen screen;
         Color color = Color.WhiteSmoke;
         int size = 12;
         ClockType current = ClockType.FontClock;
@@ -28,8 +29,9 @@ namespace AeroWatch
 
         Dictionary<ClockType, GraphicsClock> clocks = new Dictionary<ClockType, GraphicsClock>();
 
-        public Form1()
+        public Form1(Screen screen)
         {
+            this.screen = screen;
             //transparencyKey = Color.Transparent;
         }
 
@@ -50,7 +52,11 @@ namespace AeroWatch
             if (!clocks.TryGetValue(current, out v))
                 return Rectangle.Empty;
 
-            return v.GetBounds();
+            var bounds = v.GetBounds(); 
+            var x = screen.Bounds.X + screen.Bounds.Width - bounds.Width;
+            var y = screen.Bounds.Y + screen.Bounds.Top;
+
+            return new Rectangle(x, y, bounds.Width, bounds.Height);
         }
 
         private void LoadClock()

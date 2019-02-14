@@ -23,9 +23,7 @@ namespace AeroWatch
         public virtual Rectangle GetBounds()
         {
             var size = GetSize();
-            var x = Screen.PrimaryScreen.Bounds.Width - size.Width;
-            var y = Screen.PrimaryScreen.Bounds.Top;
-            return new Rectangle(x, y, size.Width, size.Height);
+            return new Rectangle(0, 0, size.Width, size.Height);
         }
 
         protected abstract Size GetSize();
