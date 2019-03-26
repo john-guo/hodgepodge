@@ -13,18 +13,21 @@ namespace AeroWatch
 {
     public partial class LauncherForm : Form
     {
-        Form1 clockForm;
+        List<Form1> clockForms;
+        //Form1 clockForm;
 
         public LauncherForm()
         {
             InitializeComponent();
             Visible = false;
             SetVisibleCore(false);
+
+            clockForms = new List<Form1>();
         }
 
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
         {
-            clockForm.Opacity = 0.25;
+            clockForms.ForEach(clockForm => clockForm.Opacity = 0.25);
             toolStripMenuItem3.Checked = true;
             toolStripMenuItem4.Checked = false;
             toolStripMenuItem5.Checked = false;
@@ -33,7 +36,7 @@ namespace AeroWatch
 
         private void toolStripMenuItem4_Click(object sender, EventArgs e)
         {
-            clockForm.Opacity = 0.5;
+            clockForms.ForEach(clockForm => clockForm.Opacity = 0.5);
             toolStripMenuItem3.Checked = false;
             toolStripMenuItem4.Checked = true;
             toolStripMenuItem5.Checked = false;
@@ -42,7 +45,7 @@ namespace AeroWatch
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
-            clockForm.Opacity = 0.75;
+            clockForms.ForEach(clockForm => clockForm.Opacity = 0.75);
             toolStripMenuItem3.Checked = false;
             toolStripMenuItem4.Checked = false;
             toolStripMenuItem5.Checked = true;
@@ -51,7 +54,7 @@ namespace AeroWatch
 
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
         {
-            clockForm.Opacity = 1.0;
+            clockForms.ForEach(clockForm => clockForm.Opacity = 1.0);
             toolStripMenuItem3.Checked = false;
             toolStripMenuItem4.Checked = false;
             toolStripMenuItem5.Checked = false;
@@ -60,7 +63,7 @@ namespace AeroWatch
 
         private void watchToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clockForm.Current = ClockType.FontClock;
+            clockForms.ForEach(clockForm => clockForm.Current = ClockType.FontClock);
             watchToolStripMenuItem.Checked = true;
             clockToolStripMenuItem.Checked = false;
             pictureClockToolStripMenuItem.Checked = false;
@@ -68,7 +71,7 @@ namespace AeroWatch
 
         private void clockToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clockForm.Current = ClockType.ImageClock;
+            clockForms.ForEach(clockForm => clockForm.Current = ClockType.ImageClock);
             watchToolStripMenuItem.Checked = false;
             clockToolStripMenuItem.Checked = true;
             pictureClockToolStripMenuItem.Checked = false;
@@ -76,27 +79,34 @@ namespace AeroWatch
 
         private void tsmExit_Click(object sender, EventArgs e)
         {
-            clockForm.Close();
+            clockForms.ForEach(clockForm => clockForm.Close());
             Close();
         }
 
         private void tsmDisplay_Click(object sender, EventArgs e)
         {
-            clockForm.ShowMe = !clockForm.ShowMe;
+            clockForms.ForEach(clockForm => clockForm.ShowMe = !clockForm.ShowMe);
         }
 
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
         {
-            clockForm.ShowMe = true;
+            clockForms.ForEach(clockForm => clockForm.ShowMe = true);
         }
 
         private void LauncherForm_Load(object sender, EventArgs e)
         {
-            clockForm = new Form1();
-            clockForm.FormShow += ClockForm_ClockShow;
-            clockForm.FormHide += ClockForm_ClockHide;
-            clockForm.Load += ClockForm_Load;
-            clockForm.Show();
+            Screen.AllScreens.All(screen =>
+            {
+                var clockForm = new Form1(screen);
+                clockForm.FormShow += ClockForm_ClockShow;
+                clockForm.FormHide += ClockForm_ClockHide;
+                clockForm.Load += ClockForm_Load;
+                clockForm.Show();
+
+                clockForms.Add(clockForm);
+                return true;
+            });
+
 
             //var test = new BreathingGalaxies();
             //test.Show();
@@ -145,7 +155,7 @@ namespace AeroWatch
 
         private void pictureClockToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            clockForm.Current = ClockType.PictureClock;
+            clockForms.ForEach(clockForm => clockForm.Current = ClockType.PictureClock);
             watchToolStripMenuItem.Checked = false;
             clockToolStripMenuItem.Checked = false;
             pictureClockToolStripMenuItem.Checked = true;
