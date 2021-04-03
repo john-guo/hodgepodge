@@ -1,0 +1,68 @@
+﻿<Window x:Class="dohnadohna.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:dohnadohna"
+        mc:Ignorable="d"
+        Title="多娜多娜自定义工具" Height="720" Width="850" Background="#FEFC51">
+
+    <TabControl x:Name="tab" TabStripPlacement="Left" BorderThickness="0" Margin="0" Padding="0">
+        <TabControl.Resources>
+            <Style TargetType="{x:Type TabItem}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TabItem}">
+                            <Grid>
+                                <Border Name="Border" Margin="0,0,0,0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" CornerRadius="0">
+                                    <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center"
+                              HorizontalAlignment="Center"
+                              ContentSource="Header" Margin="0"
+                              RecognizesAccessKey="True"/>
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </TabControl.Resources>
+
+        <TabItem Header="人材" BorderThickness="0" Margin="0" Padding="0" >
+            <TabItem.HeaderTemplate>
+                <DataTemplate>
+                    <Label Style="{StaticResource dohnadohnaTextBlock}" x:Name="HdText" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FF00A0" Foreground="White" Content="{Binding}"></Label>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{ Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}}" Value="True">
+                            <Setter TargetName="HdText" Property="FontWeight" Value="Bold"/>
+                            <Setter TargetName="HdText" Property="Foreground" Value="#00F7FF"/>
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </TabItem.HeaderTemplate>
+            <Frame x:Name="staff" Source="Staff.xaml" NavigationUIVisibility="Hidden"  Margin="0" BorderThickness="0" Padding="0"/>
+        </TabItem >
+        
+        <TabItem Header="顾客" BorderThickness="0" Margin="0" Padding="0">
+            <TabItem.HeaderTemplate>
+                <DataTemplate>
+                    <Label Style="{StaticResource dohnadohnaTextBlock}" x:Name="HdText" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FF00A0" Foreground="White" Content="{Binding}"></Label>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{ Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabItem}}}" Value="True">
+                            <Setter TargetName="HdText" Property="FontWeight" Value="Bold"/>
+                            <Setter TargetName="HdText" Property="Foreground" Value="#00F7FF"/>
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </TabItem.HeaderTemplate>
+            <Frame x:Name="customer" Source="Customer.xaml" NavigationUIVisibility="Hidden" Margin="0" BorderThickness="0" Padding="0"/>
+        </TabItem>
+
+        <TabItem Header="打开" BorderThickness="0" Margin="0" Padding="0">
+            <TabItem.HeaderTemplate>
+                <DataTemplate>
+                    <Button Style="{StaticResource dohnadohnaButton}" Content="{Binding}" Click="Button_Click"></Button>
+                </DataTemplate>
+            </TabItem.HeaderTemplate>
+        </TabItem>
+    </TabControl>
+</Window>

@@ -1,0 +1,397 @@
+﻿<Application x:Class="dohnadohna.App"
+             xmlns ="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:dohnadohna"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="boolToVisibleConverter"/>
+            <local:RefreshRequerySuggestedConverter x:Key="rrsc"/>
+            <local:ImageConverter x:Key="imgConverter"/>
+            <Style TargetType="CheckBox" x:Key="dohnadohnaCheckBox">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Background" Value="#FF00A0"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#FF00A0"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+    
+            <Style TargetType="Label" x:Key="dohnadohnaTextBlock">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Background" Value="#FF00A0"/>
+                <Setter Property="Padding" Value="10,5,10,5"/>
+                <Setter Property="Margin" Value="10"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Label}">
+                            <Border Background="#FF00A0" Padding="10,5,10,5" HorizontalAlignment="Stretch" BorderThickness="5" BorderBrush="Black" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <!--下拉按钮-->
+            <Style TargetType="ToggleButton" x:Key="ComboxStyleBtn">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border x:Name="Back" Background="Transparent" BorderThickness="0" BorderBrush="Transparent">
+                                <Path x:Name="Arrow"
+                                      StrokeThickness="10"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Data="M 0 0 L 8 20 L 16 0 Z" >
+                                    <Path.Fill>
+                                        <SolidColorBrush Color="Black"/>
+                                    </Path.Fill>
+                                </Path>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Back" Property="Cursor" Value="Hand"></Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--Combox-->
+            <Style TargetType="ComboBox" x:Key="dohnadohnaComboBox">
+                <Setter Property="Foreground" Value="White"></Setter>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="10,5,10,5"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <!--ComBoxItem-->
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="MinHeight" Value="22"></Setter>
+                            <Setter Property="MinWidth" Value="60"></Setter>
+                            <Setter Property="Foreground" Value="White"></Setter>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ComboBoxItem">
+                                        <Border Name="Back" Background="Transparent" BorderThickness="0,0,0,0" BorderBrush="Black" >
+                                            <ContentPresenter ContentSource="{Binding Source}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0">
+                                            </ContentPresenter>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Back" Property="Background" Value="#FEFC51"></Setter>
+                                                <Setter Property="Foreground" Value="Black"></Setter>
+                                            </Trigger>
+                                            <Trigger Property="IsHighlighted" Value="True">
+                                                <Setter TargetName="Back" Property="Background" Value="#FEFC51"></Setter>
+                                                <Setter Property="Foreground" Value="Black"></Setter>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBox">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.7*"/>
+                                    <ColumnDefinition Width="0.3*" MaxWidth="30"/>
+                                </Grid.ColumnDefinitions>
+                                <Border  Grid.Column="0" BorderThickness="5" BorderBrush="Black" CornerRadius="8" Background="#FF00A0">
+                                    <ContentPresenter x:Name="ContentSite"
+                                IsHitTestVisible="False"
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                Margin="2"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"/>
+                                </Border>
+                                <Border Grid.Column="1" BorderThickness="0" BorderBrush="Black" CornerRadius="0">
+                                    <ToggleButton Style="{StaticResource ComboxStyleBtn}" IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"></ToggleButton>
+                                </Border>
+                                <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" x:Name="Popup" Focusable="False" AllowsTransparency="True" PopupAnimation="Slide">
+                                    <Border CornerRadius="1" MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{TemplateBinding ActualWidth}" x:Name="DropDown" SnapsToDevicePixels="True">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="Black" BlurRadius="2" ShadowDepth="0" Opacity="0.5"/>
+                                        </Border.Effect>
+                                        <ScrollViewer Margin="4,6,4,6" Style="{DynamicResource ScrollViewerStyle}" MaxHeight="{TemplateBinding MaxDropDownHeight}" SnapsToDevicePixels="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                                            <!-- StackPanel 用于显示子级，方法是将 IsItemsHost 设置为 True -->
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" Background="#FF00A0"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <Style TargetType="Label" x:Key="dohnadohnaLabel">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Background" Value="#FF00A0"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+                <Setter Property="FontWeight" Value="UltraBold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Label}">
+                            <Border Background="#FF00A0" HorizontalAlignment="Stretch" BorderThickness="5" BorderBrush="Black" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="TextBox" x:Key="dohnadohnaTextBox">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border Background="#FF00A0" BorderBrush="Black" BorderThickness="5" CornerRadius="8">
+                                <Grid>
+                                    <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                                    <Label x:Name="WaterMarkLabel" Content="{TemplateBinding Tag}" 
+                                   FontSize="12" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Visibility="Collapsed" Foreground="#A7A7AE"/>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Visibility" TargetName="WaterMarkLabel" Value="Visible"/>
+                                </Trigger>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="Visibility" TargetName="WaterMarkLabel" Value="Collapsed"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Background" Value="#FF00A0"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="10,5,10,5"/>
+                <Setter Property="BorderThickness" Value="5"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+            </Style>
+
+            <Style TargetType="Button" x:Key="dohnadohnaButton">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#FF00A0"/>
+                <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="10,5,10,5"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+                <Setter Property="BorderThickness" Value="5"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect ShadowDepth="3"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="#FF00A0" Padding="10,5,10,5" HorizontalAlignment="Stretch" BorderBrush="Black" BorderThickness="5" CornerRadius="4">
+                                <ContentPresenter HorizontalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <BlurEffect/>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="Grid">
+                <Setter Property="Margin" Value="5" />
+            </Style>
+
+            <Style TargetType="Page">
+                <Setter Property="Background" Value="#FEFC51"/>
+            </Style>
+
+
+            <Style TargetType="{x:Type ToggleButton}" x:Key="dohnadohnaToggleButton">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="#FF00A0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border Background="{TemplateBinding Background}" x:Name="Border" Padding="10,5,10,5" HorizontalAlignment="Stretch" BorderBrush="Black" BorderThickness="5" CornerRadius="4">
+                                <ContentPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Cursor" Value="Hand"/>
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter Property="Background" Value="#FEFC51"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Trigger>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <BlurEffect/>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="Border" x:Key="dohnadohnaBorder">
+                <Setter Property="Background" Value="#FF00A0"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+                <Setter Property="BorderThickness" Value="5"/>
+                <Setter Property="CornerRadius" Value="8"/>
+            </Style>
+
+            <x:Array Type="{x:Type local:Level}" x:Key="level">
+                <local:Level Value="S+" Name="神话級"/>
+                <local:Level Value="S"  Name="传说級"/>
+                <local:Level Value="A+" Name="世界級"/>
+                <local:Level Value="A"  Name="全国級"/>
+                <local:Level Value="B+" Name="极其优秀"/>
+                <local:Level Value="B"  Name="优秀"/>
+                <local:Level Value="C+" Name="较为优秀"/>
+                <local:Level Value="C"  Name="普通"/>
+                <local:Level Value="D+" Name="劣势"/>
+                <local:Level Value="D"  Name="毫无价值"/>
+            </x:Array>
+
+            <x:Array Type="{x:Type local:SelectionItem}" x:Key="attributes">
+                <local:SelectionItem IsSelected="False" Item="巨乳"/>
+                <local:SelectionItem IsSelected="False" Item="贫乳"/>
+                <local:SelectionItem IsSelected="False" Item="安产型"/>
+                <local:SelectionItem IsSelected="False" Item="美腿"/>
+                <local:SelectionItem IsSelected="False" Item="美肌"/>
+                <local:SelectionItem IsSelected="False" Item="健硕"/>
+                <local:SelectionItem IsSelected="False" Item="穿显瘦"/>
+                <local:SelectionItem IsSelected="False" Item="名器"/>
+                <local:SelectionItem IsSelected="False" Item="外伤"/>
+                <local:SelectionItem IsSelected="False" Item="骨折"/>
+                <local:SelectionItem IsSelected="False" Item="坐轮椅"/>
+                <local:SelectionItem IsSelected="False" Item="低血圧"/>
+                <local:SelectionItem IsSelected="False" Item="病弱"/>
+                <local:SelectionItem IsSelected="False" Item="失明"/>
+                <local:SelectionItem IsSelected="False" Item="纹身"/>
+                <local:SelectionItem IsSelected="False" Item="耳洞"/>
+                <local:SelectionItem IsSelected="False" Item="敏感"/>
+                <local:SelectionItem IsSelected="False" Item="体臭"/>
+                <local:SelectionItem IsSelected="False" Item="大小姐"/>
+                <local:SelectionItem IsSelected="False" Item="名人"/>
+                <local:SelectionItem IsSelected="False" Item="班长"/>
+                <local:SelectionItem IsSelected="False" Item="优等生"/>
+                <local:SelectionItem IsSelected="False" Item="运动部"/>
+                <local:SelectionItem IsSelected="False" Item="失足"/>
+                <local:SelectionItem IsSelected="False" Item="贫苦"/>
+                <local:SelectionItem IsSelected="False" Item="有男友"/>
+                <local:SelectionItem IsSelected="False" Item="有女友"/>
+                <local:SelectionItem IsSelected="False" Item="已婚"/>
+                <local:SelectionItem IsSelected="False" Item="经产妇"/>
+                <local:SelectionItem IsSelected="False" Item="受欢迎"/>
+                <local:SelectionItem IsSelected="False" Item="王子"/>
+                <local:SelectionItem IsSelected="False" Item="娇柔"/>
+                <local:SelectionItem IsSelected="False" Item="冷酷"/>
+                <local:SelectionItem IsSelected="False" Item="寡言"/>
+                <local:SelectionItem IsSelected="False" Item="顽固"/>
+                <local:SelectionItem IsSelected="False" Item="积极"/>
+                <local:SelectionItem IsSelected="False" Item="痴情"/>
+                <local:SelectionItem IsSelected="False" Item="羞涩"/>
+                <local:SelectionItem IsSelected="False" Item="胆小"/>
+                <local:SelectionItem IsSelected="False" Item="顺从"/>
+                <local:SelectionItem IsSelected="False" Item="正义感"/>
+                <local:SelectionItem IsSelected="False" Item="认真"/>
+                <local:SelectionItem IsSelected="False" Item="小恶魔"/>
+                <local:SelectionItem IsSelected="False" Item="强横"/>
+                <local:SelectionItem IsSelected="False" Item="洁癖"/>
+                <local:SelectionItem IsSelected="False" Item="纯洁"/>
+                <local:SelectionItem IsSelected="False" Item="好色"/>
+                <local:SelectionItem IsSelected="False" Item="变态"/>
+                <local:SelectionItem IsSelected="False" Item="暖心"/>
+                <local:SelectionItem IsSelected="False" Item="松弛"/>
+                <local:SelectionItem IsSelected="False" Item="奇妙"/>
+                <local:SelectionItem IsSelected="False" Item="阴郁"/>
+                <local:SelectionItem IsSelected="False" Item="自虐"/>
+                <local:SelectionItem IsSelected="False" Item="神经质"/>
+                <local:SelectionItem IsSelected="False" Item="优雅"/>
+                <local:SelectionItem IsSelected="False" Item="顾家"/>
+                <local:SelectionItem IsSelected="False" Item="魔性"/>
+            </x:Array>
+
+            <x:Array Type="{x:Type sys:String}" x:Key="voice">
+                <sys:String>女生通用／大／认真</sys:String>
+                <sys:String>女生通用／大／阳光</sys:String>
+                <sys:String>女生通用／大／刚强</sys:String>
+                <sys:String>女生通用／高／认真</sys:String>
+                <sys:String>女生通用／高／活泼</sys:String>
+                <sys:String>女生通用／高／阳光</sys:String>
+                <sys:String>女生通用／高／低调</sys:String>
+                <sys:String>女生通用／高／天真</sys:String>
+                <sys:String>女生通用／中／认真</sys:String>
+                <sys:String>女生通用／中／活泼</sys:String>
+                <sys:String>女生通用／中／低调</sys:String>
+                <sys:String>女生通用／小／天真</sys:String>
+                <sys:String>女生通用／小／好强</sys:String>
+                <sys:String>女生通用／小／低调</sys:String>
+            </x:Array>
+
+
+            <x:Array Type="{x:Type sys:String}" x:Key="presents">
+                <sys:String>LKS↑↑</sys:String>
+                <sys:String>TEC↓</sys:String>
+            </x:Array>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
