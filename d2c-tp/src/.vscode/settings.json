@@ -1,0 +1,16 @@
+{
+    "deploy.reloaded": {
+        "deployOnSave": true,
+        "deployOnSaveButton":true,
+        "targets": [
+            {
+                "type": "sftp",
+                "name": "198",
+                "host": "112.124.5.198",
+                "user": "devcn",
+                "password": "d2cChin@",
+                "dir": "/mnt/m.d2c-china.cn/Application/",
+            }
+        ]
+    }
+}
