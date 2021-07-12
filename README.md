@@ -64,7 +64,7 @@ clangtest 测试Clang
 
 cryptotest 测试Crypto API
 
-cvtest 测试opencv
+cvtest 测试opencv camera串流成web camera
 
 d2c-tp 给某公司写的php代码，包括完整电商平台，微信公众号等。（目前都已下线）
 
