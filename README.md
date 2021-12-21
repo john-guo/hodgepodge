@@ -2,6 +2,8 @@
 
 各种小工具、测试性代码、可行性验证
 
+myRustTetris 学习Rust的第一个程序 俄罗斯方块，存在一些奇怪的bug。
+
 AzureCloudService1 只是用来测试azure消息队列
 
 AzureFunctionApp1 调用vocaloid根据简谱和拼音转为歌曲的azure前端服务部分，不包含vocaloid部分
