@@ -17,19 +17,19 @@ macro_rules! var {
     };
 }
 
-const w : u32 = 20;
-const h : u32 = 20;
+const w : i32 = 20;
+const h : i32 = 20;
 const _ROWS : usize = 14;
 const _COLS : usize = 10;
-static ROWS : u32 = 14;
-static COLS : u32 = 10;
-static mut buf : [[u32; _COLS]; _ROWS] = [[0; _COLS]; _ROWS];
-static mut offset : u32 = 60;
+static ROWS : i32 = 14;
+static COLS : i32 = 10;
+static mut buf : [[i32; _COLS]; _ROWS] = [[0; _COLS]; _ROWS];
+static mut offset : i32 = 60;
 
 struct cube {
     map : [[u8;4];4],
-    x : u32,
-    y : u32,
+    x : i32,
+    y : i32,
     id : u8,
     color: Color
 }
@@ -63,14 +63,14 @@ impl cube {
                     continue;
                 }
 
-                let u : u32 = j.try_into().unwrap();
-                let v : u32 = i.try_into().unwrap();
+                let u : i32 = j.try_into().unwrap();
+                let v : i32 = i.try_into().unwrap();
 
                 unsafe {
-                    let u : u32 = self.x + u * w + offset;
-                    let v : u32 = self.y + v * h;
+                    let u : i32 = self.x + u * w + offset;
+                    let v : i32 = self.y + v * h;
     
-                    canvas.fill_rect(Rect::new(u.try_into().unwrap(), v.try_into().unwrap(), w, h));
+                    canvas.fill_rect(Rect::new(u.try_into().unwrap(), v.try_into().unwrap(), w.try_into().unwrap(), h.try_into().unwrap()));
                 }
             }
         }
@@ -89,13 +89,13 @@ impl cube {
                     continue;
                 }
 
-                let u : u32 = j.try_into().unwrap();
-                let v : u32 = i.try_into().unwrap();
+                let u : i32 = j.try_into().unwrap();
+                let v : i32 = i.try_into().unwrap();
 
-                let u : u32 = self.x + u * w;
-                let v : u32 = self.y + v * h;
+                let u : i32 = self.x + u * w;
+                let v : i32 = self.y + v * h;
 
-                canvas.fill_rect(Rect::new(u.try_into().unwrap(), v.try_into().unwrap(), w, h));
+                canvas.fill_rect(Rect::new(u.try_into().unwrap(), v.try_into().unwrap(), w.try_into().unwrap(), h.try_into().unwrap()));
             }
         }
     }
@@ -153,11 +153,11 @@ impl cube {
     fn down(&mut self) -> i32 {
         for i in 0..4 {
             for j in 0..4 {
-                let x:u32 = i.try_into().unwrap();
-                let y:u32 = j.try_into().unwrap();
+                let x:i32 = i.try_into().unwrap();
+                let y:i32 = j.try_into().unwrap();
                 if self.map[i][j] == 1 {
-                    let mut row:u32 = (self.y + h * (x + 1)) / h;
-                    let mut col:u32 = (self.x + w * y) / w;
+                    let mut row:i32 = (self.y + h * (x + 1)) / h;
+                    let mut col:i32 = (self.x + w * y) / w;
                     
                     if row >= ROWS || col >= COLS
                     {
@@ -180,8 +180,8 @@ impl cube {
                         }
                     }
                     
-                    let u:usize = row.try_into().unwrap();
-                    let v:usize = col.try_into().unwrap();
+                    let u:usize = std::cmp::max(0, row).try_into().unwrap();
+                    let v:usize = std::cmp::max(0, col).try_into().unwrap();
                     unsafe {
                         if buf[u][v] == 1
                         {
@@ -202,21 +202,26 @@ impl cube {
         -1;
     }
     fn left(&mut self) -> i32 {
-        for j in 4..0 {
+        for j in 0..4 {
             for i in 0..4 {
-                let x:u32 = i.try_into().unwrap();
-                let y:u32 = j.try_into().unwrap();
+                let x:i32 = i.try_into().unwrap();
+                let y:i32 = j.try_into().unwrap();
 
                 if self.map[i][j] == 1 {
-                    let row:u32 = (self.y + h * x) / h;
-                    let col:u32 = (self.x + w * (y - 1)) / w;
+                    let row:i32 = (self.y + h * x) / h;
+                    let col:i32 = (self.x + w * (y - 1)) / w;
+                    
                     if row >= ROWS || col >= COLS
                     {
                         return -1;
                     }
+                    if row < 0 || col < 0
+                    {
+                        return -1;
+                    }
 
-                    let u:usize = row.try_into().unwrap();
-                    let v:usize = col.try_into().unwrap();
+                    let u:usize = std::cmp::max(0, row).try_into().unwrap();
+                    let v:usize = std::cmp::max(0, col).try_into().unwrap();
                     unsafe {
                         if buf[u][v] == 1
                         {
@@ -227,29 +232,29 @@ impl cube {
             }
         }
         
-        if self.x >= w
-        {
-            self.x -= w;
-        }
-
+        self.x -= w;
         return 0;
     }
 
     fn right(&mut self) -> i32 {
         for j in 0..4 {
             for i in 0..4 {
-                let x:u32 = i.try_into().unwrap();
-                let y:u32 = j.try_into().unwrap();
+                let x:i32 = i.try_into().unwrap();
+                let y:i32 = j.try_into().unwrap();
                 if self.map[i][j] == 1 {
-                    let row:u32 = (self.y + h * x) / h;
-                    let col:u32 = (self.x + w * (y + 1)) / w;
+                    let row:i32 = (self.y + h * x) / h;
+                    let col:i32 = (self.x + w * (y + 1)) / w;
                     if row >= ROWS || col >= COLS
                     {
                         return -1;
                     }
+                    if row < 0 || col < 0
+                    {
+                        return -1;
+                    }
 
-                    let u:usize = row.try_into().unwrap();
-                    let v:usize = col.try_into().unwrap();
+                    let u:usize = std::cmp::max(0, row).try_into().unwrap();
+                    let v:usize = std::cmp::max(0, col).try_into().unwrap();
                     unsafe {
                         if buf[u][v] == 1
                         {
@@ -268,15 +273,15 @@ impl cube {
         let top = self.y / h;
         for i in 0..4 {
             for j in 0..4 {
-                let x:u32 = i.try_into().unwrap();
-                let y:u32 = j.try_into().unwrap();
+                let x:i32 = i.try_into().unwrap();
+                let y:i32 = j.try_into().unwrap();
                 if self.map[i][j] == 1 {
-                    let row:u32 = top + x;
-                    let col:u32 = left + y;
+                    let row:i32 = top + x;
+                    let col:i32 = left + y;
                     if row < ROWS && col < COLS
                     {
-                        let u:usize = row.try_into().unwrap();
-                        let v:usize = col.try_into().unwrap();
+                        let u:usize = std::cmp::max(0, row).try_into().unwrap();
+                        let v:usize = std::cmp::max(0, col).try_into().unwrap();
 
                         unsafe 
                         {
@@ -312,12 +317,12 @@ impl cube {
 
         for i in 0..4 {
             for j in 0..4 {
-                let x:u32 = i.try_into().unwrap();
-                let y:u32 = j.try_into().unwrap();
+                let x:i32 = i.try_into().unwrap();
+                let y:i32 = j.try_into().unwrap();
                 if self.map[i][j] == 1 {
-                    let row:u32 = top + x;
-                    let col:u32 = left + y;
-                    if row < ROWS && col < COLS
+                    let row:i32 = top + x;
+                    let col:i32 = left + y;
+                    if row < ROWS && col < COLS && row >= 0 && col >= 0
                     {
                         let u:usize = row.try_into().unwrap();
                         let v:usize = col.try_into().unwrap();
@@ -327,6 +332,10 @@ impl cube {
                                 self.map = tmp.clone(); 
                             }
                         }
+                    }
+                    else
+                    {
+                        self.map = tmp.clone(); 
                     }
                 }
             }
@@ -414,10 +423,10 @@ impl game {
                         continue;
                     }
     
-                    let u : u32 = j.try_into().unwrap();
-                    let v : u32 = i.try_into().unwrap();
+                    let u : i32 = j.try_into().unwrap();
+                    let v : i32 = i.try_into().unwrap();
     
-                    let r = Rect::new((u * w + offset).try_into().unwrap(), (v * h).try_into().unwrap(), w, h);
+                    let r = Rect::new((u * w + offset).try_into().unwrap(), (v * h).try_into().unwrap(), w.try_into().unwrap(), h.try_into().unwrap());
                     
                     canvas.set_draw_color(c);
                     canvas.fill_rect(r);
@@ -577,7 +586,7 @@ pub fn main() {
     let ttf = sdl2::ttf::init().unwrap();
     let font = &ttf.load_font(std::path::Path::new("arial.ttf"), 16).unwrap();
 
-    let window = video_subsystem.window("my Rust Tetris Democ", 800, 600)
+    let window = video_subsystem.window("my Rust Tetris Democ", 280, 340)
         .position_centered()
         .build()
         .unwrap();
@@ -606,8 +615,6 @@ pub fn main() {
                 break 'eventloop;
             }
         }
-
-        // The rest of the game loop goes here...
 
         ticket += 1;
         canvas.present();
