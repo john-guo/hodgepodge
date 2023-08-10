@@ -34,6 +34,7 @@
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.watchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pictureClockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,13 +44,11 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmExit = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.pictureClockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // contextMenuStrip1
             // 
-            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem2,
             this.toolStripMenuItem1,
@@ -77,7 +76,7 @@
             this.watchToolStripMenuItem.CheckOnClick = true;
             this.watchToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.watchToolStripMenuItem.Name = "watchToolStripMenuItem";
-            this.watchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.watchToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.watchToolStripMenuItem.Text = "Watch";
             this.watchToolStripMenuItem.Click += new System.EventHandler(this.watchToolStripMenuItem_Click);
             // 
@@ -85,9 +84,16 @@
             // 
             this.clockToolStripMenuItem.CheckOnClick = true;
             this.clockToolStripMenuItem.Name = "clockToolStripMenuItem";
-            this.clockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clockToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.clockToolStripMenuItem.Text = "DrawClock";
             this.clockToolStripMenuItem.Click += new System.EventHandler(this.clockToolStripMenuItem_Click);
+            // 
+            // pictureClockToolStripMenuItem
+            // 
+            this.pictureClockToolStripMenuItem.Name = "pictureClockToolStripMenuItem";
+            this.pictureClockToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.pictureClockToolStripMenuItem.Text = "PictureClock";
+            this.pictureClockToolStripMenuItem.Click += new System.EventHandler(this.pictureClockToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -104,7 +110,7 @@
             // 
             this.toolStripMenuItem3.CheckOnClick = true;
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(97, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem3.Text = "25";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
@@ -112,7 +118,7 @@
             // 
             this.toolStripMenuItem4.CheckOnClick = true;
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(97, 22);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem4.Text = "50";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
             // 
@@ -120,7 +126,7 @@
             // 
             this.toolStripMenuItem5.CheckOnClick = true;
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(97, 22);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem5.Text = "75";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem5_Click);
             // 
@@ -130,7 +136,7 @@
             this.toolStripMenuItem6.CheckOnClick = true;
             this.toolStripMenuItem6.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(97, 22);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(92, 22);
             this.toolStripMenuItem6.Text = "100";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem6_Click);
             // 
@@ -160,18 +166,11 @@
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
             // 
-            // pictureClockToolStripMenuItem
-            // 
-            this.pictureClockToolStripMenuItem.Name = "pictureClockToolStripMenuItem";
-            this.pictureClockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.pictureClockToolStripMenuItem.Text = "PictureClock";
-            this.pictureClockToolStripMenuItem.Click += new System.EventHandler(this.pictureClockToolStripMenuItem_Click);
-            // 
             // LauncherForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(284, 283);
             this.ControlBox = false;
             this.Enabled = false;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;

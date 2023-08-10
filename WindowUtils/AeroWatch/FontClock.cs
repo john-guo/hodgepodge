@@ -14,6 +14,7 @@ namespace AeroWatch
         private Font paintFont;
         //private Brush paintBrush;
         private Color paintColor;
+        private PrivateFontCollection privateFonts;
         int fontSize;
 
         public FontClock(Color color, int size)
@@ -25,7 +26,7 @@ namespace AeroWatch
 
         public override void Initialize(string fileName)
         {
-            var privateFonts = new PrivateFontCollection();
+            privateFonts = new PrivateFontCollection();
             privateFonts.AddFontFile(fileName);
             paintFont = new Font(privateFonts.Families.First(), fontSize);
         }

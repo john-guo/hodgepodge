@@ -45,7 +45,7 @@ namespace WindowUtils
         public event EventHandler FormShow = delegate { };
         public event EventHandler FormHide = delegate { };
 
-        public static bool DonotRefresh = false;
+        public static volatile bool DonotRefresh = false;
 
         private Graphics g;
         protected bool useDoubleBuffer = true;
