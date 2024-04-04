@@ -325,16 +325,7 @@ namespace Wrench
 
             if (checkBox5.Checked)
             {
-
-                var currExStyle = GetWindowLongPtr(target, WindowLongIndex.GWL_EXSTYLE);
-                SetWindowLongPtr(target, WindowLongIndex.GWL_EXSTYLE, new IntPtr(currExStyle.ToInt64() & (long)~ExtendedWindowStyles.WS_EX_LAYERED));
-
-                MARGINS margins = new MARGINS { leftWidth = -1 };
-                DwmExtendFrameIntoClientArea(target, ref margins);
-
-                SetWindowPos(target, IntPtr.Zero, 0, 0, 0, 0, SWP.NOMOVE | SWP.NOSIZE | SWP.NOZORDER | SWP.FRAMECHANGED | SWP.SHOWWINDOW);
-
-                //WindowSheetOfGlass(target);
+                WindowSheetOfGlass(target);
             }
             else
             {
