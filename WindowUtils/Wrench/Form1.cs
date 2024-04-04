@@ -12,6 +12,10 @@ using WindowUtils;
 using System.Threading;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using static WindowUtils.Utils.Dwm;
+using static WindowUtils.Utils;
+using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace Wrench
 {
@@ -69,24 +73,33 @@ namespace Wrench
             if (hwnd == Handle)
                 return;
 
+            SetTargetWindow(hwnd);
+        }
+
+        private void SetTargetWindow(IntPtr hwnd)
+        {
+            if (hwnd == null)
+                return;
+
             int pid;
             var tid = Utils.GetWindowThreadProcessId(hwnd, out pid);
             var process = Process.GetProcessById(pid);
-            if (process.MainWindowHandle == Handle)
+
+            if (process == null || process.MainWindowHandle == Handle)
                 return;
-            
+
             var mainWnd = process.MainWindowHandle;
 
             target = mainWnd == IntPtr.Zero ? hwnd : mainWnd;
 
-            var title = process.MainWindowTitle;
+            var title = GetWindowText(target);
 
             if (string.IsNullOrWhiteSpace(title))
                 title = process.ProcessName;
 
             Invoke((Action)delegate
             {
-                label1.Text = title;
+                toolStripStatusLabel1.Text = title;
             });
 
             button2.Enabled = true;
@@ -94,6 +107,33 @@ namespace Wrench
 
         private void button1_Click(object sender, EventArgs e)
         {
+            checkBox1.Checked = false;
+            checkBox2.Checked = false;
+            checkBox3.Checked = false;
+            checkBox4.Checked = false;
+            checkBox5.Checked = false;
+            checkBox6.Checked = false;
+            checkBox7.Checked = false;
+
+            trackBar1.Value = 100;
+
+            var prochint = txtProc.Text.Trim();
+            if (prochint.Length > 0)
+            {
+                if (int.TryParse(prochint, NumberStyles.HexNumber, null, out int pid))
+                {
+                    var hwd = new IntPtr(pid);
+                    SetTargetWindow(hwd);
+                }
+                else
+                {
+                    var hwd = FindWindowsWithText(title => title.ToLower().Contains(prochint.ToLower())).FirstOrDefault();
+                    SetTargetWindow(hwd);
+                }
+
+                return;
+            }
+
             foreach (var v in Enum.GetValues(typeof(Utils.OCRId)))
             {
                 Utils.OCRId id = (Utils.OCRId)v;
@@ -103,11 +143,6 @@ namespace Wrench
 
                 Utils.SetSystemCursor(Cursors.Cross.Handle, id);
             }
-
-            checkBox1.Checked = false;
-            checkBox2.Checked = false;
-            checkBox3.Checked = false;
-            trackBar1.Value = 100;
 
             g_events.MouseClick += G_events_MouseClick;
             g_events.MouseMove += G_events_MouseMove;
@@ -281,6 +316,65 @@ namespace Wrench
 
             var img = PrintWindow(target);
             Clipboard.SetImage(img);
+        }
+
+        private void checkBox5_CheckedChanged(object sender, EventArgs e)
+        {
+            if (target == IntPtr.Zero)
+                return;
+
+            if (checkBox5.Checked)
+            {
+
+                var currExStyle = GetWindowLongPtr(target, WindowLongIndex.GWL_EXSTYLE);
+                SetWindowLongPtr(target, WindowLongIndex.GWL_EXSTYLE, new IntPtr(currExStyle.ToInt64() & (long)~ExtendedWindowStyles.WS_EX_LAYERED));
+
+                MARGINS margins = new MARGINS { leftWidth = -1 };
+                DwmExtendFrameIntoClientArea(target, ref margins);
+
+                SetWindowPos(target, IntPtr.Zero, 0, 0, 0, 0, SWP.NOMOVE | SWP.NOSIZE | SWP.NOZORDER | SWP.FRAMECHANGED | SWP.SHOWWINDOW);
+
+                //WindowSheetOfGlass(target);
+            }
+            else
+            {
+                MARGINS margins = new MARGINS { leftWidth = 0 };
+                DwmExtendFrameIntoClientArea(target, ref margins);
+            }
+        }
+
+        private void checkBox6_CheckedChanged(object sender, EventArgs e)
+        {
+            if (target == IntPtr.Zero)
+                return;
+
+            if (checkBox6.Checked)
+            {
+                WindowEnableBlurBehind(target);
+            }
+            else
+            {
+                DWM_BLURBEHIND dwm_BB = new DWM_BLURBEHIND(false);
+                DwmEnableBlurBehindWindow(target, ref dwm_BB);
+            }
+        }
+
+        private void checkBox7_CheckedChanged(object sender, EventArgs e)
+        {
+            if (target == IntPtr.Zero)
+                return;
+
+            if (checkBox7.Checked)
+            {
+                var oldStyles = GetWindowLongPtr(target, WindowLongIndex.GWL_STYLE);
+                SetWindowLongPtr(target, WindowLongIndex.GWL_STYLE, new IntPtr(~(long)(WindowStyles.WS_CAPTION | WindowStyles.WS_THICKFRAME | WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_SYSMENU) & oldStyles.ToInt64()));
+            }
+            else
+            {
+                var oldStyles = GetWindowLongPtr(target, WindowLongIndex.GWL_STYLE);
+                SetWindowLongPtr(target, WindowLongIndex.GWL_STYLE, new IntPtr((long)(WindowStyles.WS_CAPTION | WindowStyles.WS_THICKFRAME | WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_SYSMENU) | oldStyles.ToInt64()));
+            }
+            SetWindowPos(target, IntPtr.Zero, 0, 0, 0, 0, SWP.NOMOVE | SWP.NOSIZE | SWP.NOZORDER | SWP.FRAMECHANGED | SWP.SHOWWINDOW);
         }
     }
 }
