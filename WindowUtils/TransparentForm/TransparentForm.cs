@@ -169,7 +169,8 @@ namespace WindowUtils
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             StopTimerCanvas();
-            bg.Dispose();
+            if (useDoubleBuffer)
+                bg.Dispose();
         }
 
         protected virtual void ResizeCanvas()
