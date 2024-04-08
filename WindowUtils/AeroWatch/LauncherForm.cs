@@ -14,6 +14,7 @@ namespace AeroWatch
     public partial class LauncherForm : Form
     {
         List<Form1> clockForms;
+        int primaryIndex = 0;
         //Form1 clockForm;
 
         public LauncherForm()
@@ -97,6 +98,11 @@ namespace AeroWatch
         {
             Screen.AllScreens.All(screen =>
             {
+                if (screen.Primary)
+                {
+                    primaryIndex = clockForms.Count;
+                }
+
                 var clockForm = new Form1(screen);
                 clockForm.FormShow += ClockForm_ClockShow;
                 clockForm.FormHide += ClockForm_ClockHide;
@@ -146,6 +152,7 @@ namespace AeroWatch
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
             TransparentForm.DonotRefresh = true;
+            clockForms[primaryIndex].Activate();
         }
 
         private void contextMenuStrip1_Closing(object sender, ToolStripDropDownClosingEventArgs e)
