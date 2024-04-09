@@ -152,7 +152,6 @@ namespace AeroWatch
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
             TransparentForm.DonotRefresh = true;
-            clockForms[primaryIndex].Activate();
         }
 
         private void contextMenuStrip1_Closing(object sender, ToolStripDropDownClosingEventArgs e)
