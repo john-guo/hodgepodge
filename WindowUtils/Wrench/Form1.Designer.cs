@@ -53,6 +53,8 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.checkBox7 = new System.Windows.Forms.CheckBox();
             this.txtProc = new System.Windows.Forms.TextBox();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.checkBox8 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -310,11 +312,23 @@
             this.txtProc.Size = new System.Drawing.Size(97, 20);
             this.txtProc.TabIndex = 19;
             // 
+            // checkBox8
+            // 
+            this.checkBox8.AutoSize = true;
+            this.checkBox8.Location = new System.Drawing.Point(116, 231);
+            this.checkBox8.Name = "checkBox8";
+            this.checkBox8.Size = new System.Drawing.Size(101, 17);
+            this.checkBox8.TabIndex = 20;
+            this.checkBox8.Text = "TransparentKey";
+            this.checkBox8.UseVisualStyleBackColor = true;
+            this.checkBox8.CheckedChanged += new System.EventHandler(this.checkBox8_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(503, 368);
+            this.Controls.Add(this.checkBox8);
             this.Controls.Add(this.txtProc);
             this.Controls.Add(this.checkBox7);
             this.Controls.Add(this.statusStrip1);
@@ -377,6 +391,8 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.CheckBox checkBox7;
         private System.Windows.Forms.TextBox txtProc;
+        private System.Windows.Forms.ColorDialog colorDialog1;
+        private System.Windows.Forms.CheckBox checkBox8;
     }
 }
 

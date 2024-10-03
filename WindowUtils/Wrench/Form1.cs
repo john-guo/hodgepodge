@@ -367,5 +367,29 @@ namespace Wrench
             }
             SetWindowPos(target, IntPtr.Zero, 0, 0, 0, 0, SWP.NOMOVE | SWP.NOSIZE | SWP.NOZORDER | SWP.FRAMECHANGED | SWP.SHOWWINDOW);
         }
+
+        private void checkBox8_CheckedChanged(object sender, EventArgs e)
+        {
+            if (target == IntPtr.Zero)
+                return;
+
+            if (checkBox8.Checked)
+            {
+                if (colorDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    checkBox8.ForeColor = colorDialog1.Color;
+                }
+
+                targetExStyle = Utils.AddWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_LAYERED);
+                uint rgb = (uint)(colorDialog1.Color.ToArgb() & 0x00ffffff);
+                SetLayeredWindowAttributes(target, rgb, 0, (uint)LWA.LWA_COLORKEY);
+            }
+            else
+            {
+                checkBox8.ForeColor = checkBox7.ForeColor;
+
+                targetExStyle = Utils.RemoveWindowExStyle(target, Utils.ExtendedWindowStyles.WS_EX_LAYERED);
+            }
+        }
     }
 }

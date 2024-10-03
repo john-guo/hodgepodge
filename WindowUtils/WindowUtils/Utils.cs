@@ -111,6 +111,13 @@ namespace WindowUtils
             return found;
         }
 
+        [Flags]
+        public enum LWA : uint
+        {
+            LWA_COLORKEY = 0x00000001,
+            LWA_ALPHA = 0x00000002
+        }
+
         public enum WindowLongIndex : int
         {
             GWL_EXSTYLE = -20,
@@ -1578,6 +1585,15 @@ namespace WindowUtils
         public static extern uint GetCurrentThreadId();
         [DllImport("user32.dll")]
         public static extern IntPtr GetFocus();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+        [DllImport("gdi32.dll")]
+        public static extern uint GetPixel(IntPtr hdc, int nXPos, int nYPos);
 
 
         public class Dwm
